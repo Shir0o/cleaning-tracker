@@ -1,6 +1,9 @@
-# cleaning_tracker
+# Cleaning Tracker
 
-A new Flutter project.
+A Flutter application for tracking household cleaning schedules and maintenance tasks.
+This includes tracking filter lives, bed sheet change/wash due dates, and general cleaning tasks like bathroom cleaning.
+
+Currently, the app relies on a local database (no online DB). A planned feature will allow syncing the local data into a file for backup to Google Drive.
 
 ## Getting Started
 

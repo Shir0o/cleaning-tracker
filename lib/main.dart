@@ -1,121 +1,246 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const CleaningTrackerApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class CleaningTrackerApp extends StatelessWidget {
+  const CleaningTrackerApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Cleaning Tracker',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: const ColorScheme(
+          brightness: Brightness.light,
+          primary: Color(0xFF0038FF), // Primary blue from Stitch
+          onPrimary: Colors.white,
+          secondary: Color(0xFF0038FF),
+          onSecondary: Colors.white,
+          error: Color(0xFFFF0000), // Accent red from Stitch
+          onError: Colors.white,
+          surface: Colors.white, // Background light from Stitch (using surface instead of background)
+          onSurface: Colors.black,
+        ),
+        scaffoldBackgroundColor: Colors.white,
+        fontFamily: GoogleFonts.inter().fontFamily, // Satoshi missing, using Inter as a similar clean grotesque font
+        useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const DashboardScreen(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+class DashboardScreen extends StatelessWidget {
+  const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: .center,
-          children: [
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+        backgroundColor: colorScheme.surface,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        shape: const Border(
+          bottom: BorderSide(color: Colors.black, width: 2),
+        ),
+        title: Text(
+          'STATUS',
+          style: GoogleFonts.spaceGrotesk(
+            fontWeight: FontWeight.bold,
+            fontSize: 32,
+            letterSpacing: -0.5,
+            color: Colors.black,
+          ),
+        ),
+        actions: [
+          Container(
+            margin: const EdgeInsets.only(right: 16),
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.black, width: 2),
+              color: colorScheme.surface,
             ),
-          ],
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  // Settings action
+                },
+                child: const Icon(
+                  Icons.settings,
+                  color: Colors.black,
+                  size: 24,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+      body: ListView(
+        padding: const EdgeInsets.only(bottom: 100),
+        children: const [
+          TaskCard(
+            title: 'HVAC FILTER',
+            dueDateText: '14 DAYS',
+            progress: 0.85,
+            isOverdue: false,
+          ),
+          TaskCard(
+            title: 'WATER FILTER',
+            dueDateText: '2 DAYS',
+            progress: 0.15,
+            isOverdue: false,
+          ),
+          TaskCard(
+            title: 'SMOKE ALARMS',
+            dueDateText: '-5 DAYS',
+            progress: 1.0,
+            isOverdue: true,
+          ),
+          TaskCard(
+            title: 'DRYER VENT',
+            dueDateText: '90 DAYS',
+            progress: 1.0,
+            isOverdue: false,
+            isFresh: true,
+          ),
+          TaskCard(
+            title: 'VACUUMING',
+            dueDateText: '3 DAYS',
+            progress: 0.25,
+            isOverdue: false,
+          ),
+          TaskCard(
+            title: 'BATHROOM',
+            dueDateText: '0 DAYS',
+            progress: 1.0,
+            isOverdue: true,
+          ),
+        ],
+      ),
+      floatingActionButton: Container(
+        width: 56,
+        height: 56,
+        decoration: BoxDecoration(
+          color: Colors.black,
+          border: Border.all(color: Colors.black, width: 2),
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              // Add task action
+            },
+            child: const Icon(
+              Icons.add,
+              color: Colors.white,
+              size: 32,
+            ),
+          ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+    );
+  }
+}
+
+class TaskCard extends StatelessWidget {
+  final String title;
+  final String dueDateText;
+  final double progress;
+  final bool isOverdue;
+  final bool isFresh;
+
+  const TaskCard({
+    super.key,
+    required this.title,
+    required this.dueDateText,
+    required this.progress,
+    required this.isOverdue,
+    this.isFresh = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
+    final textColor = isOverdue ? colorScheme.error : Colors.black;
+    final progressColor = isOverdue ? colorScheme.error : colorScheme.primary;
+
+    return Container(
+      decoration: const BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: Colors.black, width: 2),
+        ),
+      ),
+      child: Material(
+        color: colorScheme.surface,
+        child: InkWell(
+          onTap: () {
+            // Task card tap
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      title,
+                      style: GoogleFonts.spaceGrotesk(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: textColor,
+                      ),
+                    ),
+                    Text(
+                      dueDateText,
+                      style: GoogleFonts.chivoMono(
+                        fontSize: 14,
+                        letterSpacing: 2.0,
+                        color: textColor,
+                        fontWeight: isOverdue ? FontWeight.bold : FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  height: 24,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF4F4F4), // Surface color from Stitch (hardcoding since we used the Surface slot for background earlier)
+                    border: Border.all(color: Colors.black, width: 2),
+                  ),
+                  child: FractionallySizedBox(
+                    alignment: Alignment.centerLeft,
+                    widthFactor: progress,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: progressColor,
+                        border: progress < 1.0 || isFresh // Add right border if not completely full, or if it's the 100% fresh state
+                            ? const Border(right: BorderSide(color: Colors.black, width: 2))
+                            : null, // Full overdue bar has no inner border
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

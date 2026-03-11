@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dashboard - The Ledger</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&amp;family=Chivo+Mono:wght@400&amp;family=Satoshi:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0038FF",
+                        "background-light": "#FFFFFF",
+                        "background-dark": "#000000",
+                        "surface": "#F4F4F4",
+                        "accent": "#FF0000",
+                        "muted": "#8A8A8A"
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "body": ["Satoshi", "sans-serif"],
+                        "mono": ["Chivo Mono", "monospace"]
+                    },
+                    borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "0px"},
+                    borderWidth: {
+                        "thick": "2px",
+                        "thin": "1px"
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Satoshi', sans-serif;
+            background-color: #FFFFFF;
+            color: #000000;
+        }
+        .font-heading { font-family: 'Space Grotesk', sans-serif; }
+        .font-mono { font-family: 'Chivo Mono', monospace; }
+        
+        /* Hide scrollbar for clean brutalist look */
+        ::-webkit-scrollbar { display: none; }
+        * { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+        body {
+          min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+<body class="bg-background-light min-h-screen relative flex flex-col antialiased">
+<!-- Fixed Header -->
+<header class="h-[64px] fixed top-0 w-full bg-background-light border-b-thick border-black flex items-center justify-between px-4 z-50">
+<h1 class="font-heading font-bold text-[32px] tracking-tight uppercase">Status</h1>
+<button class="flex items-center justify-center w-[40px] h-[40px] border-thick border-black hover:bg-surface active:bg-primary active:text-white transition-colors">
+<span class="material-symbols-outlined" style="font-size: 24px;">settings</span>
+</button>
+</header>
+<!-- Main Content List -->
+<main class="mt-[64px] pb-[100px] flex flex-col w-full">
+<!-- Task Card: Normal State -->
+<article class="w-full border-b-thick border-black relative overflow-hidden group">
+<!-- Swipe Action Background (Hidden behind) -->
+<div class="absolute inset-y-0 right-0 w-[64px] bg-primary flex justify-center items-center cursor-pointer">
+<span class="material-symbols-outlined text-white" style="font-size: 32px;">refresh</span>
+</div>
+<!-- Foreground Content (Swipable conceptually, static in UI) -->
+<div class="bg-background-light p-4 flex flex-col gap-2 relative z-10 transition-transform duration-200 hover:-translate-x-[64px] cursor-pointer">
+<div class="flex justify-between items-end">
+<h2 class="font-heading font-bold text-xl uppercase">HVAC Filter</h2>
+<span class="font-mono text-sm tracking-widest">14 DAYS</span>
+</div>
+<!-- Progress Bar Container -->
+<div class="w-full h-[24px] bg-surface border-thick border-black relative">
+<!-- Progress Fill -->
+<div class="h-full bg-primary absolute top-0 left-0 border-r-thick border-black" style="width: 85%;"></div>
+</div>
+</div>
+</article>
+<!-- Task Card: Warning/Close State -->
+<article class="w-full border-b-thick border-black relative overflow-hidden group">
+<div class="absolute inset-y-0 right-0 w-[64px] bg-primary flex justify-center items-center cursor-pointer">
+<span class="material-symbols-outlined text-white" style="font-size: 32px;">refresh</span>
+</div>
+<div class="bg-background-light p-4 flex flex-col gap-2 relative z-10 transition-transform duration-200 hover:-translate-x-[64px] cursor-pointer">
+<div class="flex justify-between items-end">
+<h2 class="font-heading font-bold text-xl uppercase">Water Filter</h2>
+<span class="font-mono text-sm tracking-widest">2 DAYS</span>
+</div>
+<div class="w-full h-[24px] bg-surface border-thick border-black relative">
+<div class="h-full bg-primary absolute top-0 left-0 border-r-thick border-black" style="width: 15%;"></div>
+</div>
+</div>
+</article>
+<!-- Task Card: Overdue State -->
+<article class="w-full border-b-thick border-black relative overflow-hidden group">
+<div class="absolute inset-y-0 right-0 w-[64px] bg-primary flex justify-center items-center cursor-pointer">
+<span class="material-symbols-outlined text-white" style="font-size: 32px;">refresh</span>
+</div>
+<div class="bg-background-light p-4 flex flex-col gap-2 relative z-10 transition-transform duration-200 hover:-translate-x-[64px] cursor-pointer">
+<div class="flex justify-between items-end">
+<h2 class="font-heading font-bold text-xl uppercase text-accent">Smoke Alarms</h2>
+<span class="font-mono text-sm tracking-widest text-accent font-bold">-5 DAYS</span>
+</div>
+<div class="w-full h-[24px] bg-surface border-thick border-black relative">
+<!-- Progress Fill Overdue -->
+<div class="h-full bg-accent absolute top-0 left-0 w-full border-r-thick border-black"></div>
+</div>
+</div>
+</article>
+<!-- Task Card: Freshly Reset -->
+<article class="w-full border-b-thick border-black relative overflow-hidden group">
+<div class="absolute inset-y-0 right-0 w-[64px] bg-primary flex justify-center items-center cursor-pointer">
+<span class="material-symbols-outlined text-white" style="font-size: 32px;">refresh</span>
+</div>
+<div class="bg-background-light p-4 flex flex-col gap-2 relative z-10 transition-transform duration-200 hover:-translate-x-[64px] cursor-pointer">
+<div class="flex justify-between items-end">
+<h2 class="font-heading font-bold text-xl uppercase">Dryer Vent</h2>
+<span class="font-mono text-sm tracking-widest">90 DAYS</span>
+</div>
+<div class="w-full h-[24px] bg-surface border-thick border-black relative">
+<div class="h-full bg-primary absolute top-0 left-0 border-r-thick border-black" style="width: 100%;"></div>
+</div>
+</div>
+</article>
+<!-- Task Card: Cleaning - Vacuuming -->
+<article class="w-full border-b-thick border-black relative overflow-hidden group">
+<div class="absolute inset-y-0 right-0 w-[64px] bg-primary flex justify-center items-center cursor-pointer">
+<span class="material-symbols-outlined text-white" style="font-size: 32px;">refresh</span>
+</div>
+<div class="bg-background-light p-4 flex flex-col gap-2 relative z-10 transition-transform duration-200 hover:-translate-x-[64px] cursor-pointer">
+<div class="flex justify-between items-end">
+<h2 class="font-heading font-bold text-xl uppercase">Vacuuming</h2>
+<span class="font-mono text-sm tracking-widest">3 DAYS</span>
+</div>
+<div class="w-full h-[24px] bg-surface border-thick border-black relative">
+<div class="h-full bg-primary absolute top-0 left-0 border-r-thick border-black" style="width: 25%;"></div>
+</div>
+</div>
+</article>
+<!-- Task Card: Cleaning - Bathroom -->
+<article class="w-full border-b-thick border-black relative overflow-hidden group">
+<div class="absolute inset-y-0 right-0 w-[64px] bg-primary flex justify-center items-center cursor-pointer">
+<span class="material-symbols-outlined text-white" style="font-size: 32px;">refresh</span>
+</div>
+<div class="bg-background-light p-4 flex flex-col gap-2 relative z-10 transition-transform duration-200 hover:-translate-x-[64px] cursor-pointer">
+<div class="flex justify-between items-end">
+<h2 class="font-heading font-bold text-xl uppercase text-accent">Bathroom</h2>
+<span class="font-mono text-sm tracking-widest text-accent font-bold">0 DAYS</span>
+</div>
+<div class="w-full h-[24px] bg-surface border-thick border-black relative">
+<div class="h-full bg-accent absolute top-0 left-0 w-full border-r-thick border-black"></div>
+</div>
+</div>
+</article>
+</main>
+<!-- FAB (Add Task) -->
+<button aria-label="Add Task" class="fixed bottom-6 right-6 w-[56px] h-[56px] bg-black text-white flex justify-center items-center shadow-none hover:bg-primary transition-colors border-thick border-black">
+<span class="material-symbols-outlined" style="font-size: 32px; font-weight: 300;">add</span>
+</button>
+</body></html>
