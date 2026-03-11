@@ -1,0 +1,13 @@
+# Prompt Context for Gemini
+
+When working on this project (`cleaning-tracker`), please follow these guidelines:
+
+## Development Approach
+- **Test-Driven Design (TDD)**: Whenever adding a new feature, modifying existing logic, or fixing a bug, employ a Test-Driven Development workflow.
+  1. Write a failing test for the new functionality or fix.
+  2. Implement the minimal amount of code required to make the test pass.
+  3. Refactor the code while ensuring tests remain green.
+
+## Code Quality
+- Ensure new code is accompanied by corresponding unit, widget, or integration tests in the `test/` directory.
+- Verify tests pass using `flutter test` and the code aligns with rules in `flutter analyze`.
