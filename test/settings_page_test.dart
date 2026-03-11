@@ -40,4 +40,20 @@ void main() {
     expect(find.byType(SettingsPage), findsOneWidget);
     expect(find.text('SYSTEM SETTINGS'.toUpperCase()), findsOneWidget);
   });
+
+  testWidgets('Settings page "VIEW ALL LOGS" navigates to LogHistoryPage', (WidgetTester tester) async {
+    // Build our app and trigger a frame.
+    await tester.pumpWidget(const MaterialApp(home: SettingsPage()));
+
+    // Verify the view all logs button is present
+    expect(find.text('VIEW ALL LOGS'), findsOneWidget);
+
+    // Tap the view all logs button
+    await tester.ensureVisible(find.text('VIEW ALL LOGS'));
+    await tester.tap(find.text('VIEW ALL LOGS'));
+    await tester.pumpAndSettle(); // Wait for navigation animation
+
+    // Verify we are on the Log History Page
+    expect(find.text('ARCHIVE'), findsOneWidget);
+  });
 }

@@ -9,5 +9,5 @@ When working on this project (`cleaning-tracker`), please follow these guideline
   3. Refactor the code while ensuring tests remain green.
 
 ## Code Quality
-- Ensure new code is accompanied by corresponding unit, widget, or integration tests in the `test/` directory.
+- Ensure new code is accompanied by corresponding unit, widget, golden, scenario, and integration tests in the `test/` or `integration_test/` directory.
 - Verify tests pass using `flutter test` and the code aligns with rules in `flutter analyze`.

@@ -1,4 +1,4 @@
-package com.example.cleaning_tracker
+package com.twang.cleaningtracker
 
 import io.flutter.embedding.android.FlutterActivity
 

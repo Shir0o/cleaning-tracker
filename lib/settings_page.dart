@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'log_history_page.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -334,7 +335,11 @@ class _SettingsPageState extends State<SettingsPage> {
                   color: Colors.transparent,
                   child: InkWell(
                     onTap: () {
-                       // View logs
+                       Navigator.of(context).push(
+                         MaterialPageRoute(
+                           builder: (context) => const LogHistoryPage(),
+                         ),
+                       );
                     },
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
@@ -442,7 +447,7 @@ class _SettingsPageState extends State<SettingsPage> {
             if (value)
               Positioned.fill(
                 child: Container(
-                  color: const Color(0xFF0038FF).withOpacity(0.2), // Optional tint to show active
+                  color: const Color(0xFF0038FF).withValues(alpha: 0.2), // Optional tint to show active
                 ),
               )
           ],
