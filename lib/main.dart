@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'settings_page.dart';
+
 void main() {
   runApp(const CleaningTrackerApp());
 }
@@ -73,7 +75,11 @@ class DashboardScreen extends StatelessWidget {
               color: Colors.transparent,
               child: InkWell(
                 onTap: () {
-                  // Settings action
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const SettingsPage(),
+                    ),
+                  );
                 },
                 child: const Icon(
                   Icons.settings,
