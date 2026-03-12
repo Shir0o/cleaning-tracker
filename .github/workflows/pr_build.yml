@@ -5,9 +5,32 @@ on:
     branches: [ "main", "master" ]
 
 jobs:
-  build:
-    runs-on: macos-latest
+  lint_and_test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
 
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze code
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test
+
+  build_android:
+    needs: lint_and_test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
 
@@ -25,11 +48,24 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Run tests
-        run: flutter test || echo "Tests failed or no tests found"
-
       - name: Build Android APK
         run: flutter build apk --debug
+
+  build_ios:
+    needs: lint_and_test
+    runs-on: macos-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Install dependencies
+        run: flutter pub get
 
       - name: Build iOS
         run: flutter build ios --debug --no-codesign
