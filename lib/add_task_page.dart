@@ -60,17 +60,17 @@ class _AddTaskPageState extends State<AddTaskPage> {
             ),
           ),
         ),
-        shape: const Border(
-          bottom: BorderSide(color: Colors.black, width: 2),
-        ),
+        shape: const Border(bottom: BorderSide(color: Colors.black, width: 2)),
         title: Text(
           'NEW SYSTEM',
-          style: _safeGoogleFont(() => GoogleFonts.spaceGrotesk(
-            fontWeight: FontWeight.bold,
-            fontSize: 32,
-            letterSpacing: -0.5,
-            color: Colors.black,
-          )),
+          style: _safeGoogleFont(
+            () => GoogleFonts.spaceGrotesk(
+              fontWeight: FontWeight.bold,
+              fontSize: 32,
+              letterSpacing: -0.5,
+              color: Colors.black,
+            ),
+          ),
         ),
         centerTitle: false,
       ),
@@ -85,16 +85,17 @@ class _AddTaskPageState extends State<AddTaskPage> {
               child: TextField(
                 controller: _nameController,
                 cursorColor: colorScheme.primary,
-                style: _safeGoogleFont(() => GoogleFonts.inter(
-                  fontSize: 16,
-                  color: Colors.black,
-                )),
+                style: _safeGoogleFont(
+                  () => GoogleFonts.inter(fontSize: 16, color: Colors.black),
+                ),
                 decoration: InputDecoration(
                   hintText: 'SYSTEM NAME...',
-                  hintStyle: _safeGoogleFont(() => GoogleFonts.inter(
-                    fontSize: 16,
-                    color: const Color(0xFF8A8A8A),
-                  )),
+                  hintStyle: _safeGoogleFont(
+                    () => GoogleFonts.inter(
+                      fontSize: 16,
+                      color: const Color(0xFF8A8A8A),
+                    ),
+                  ),
                   filled: true,
                   fillColor: Colors.white,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16),
@@ -103,7 +104,10 @@ class _AddTaskPageState extends State<AddTaskPage> {
                     borderRadius: BorderRadius.zero,
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                    borderSide: BorderSide(
+                      color: colorScheme.primary,
+                      width: 2,
+                    ),
                     borderRadius: BorderRadius.zero,
                   ),
                 ),
@@ -112,12 +116,14 @@ class _AddTaskPageState extends State<AddTaskPage> {
             const SizedBox(height: 32),
             Text(
               'INTERVAL',
-              style: _safeGoogleFont(() => GoogleFonts.spaceGrotesk(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-                letterSpacing: -0.5,
-                color: Colors.black,
-              )),
+              style: _safeGoogleFont(
+                () => GoogleFonts.spaceGrotesk(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  letterSpacing: -0.5,
+                  color: Colors.black,
+                ),
+              ),
             ),
             const SizedBox(height: 16),
             Expanded(
@@ -125,7 +131,8 @@ class _AddTaskPageState extends State<AddTaskPage> {
                 crossAxisCount: 2,
                 mainAxisSpacing: 16,
                 crossAxisSpacing: 16,
-                childAspectRatio: 2.0, // Adjust this if needed for a 96px height button
+                childAspectRatio:
+                    2.0, // Adjust this if needed for a 96px height button
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
                   _buildIntervalButton('7 DAYS'),
@@ -142,9 +149,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
         padding: const EdgeInsets.all(16),
         decoration: const BoxDecoration(
           color: Colors.white,
-          border: Border(
-            top: BorderSide(color: Colors.black, width: 2),
-          ),
+          border: Border(top: BorderSide(color: Colors.black, width: 2)),
         ),
         child: SizedBox(
           height: 64,
@@ -162,11 +167,13 @@ class _AddTaskPageState extends State<AddTaskPage> {
             },
             child: Text(
               'INITIALIZE TRACKER',
-              style: _safeGoogleFont(() => GoogleFonts.spaceGrotesk(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-                letterSpacing: 1.0,
-              )),
+              style: _safeGoogleFont(
+                () => GoogleFonts.spaceGrotesk(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  letterSpacing: 1.0,
+                ),
+              ),
             ),
           ),
         ),
@@ -193,11 +200,13 @@ class _AddTaskPageState extends State<AddTaskPage> {
           child: Center(
             child: Text(
               text,
-              style: _safeGoogleFont(() => GoogleFonts.inter(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-                color: isSelected ? Colors.white : Colors.black,
-              )),
+              style: _safeGoogleFont(
+                () => GoogleFonts.inter(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  color: isSelected ? Colors.white : Colors.black,
+                ),
+              ),
             ),
           ),
         ),

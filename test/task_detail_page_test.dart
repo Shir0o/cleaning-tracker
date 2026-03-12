@@ -50,7 +50,9 @@ void main() {
       expect(find.text('LOG ARCHIVE'), findsOneWidget);
     });
 
-    testWidgets('calculates 0% and shows appropriate status for overdue', (WidgetTester tester) async {
+    testWidgets('calculates 0% and shows appropriate status for overdue', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: TaskDetailPage(

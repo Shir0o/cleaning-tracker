@@ -19,7 +19,10 @@ void main() {
 
     // Verify headers and sections exist
     expect(find.text('SYSTEM SETTINGS'), findsOneWidget);
-    expect(find.text('01. Notification Preferences'.toUpperCase()), findsOneWidget);
+    expect(
+      find.text('01. Notification Preferences'.toUpperCase()),
+      findsOneWidget,
+    );
     expect(find.text('02. Global Preferences'.toUpperCase()), findsOneWidget);
     expect(find.text('03. Data & Sync'.toUpperCase()), findsOneWidget);
     expect(find.text('04. History'.toUpperCase()), findsOneWidget);
@@ -34,7 +37,9 @@ void main() {
     expect(find.text('VIEW ALL LOGS'), findsOneWidget);
   });
 
-  testWidgets('Dashboard settings icon navigates to SettingsPage', (WidgetTester tester) async {
+  testWidgets('Dashboard settings icon navigates to SettingsPage', (
+    WidgetTester tester,
+  ) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const CleaningTrackerApp());
 
@@ -50,7 +55,9 @@ void main() {
     expect(find.text('SYSTEM SETTINGS'), findsOneWidget);
   });
 
-  testWidgets('Settings page "VIEW ALL LOGS" navigates to LogHistoryPage', (WidgetTester tester) async {
+  testWidgets('Settings page "VIEW ALL LOGS" navigates to LogHistoryPage', (
+    WidgetTester tester,
+  ) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const MaterialApp(home: SettingsPage()));
 

@@ -9,7 +9,9 @@ void main() {
   });
 
   group('TaskDetailPage Scenarios', () {
-    testWidgets('Tapping back button navigates back', (WidgetTester tester) async {
+    testWidgets('Tapping back button navigates back', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(

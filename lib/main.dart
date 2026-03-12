@@ -26,11 +26,13 @@ class CleaningTrackerApp extends StatelessWidget {
           onSecondary: Colors.white,
           error: Color(0xFFFF0000), // Accent red from Stitch
           onError: Colors.white,
-          surface: Colors.white, // Background light from Stitch (using surface instead of background)
+          surface: Colors
+              .white, // Background light from Stitch (using surface instead of background)
           onSurface: Colors.black,
         ),
         scaffoldBackgroundColor: Colors.white,
-        fontFamily: GoogleFonts.inter().fontFamily, // Satoshi missing, using Inter as a similar clean grotesque font
+        fontFamily: GoogleFonts.inter()
+            .fontFamily, // Satoshi missing, using Inter as a similar clean grotesque font
         useMaterial3: true,
       ),
       home: const DashboardScreen(),
@@ -59,17 +61,17 @@ class DashboardScreen extends StatelessWidget {
         backgroundColor: colorScheme.surface,
         elevation: 0,
         scrolledUnderElevation: 0,
-        shape: const Border(
-          bottom: BorderSide(color: Colors.black, width: 2),
-        ),
+        shape: const Border(bottom: BorderSide(color: Colors.black, width: 2)),
         title: Text(
           'STATUS',
-          style: _safeGoogleFont(() => GoogleFonts.spaceGrotesk(
-            fontWeight: FontWeight.bold,
-            fontSize: 32,
-            letterSpacing: -0.5,
-            color: Colors.black,
-          )),
+          style: _safeGoogleFont(
+            () => GoogleFonts.spaceGrotesk(
+              fontWeight: FontWeight.bold,
+              fontSize: 32,
+              letterSpacing: -0.5,
+              color: Colors.black,
+            ),
+          ),
         ),
         actions: [
           Container(
@@ -154,16 +156,10 @@ class DashboardScreen extends StatelessWidget {
           child: InkWell(
             onTap: () {
               Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const AddTaskPage(),
-                ),
+                MaterialPageRoute(builder: (context) => const AddTaskPage()),
               );
             },
-            child: const Icon(
-              Icons.add,
-              color: Colors.white,
-              size: 32,
-            ),
+            child: const Icon(Icons.add, color: Colors.white, size: 32),
           ),
         ),
       ),
@@ -204,9 +200,7 @@ class TaskCard extends StatelessWidget {
 
     return Container(
       decoration: const BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: Colors.black, width: 2),
-        ),
+        border: Border(bottom: BorderSide(color: Colors.black, width: 2)),
       ),
       child: Material(
         color: colorScheme.surface,
@@ -234,20 +228,26 @@ class TaskCard extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: _safeGoogleFont(() => GoogleFonts.spaceGrotesk(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                        color: textColor,
-                      )),
+                      style: _safeGoogleFont(
+                        () => GoogleFonts.spaceGrotesk(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                          color: textColor,
+                        ),
+                      ),
                     ),
                     Text(
                       dueDateText,
-                      style: _safeGoogleFont(() => GoogleFonts.chivoMono(
-                        fontSize: 14,
-                        letterSpacing: 2.0,
-                        color: textColor,
-                        fontWeight: isOverdue ? FontWeight.bold : FontWeight.normal,
-                      )),
+                      style: _safeGoogleFont(
+                        () => GoogleFonts.chivoMono(
+                          fontSize: 14,
+                          letterSpacing: 2.0,
+                          color: textColor,
+                          fontWeight: isOverdue
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -256,7 +256,9 @@ class TaskCard extends StatelessWidget {
                   height: 24,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF4F4F4), // Surface color from Stitch (hardcoding since we used the Surface slot for background earlier)
+                    color: const Color(
+                      0xFFF4F4F4,
+                    ), // Surface color from Stitch (hardcoding since we used the Surface slot for background earlier)
                     border: Border.all(color: Colors.black, width: 2),
                   ),
                   child: FractionallySizedBox(
@@ -265,8 +267,15 @@ class TaskCard extends StatelessWidget {
                     child: Container(
                       decoration: BoxDecoration(
                         color: progressColor,
-                        border: progress < 1.0 || isFresh // Add right border if not completely full, or if it's the 100% fresh state
-                            ? const Border(right: BorderSide(color: Colors.black, width: 2))
+                        border:
+                            progress < 1.0 ||
+                                isFresh // Add right border if not completely full, or if it's the 100% fresh state
+                            ? const Border(
+                                right: BorderSide(
+                                  color: Colors.black,
+                                  width: 2,
+                                ),
+                              )
                             : null, // Full overdue bar has no inner border
                       ),
                     ),
