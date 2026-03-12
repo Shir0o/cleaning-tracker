@@ -32,7 +32,11 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _initGoogleSignIn() async {
     try {
-      await GoogleSignIn.instance.initialize();
+      await GoogleSignIn.instance.initialize(
+        // For Android in 7.x, serverClientId is often required even for basic auth
+        // In a real app, this would be your web client ID from Google Cloud Console
+        serverClientId: 'PLACEHOLDER_SERVER_CLIENT_ID',
+      );
 
       GoogleSignIn.instance.authenticationEvents.listen((event) {
         if (mounted) {
@@ -47,12 +51,17 @@ class _SettingsPageState extends State<SettingsPage> {
       });
 
       // Check if user is already signed in
-      final account = await GoogleSignIn.instance
-          .attemptLightweightAuthentication();
-      if (mounted) {
-        setState(() {
-          _currentUser = account;
-        });
+      // attemptLightweightAuthentication can throw if config is missing
+      try {
+        final account = await GoogleSignIn.instance
+            .attemptLightweightAuthentication();
+        if (mounted) {
+          setState(() {
+            _currentUser = account;
+          });
+        }
+      } catch (e) {
+        debugPrint('Lightweight auth check failed: $e');
       }
     } catch (e) {
       debugPrint('GoogleSignIn initialization failed: $e');
