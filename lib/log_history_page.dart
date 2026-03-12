@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 class LogHistoryPage extends StatelessWidget {
   static bool testingMode = false;
-  
+
   const LogHistoryPage({super.key});
 
   TextStyle _safeGoogleFont(TextStyle Function() fontFn) {
@@ -32,22 +32,26 @@ class LogHistoryPage extends StatelessWidget {
                 onTap: () {
                   Navigator.of(context).pop();
                 },
-                child: const Icon(Icons.arrow_back, color: Colors.black, size: 24),
+                child: const Icon(
+                  Icons.arrow_back,
+                  color: Colors.black,
+                  size: 24,
+                ),
               ),
             ),
           ),
         ),
-        shape: const Border(
-          bottom: BorderSide(color: Colors.black, width: 2),
-        ),
+        shape: const Border(bottom: BorderSide(color: Colors.black, width: 2)),
         title: Text(
           'ARCHIVE',
-          style: _safeGoogleFont(() => GoogleFonts.spaceGrotesk(
-            fontWeight: FontWeight.bold,
-            fontSize: 32,
-            letterSpacing: -0.5,
-            color: Colors.black,
-          )),
+          style: _safeGoogleFont(
+            () => GoogleFonts.spaceGrotesk(
+              fontWeight: FontWeight.bold,
+              fontSize: 32,
+              letterSpacing: -0.5,
+              color: Colors.black,
+            ),
+          ),
         ),
         centerTitle: false,
       ),
@@ -80,12 +84,14 @@ class LogHistoryPage extends StatelessWidget {
       ),
       child: Text(
         year,
-        style: _safeGoogleFont(() => GoogleFonts.spaceGrotesk(
-          fontWeight: FontWeight.bold,
-          fontSize: 24,
-          height: 1.0,
-          color: Colors.black,
-        )),
+        style: _safeGoogleFont(
+          () => GoogleFonts.spaceGrotesk(
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
+            height: 1.0,
+            color: Colors.black,
+          ),
+        ),
       ),
     );
   }
@@ -103,10 +109,9 @@ class LogHistoryPage extends StatelessWidget {
             width: 48,
             child: Text(
               date,
-              style: _safeGoogleFont(() => GoogleFonts.chivoMono(
-                fontSize: 14,
-                color: Colors.black,
-              )),
+              style: _safeGoogleFont(
+                () => GoogleFonts.chivoMono(fontSize: 14, color: Colors.black),
+              ),
             ),
           ),
           const SizedBox(width: 16),
@@ -116,7 +121,9 @@ class LogHistoryPage extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontFamily: _safeGoogleFont(() => GoogleFonts.inter()).fontFamily,
+                fontFamily: _safeGoogleFont(
+                  () => GoogleFonts.inter(),
+                ).fontFamily,
                 fontWeight: FontWeight.w500,
                 fontSize: 16,
                 height: 1.2,
@@ -127,10 +134,9 @@ class LogHistoryPage extends StatelessWidget {
           const SizedBox(width: 16),
           Text(
             'RESET',
-            style: _safeGoogleFont(() => GoogleFonts.chivoMono(
-              fontSize: 14,
-              color: Colors.black,
-            )),
+            style: _safeGoogleFont(
+              () => GoogleFonts.chivoMono(fontSize: 14, color: Colors.black),
+            ),
           ),
         ],
       ),

@@ -27,7 +27,7 @@ void main() {
       // Status Section
       expect(find.text('REMAINING LIFE'), findsOneWidget);
       expect(find.text('85%'), findsOneWidget);
-      
+
       // Reset Button
       expect(find.text('RESET SYSTEM'), findsOneWidget);
 
@@ -46,11 +46,13 @@ void main() {
       // Log Archive Section
       await tester.drag(find.byType(ListView), const Offset(0, -500));
       await tester.pump();
-      
+
       expect(find.text('LOG ARCHIVE'), findsOneWidget);
     });
 
-    testWidgets('calculates 0% and shows appropriate status for overdue', (WidgetTester tester) async {
+    testWidgets('calculates 0% and shows appropriate status for overdue', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: TaskDetailPage(
