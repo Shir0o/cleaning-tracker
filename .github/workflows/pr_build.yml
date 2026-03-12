@@ -27,7 +27,7 @@ concurrency:
 
 jobs:
   # Job 1: Static Analysis and Unit Tests (Linux)
-  # Cost: Low (1x)
+  # Cost: Lowest (1x)
   test-and-analyze:
     name: "Analyze & Unit Tests (Linux)"
     runs-on: ubuntu-latest
@@ -56,16 +56,15 @@ jobs:
         run: flutter analyze
 
       - name: Run unit and widget tests
-        # --fail-fast ensures we stop immediately on the first failure
         run: |
           find test -name "*_test.dart" ! -name "*_golden_test.dart" | xargs flutter test --fail-fast
 
   # Job 2: Golden Tests and Platform Builds (macOS)
-  # Cost: High (10x)
+  # Cost: High (10x) - Kept only for iOS-specific requirements
   macos-builds:
     name: "Golden Tests & Builds (macOS)"
     runs-on: macos-latest
-    needs: test-and-analyze # Only run if basic tests pass
+    needs: test-and-analyze
     steps:
       - uses: actions/checkout@v4
 
@@ -87,17 +86,23 @@ jobs:
       - name: Build iOS
         run: flutter build ios --debug --no-codesign
 
-  # Job 3: Integration Tests (macOS Simulator)
-  # Cost: Very High (10x + slow execution)
-  # ONLY runs on PRs and ONLY if all previous steps pass.
+  # Job 3: Integration Tests (Android Emulator on Linux)
+  # Cost: Low (1x) - Significantly cheaper than macOS
+  # ONLY runs on PRs and ONLY if previous checks pass.
   integration-tests:
-    name: "Integration Tests (Simulator)"
+    name: "Integration Tests (Android)"
     if: github.event_name == 'pull_request'
-    runs-on: macos-latest
-    needs: macos-builds # Only run if basic tests and builds pass
-    timeout-minutes: 25 # Safety limit for simulator boot + tests
+    runs-on: ubuntu-latest
+    needs: macos-builds # Fail-fast: ensure builds and goldens pass first
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -105,20 +110,13 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Start iOS Simulator
-        run: |
-          # Robust way to find and boot an iPhone simulator
-          UDID=$(xcrun simctl list devices | grep -E "iPhone" | grep -v "unavailable" | head -n 1 | awk -F '[()]' '{print $2}')
-          if [ -z "$UDID" ]; then
-            echo "No iPhone simulator found!"
-            exit 1
-          fi
-          echo "Starting simulator $UDID"
-          xcrun simctl boot $UDID || true # Ignore if already booted
-          xcrun simctl bootstatus $UDID -b
-
       - name: Run Integration Tests
-        run: |
-          # Fail fast: stop if any integration test fails
-          flutter test integration_test/app_test.dart || exit 1
-          flutter test integration_test/task_detail_page_integration_test.dart || exit 1
+        uses: reactive-circus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          arch: x86_64
+          target: google_apis
+          # The script runs inside the emulator environment
+          script: |
+            flutter test integration_test/app_test.dart || exit 1
+            flutter test integration_test/task_detail_page_integration_test.dart || exit 1
