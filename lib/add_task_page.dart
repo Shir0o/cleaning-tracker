@@ -1,0 +1,207 @@
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+class AddTaskPage extends StatefulWidget {
+  static bool testingMode = false;
+
+  const AddTaskPage({super.key});
+
+  @override
+  State<AddTaskPage> createState() => _AddTaskPageState();
+}
+
+class _AddTaskPageState extends State<AddTaskPage> {
+  String _selectedInterval = '7 DAYS';
+  final TextEditingController _nameController = TextEditingController();
+
+  TextStyle _safeGoogleFont(TextStyle Function() fontFn) {
+    if (AddTaskPage.testingMode) return const TextStyle();
+    return fontFn();
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Scaffold(
+      backgroundColor: colorScheme.surface,
+      appBar: AppBar(
+        backgroundColor: colorScheme.surface,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        leadingWidth: 64,
+        leading: Center(
+          child: Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.black, width: 2),
+              color: colorScheme.surface,
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Icon(
+                  Icons.arrow_back,
+                  color: Colors.black,
+                  size: 24,
+                ),
+              ),
+            ),
+          ),
+        ),
+        shape: const Border(
+          bottom: BorderSide(color: Colors.black, width: 2),
+        ),
+        title: Text(
+          'NEW SYSTEM',
+          style: _safeGoogleFont(() => GoogleFonts.spaceGrotesk(
+            fontWeight: FontWeight.bold,
+            fontSize: 32,
+            letterSpacing: -0.5,
+            color: Colors.black,
+          )),
+        ),
+        centerTitle: false,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 56,
+              child: TextField(
+                controller: _nameController,
+                cursorColor: colorScheme.primary,
+                style: _safeGoogleFont(() => GoogleFonts.inter(
+                  fontSize: 16,
+                  color: Colors.black,
+                )),
+                decoration: InputDecoration(
+                  hintText: 'SYSTEM NAME...',
+                  hintStyle: _safeGoogleFont(() => GoogleFonts.inter(
+                    fontSize: 16,
+                    color: const Color(0xFF8A8A8A),
+                  )),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                  enabledBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.black, width: 2),
+                    borderRadius: BorderRadius.zero,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                    borderRadius: BorderRadius.zero,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 32),
+            Text(
+              'INTERVAL',
+              style: _safeGoogleFont(() => GoogleFonts.spaceGrotesk(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+                letterSpacing: -0.5,
+                color: Colors.black,
+              )),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: GridView.count(
+                crossAxisCount: 2,
+                mainAxisSpacing: 16,
+                crossAxisSpacing: 16,
+                childAspectRatio: 2.0, // Adjust this if needed for a 96px height button
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                  _buildIntervalButton('7 DAYS'),
+                  _buildIntervalButton('30 DAYS'),
+                  _buildIntervalButton('90 DAYS'),
+                  _buildIntervalButton('CUSTOM'),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          border: Border(
+            top: BorderSide(color: Colors.black, width: 2),
+          ),
+        ),
+        child: SizedBox(
+          height: 64,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.black,
+              foregroundColor: Colors.white,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.zero,
+              ),
+              elevation: 0,
+            ),
+            onPressed: () {
+              // Initialize tracker action
+            },
+            child: Text(
+              'INITIALIZE TRACKER',
+              style: _safeGoogleFont(() => GoogleFonts.spaceGrotesk(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+                letterSpacing: 1.0,
+              )),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildIntervalButton(String text) {
+    final isSelected = _selectedInterval == text;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isSelected ? Colors.black : Colors.white,
+        border: Border.all(color: Colors.black, width: 2),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            setState(() {
+              _selectedInterval = text;
+            });
+          },
+          child: Center(
+            child: Text(
+              text,
+              style: _safeGoogleFont(() => GoogleFonts.inter(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                color: isSelected ? Colors.white : Colors.black,
+              )),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

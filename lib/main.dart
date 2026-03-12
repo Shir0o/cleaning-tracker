@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'add_task_page.dart';
 import 'settings_page.dart';
 import 'task_detail_page.dart';
 
@@ -152,7 +153,11 @@ class DashboardScreen extends StatelessWidget {
           color: Colors.transparent,
           child: InkWell(
             onTap: () {
-              // Add task action
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const AddTaskPage(),
+                ),
+              );
             },
             child: const Icon(
               Icons.add,
