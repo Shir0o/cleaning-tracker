@@ -7,9 +7,7 @@ import 'package:flutter/material.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('Tap TaskCard to go to TaskDetailPage, then tap back', (
-    tester,
-  ) async {
+  testWidgets('Tap TaskCard to go to TaskDetailPage, then tap back', (tester) async {
     app.main();
     await tester.pumpAndSettle();
 

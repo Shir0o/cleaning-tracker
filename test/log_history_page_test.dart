@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cleaning_tracker/log_history_page.dart';
 
 void main() {
-  testWidgets('LogHistoryPage renders correctly with header and logs', (
-    WidgetTester tester,
-  ) async {
+  testWidgets('LogHistoryPage renders correctly with header and logs', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const MaterialApp(home: LogHistoryPage()));
 
@@ -17,10 +15,7 @@ void main() {
     expect(find.text('2023'), findsOneWidget);
 
     // Verify some specific log entries exist from the mockup
-    expect(
-      find.text('HVAC FILTER'),
-      findsWidgets,
-    ); // Due to uppercase CSS, checking uppercase or exact case
+    expect(find.text('HVAC FILTER'), findsWidgets); // Due to uppercase CSS, checking uppercase or exact case
     expect(find.text('SMOKE DETECTOR BATTERIES'), findsOneWidget);
     expect(find.text('FURNACE MAINTENANCE'), findsOneWidget);
 

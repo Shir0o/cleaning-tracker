@@ -6,9 +6,7 @@ import 'package:cleaning_tracker/main.dart' as app;
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('End-to-end: Dashboard to Settings to Log History', (
-    WidgetTester tester,
-  ) async {
+  testWidgets('End-to-end: Dashboard to Settings to Log History', (WidgetTester tester) async {
     app.main();
     await tester.pumpAndSettle();
 
@@ -16,9 +14,7 @@ void main() {
     expect(find.text('STATUS'), findsOneWidget);
 
     // Tap settings icon
-    await tester.tap(
-      find.byType(Icon).first,
-    ); // Settings icon is the first action icon usually, let's target by it or tooltip. The app doesn't have an IconData strictly addressable here by text. Let's find something more direct.
+    await tester.tap(find.byType(Icon).first); // Settings icon is the first action icon usually, let's target by it or tooltip. The app doesn't have an IconData strictly addressable here by text. Let's find something more direct.
     // Wait for that to fail if it isn't specifically Icons.settings, we know Dashboard has settings icon setup.
     await tester.tap(find.byIcon(Icons.settings));
     await tester.pumpAndSettle();

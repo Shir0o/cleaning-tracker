@@ -25,7 +25,7 @@ void main() {
 
     await expectLater(
       find.byType(TaskDetailPage),
-      matchesGoldenFile('test/goldens/task_detail_page_initial.png'),
+      matchesGoldenFile('goldens/task_detail_page_initial.png'),
     );
   });
 }

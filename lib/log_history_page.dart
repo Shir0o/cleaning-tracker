@@ -6,11 +6,9 @@ class LogHistoryPage extends StatelessWidget {
 
   const LogHistoryPage({super.key});
 
-  TextStyle _safeGoogleFont(String fontName, {TextStyle? style}) {
-    if (testingMode) {
-      return (style ?? const TextStyle()).copyWith(fontFamily: 'Ahem');
-    }
-    return GoogleFonts.getFont(fontName, textStyle: style);
+  TextStyle _safeGoogleFont(TextStyle Function() fontFn) {
+    if (testingMode) return const TextStyle();
+    return fontFn();
   }
 
   @override
@@ -34,27 +32,22 @@ class LogHistoryPage extends StatelessWidget {
                 onTap: () {
                   Navigator.of(context).pop();
                 },
-                child: const Icon(
-                  Icons.arrow_back,
-                  color: Colors.black,
-                  size: 24,
-                ),
+                child: const Icon(Icons.arrow_back, color: Colors.black, size: 24),
               ),
             ),
           ),
         ),
-        shape: const Border(bottom: BorderSide(color: Colors.black, width: 2)),
+        shape: const Border(
+          bottom: BorderSide(color: Colors.black, width: 2),
+        ),
         title: Text(
           'ARCHIVE',
-          style: _safeGoogleFont(
-            'Space Grotesk',
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 32,
-              letterSpacing: -0.5,
-              color: Colors.black,
-            ),
-          ),
+          style: _safeGoogleFont(() => GoogleFonts.spaceGrotesk(
+            fontWeight: FontWeight.bold,
+            fontSize: 32,
+            letterSpacing: -0.5,
+            color: Colors.black,
+          )),
         ),
         centerTitle: false,
       ),
@@ -87,15 +80,12 @@ class LogHistoryPage extends StatelessWidget {
       ),
       child: Text(
         year,
-        style: _safeGoogleFont(
-          'Space Grotesk',
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 24,
-            height: 1.0,
-            color: Colors.black,
-          ),
-        ),
+        style: _safeGoogleFont(() => GoogleFonts.spaceGrotesk(
+          fontWeight: FontWeight.bold,
+          fontSize: 24,
+          height: 1.0,
+          color: Colors.black,
+        )),
       ),
     );
   }
@@ -113,10 +103,10 @@ class LogHistoryPage extends StatelessWidget {
             width: 48,
             child: Text(
               date,
-              style: _safeGoogleFont(
-                'Chivo Mono',
-                style: const TextStyle(fontSize: 14, color: Colors.black),
-              ),
+              style: _safeGoogleFont(() => GoogleFonts.chivoMono(
+                fontSize: 14,
+                color: Colors.black,
+              )),
             ),
           ),
           const SizedBox(width: 16),
@@ -125,24 +115,22 @@ class LogHistoryPage extends StatelessWidget {
               title.toUpperCase(),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: _safeGoogleFont(
-                'Inter',
-                style: const TextStyle(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 16,
-                  height: 1.2,
-                  color: Colors.black,
-                ),
+              style: TextStyle(
+                fontFamily: _safeGoogleFont(() => GoogleFonts.inter()).fontFamily,
+                fontWeight: FontWeight.w500,
+                fontSize: 16,
+                height: 1.2,
+                color: Colors.black,
               ),
             ),
           ),
           const SizedBox(width: 16),
           Text(
             'RESET',
-            style: _safeGoogleFont(
-              'Chivo Mono',
-              style: const TextStyle(fontSize: 14, color: Colors.black),
-            ),
+            style: _safeGoogleFont(() => GoogleFonts.chivoMono(
+              fontSize: 14,
+              color: Colors.black,
+            )),
           ),
         ],
       ),
