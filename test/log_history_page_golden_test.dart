@@ -24,7 +24,7 @@ void main() {
 
       await expectLater(
         find.byType(LogHistoryPage),
-        matchesGoldenFile('goldens/log_history_page.png'),
+        matchesGoldenFile('test/goldens/log_history_page.png'),
       );
     });
   });
