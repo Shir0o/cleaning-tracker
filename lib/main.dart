@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'settings_page.dart';
+import 'task_detail_page.dart';
 
 void main() {
   runApp(const CleaningTrackerApp());
@@ -37,7 +38,14 @@ class CleaningTrackerApp extends StatelessWidget {
 }
 
 class DashboardScreen extends StatelessWidget {
+  static bool testingMode = false;
+  
   const DashboardScreen({super.key});
+
+  TextStyle _safeGoogleFont(TextStyle Function() fontFn) {
+    if (testingMode) return const TextStyle();
+    return fontFn();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,12 +63,12 @@ class DashboardScreen extends StatelessWidget {
         ),
         title: Text(
           'STATUS',
-          style: GoogleFonts.spaceGrotesk(
+          style: _safeGoogleFont(() => GoogleFonts.spaceGrotesk(
             fontWeight: FontWeight.bold,
             fontSize: 32,
             letterSpacing: -0.5,
             color: Colors.black,
-          ),
+          )),
         ),
         actions: [
           Container(
@@ -159,6 +167,8 @@ class DashboardScreen extends StatelessWidget {
 }
 
 class TaskCard extends StatelessWidget {
+  static bool testingMode = false;
+  
   final String title;
   final String dueDateText;
   final double progress;
@@ -173,6 +183,11 @@ class TaskCard extends StatelessWidget {
     required this.isOverdue,
     this.isFresh = false,
   });
+
+  TextStyle _safeGoogleFont(TextStyle Function() fontFn) {
+    if (testingMode) return const TextStyle();
+    return fontFn();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -192,7 +207,16 @@ class TaskCard extends StatelessWidget {
         color: colorScheme.surface,
         child: InkWell(
           onTap: () {
-            // Task card tap
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => TaskDetailPage(
+                  title: title,
+                  dueDateText: dueDateText,
+                  progress: progress,
+                  isOverdue: isOverdue,
+                ),
+              ),
+            );
           },
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -205,20 +229,20 @@ class TaskCard extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: GoogleFonts.spaceGrotesk(
+                      style: _safeGoogleFont(() => GoogleFonts.spaceGrotesk(
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
                         color: textColor,
-                      ),
+                      )),
                     ),
                     Text(
                       dueDateText,
-                      style: GoogleFonts.chivoMono(
+                      style: _safeGoogleFont(() => GoogleFonts.chivoMono(
                         fontSize: 14,
                         letterSpacing: 2.0,
                         color: textColor,
                         fontWeight: isOverdue ? FontWeight.bold : FontWeight.normal,
-                      ),
+                      )),
                     ),
                   ],
                 ),

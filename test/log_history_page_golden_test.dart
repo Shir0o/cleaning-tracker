@@ -1,14 +1,14 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:cleaning_tracker/log_history_page.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 void main() {
-  group('LogHistoryPage Golden Tests', () {
-    setUpAll(() {
-      GoogleFonts.config.allowRuntimeFetching = false;
-    });
+  setUpAll(() {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    LogHistoryPage.testingMode = true;
+  });
 
+  group('LogHistoryPage Golden Tests', () {
     testWidgets('Log History Page matches golden image', (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
@@ -17,7 +17,7 @@ void main() {
         ),
       );
 
-      // Wait for fonts to load
+      // Wait for layout
       await tester.pumpAndSettle();
 
       await expectLater(

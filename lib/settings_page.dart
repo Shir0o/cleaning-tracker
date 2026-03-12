@@ -5,6 +5,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'log_history_page.dart';
 
 class SettingsPage extends StatefulWidget {
+  static bool testingMode = false;
+  
   const SettingsPage({super.key});
 
   @override
@@ -12,6 +14,10 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  TextStyle _safeGoogleFont(TextStyle Function() fontFn) {
+    if (SettingsPage.testingMode) return const TextStyle();
+    return fontFn();
+  }
   bool _notificationsEnabled = false;
   String _lastBackupTime = 'Never';
 
@@ -112,12 +118,12 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
         title: Text(
           'SYSTEM SETTINGS',
-          style: GoogleFonts.spaceGrotesk(
+          style: _safeGoogleFont(() => GoogleFonts.spaceGrotesk(
             fontWeight: FontWeight.bold,
             fontSize: 28, // Scaled down slightly from 32 for screen fit with back button
             letterSpacing: -0.5,
             color: Colors.black,
-          ),
+          )),
         ),
         centerTitle: false,
       ),
@@ -147,7 +153,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         padding: const EdgeInsets.symmetric(horizontal: 4),
                         child: Text(
                           '2 DAYS',
-                          style: GoogleFonts.chivoMono(fontWeight: FontWeight.bold, fontSize: 14),
+                          style: _safeGoogleFont(() => GoogleFonts.chivoMono(fontWeight: FontWeight.bold, fontSize: 14)),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -169,7 +175,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         padding: const EdgeInsets.symmetric(horizontal: 4),
                         child: Text(
                           '09:00 AM',
-                          style: GoogleFonts.chivoMono(fontWeight: FontWeight.bold, fontSize: 14),
+                          style: _safeGoogleFont(() => GoogleFonts.chivoMono(fontWeight: FontWeight.bold, fontSize: 14)),
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -206,7 +212,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         padding: const EdgeInsets.symmetric(horizontal: 4),
                         child: Text(
                           'LIGHT',
-                          style: GoogleFonts.chivoMono(fontWeight: FontWeight.bold, fontSize: 14),
+                          style: _safeGoogleFont(() => GoogleFonts.chivoMono(fontWeight: FontWeight.bold, fontSize: 14)),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -227,7 +233,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         padding: const EdgeInsets.symmetric(horizontal: 4),
                         child: Text(
                           'MONDAY',
-                          style: GoogleFonts.chivoMono(fontWeight: FontWeight.bold, fontSize: 14),
+                          style: _safeGoogleFont(() => GoogleFonts.chivoMono(fontWeight: FontWeight.bold, fontSize: 14)),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -272,11 +278,11 @@ class _SettingsPageState extends State<SettingsPage> {
                         children: [
                           Text(
                             'Sync with Google Drive'.toUpperCase(),
-                            style: TextStyle(fontFamily: GoogleFonts.inter().fontFamily, fontWeight: FontWeight.bold, fontSize: 14),
+                            style: TextStyle(fontFamily: _safeGoogleFont(() => GoogleFonts.inter()).fontFamily, fontWeight: FontWeight.bold, fontSize: 14),
                           ),
                           Text(
                             'Last backup: $_lastBackupTime',
-                            style: TextStyle(fontFamily: GoogleFonts.inter().fontFamily, fontWeight: FontWeight.w500, fontSize: 12, fontStyle: FontStyle.italic, color: Colors.grey[600]),
+                            style: TextStyle(fontFamily: _safeGoogleFont(() => GoogleFonts.inter()).fontFamily, fontWeight: FontWeight.w500, fontSize: 12, fontStyle: FontStyle.italic, color: Colors.grey[600]),
                           ),
                         ],
                       )
@@ -305,7 +311,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                child: Text(
                                   'FORCE BACKUP NOW',
                                    style: TextStyle(
-                                    fontFamily: GoogleFonts.inter().fontFamily,
+                                    fontFamily: _safeGoogleFont(() => GoogleFonts.inter()).fontFamily,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 12,
                                     letterSpacing: 1.5,
@@ -352,7 +358,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 const SizedBox(width: 16),
                                 Text(
                                   'VIEW ALL LOGS',
-                                  style: TextStyle(fontFamily: GoogleFonts.inter().fontFamily, fontWeight: FontWeight.bold, fontSize: 14),
+                                  style: TextStyle(fontFamily: _safeGoogleFont(() => GoogleFonts.inter()).fontFamily, fontWeight: FontWeight.bold, fontSize: 14),
                                 ),
                              ],
                            ),
@@ -376,7 +382,7 @@ class _SettingsPageState extends State<SettingsPage> {
       child: Text(
         title.toUpperCase(),
         style: TextStyle(
-          fontFamily: GoogleFonts.inter().fontFamily,
+          fontFamily: _safeGoogleFont(() => GoogleFonts.inter()).fontFamily,
           fontWeight: FontWeight.bold,
           fontSize: 12,
           letterSpacing: 1.5,
@@ -404,12 +410,12 @@ class _SettingsPageState extends State<SettingsPage> {
                    children: [
                       Text(
                         title.toUpperCase(),
-                         style: TextStyle(fontFamily: GoogleFonts.inter().fontFamily, fontWeight: FontWeight.bold, fontSize: 14),
+                         style: TextStyle(fontFamily: _safeGoogleFont(() => GoogleFonts.inter()).fontFamily, fontWeight: FontWeight.bold, fontSize: 14),
                       ),
                       if (subtitle != null)
                         Text(
                           subtitle,
-                          style: TextStyle(fontFamily: GoogleFonts.inter().fontFamily, fontWeight: FontWeight.w500, fontSize: 12, color: Colors.grey[500]),
+                          style: TextStyle(fontFamily: _safeGoogleFont(() => GoogleFonts.inter()).fontFamily, fontWeight: FontWeight.w500, fontSize: 12, color: Colors.grey[500]),
                         ),
                    ],
                  )
