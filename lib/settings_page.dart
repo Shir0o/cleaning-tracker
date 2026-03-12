@@ -36,7 +36,7 @@ class _SettingsPageState extends State<SettingsPage> {
   void initState() {
     super.initState();
     _checkNotificationPermission();
-    _initGoogleSignIn();
+    _listenToAuthEvents();
     _loadSettings();
   }
 
@@ -180,41 +180,30 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Future<void> _initGoogleSignIn() async {
-    try {
-      await GoogleSignIn.instance.initialize(
-        // For Android in 7.x, serverClientId is required to support modern Credential Manager
-        serverClientId: googleServerClientId,
-      );
-
-      GoogleSignIn.instance.authenticationEvents.listen((event) {
-        if (mounted) {
-          setState(() {
-            if (event is GoogleSignInAuthenticationEventSignIn) {
-              _currentUser = event.user;
-            } else if (event is GoogleSignInAuthenticationEventSignOut) {
-              _currentUser = null;
-            }
-          });
-        }
-      });
-
-      // Check if user is already signed in
-      // attemptLightweightAuthentication can throw if config is missing
-      try {
-        final account = await GoogleSignIn.instance
-            .attemptLightweightAuthentication();
-        if (mounted) {
-          setState(() {
-            _currentUser = account;
-          });
-        }
-      } catch (e) {
-        debugPrint('Lightweight auth check failed: $e');
+  void _listenToAuthEvents() {
+    // Listen for changes
+    GoogleSignIn.instance.authenticationEvents.listen((event) {
+      if (mounted) {
+        setState(() {
+          if (event is GoogleSignInAuthenticationEventSignIn) {
+            _currentUser = event.user;
+          } else if (event is GoogleSignInAuthenticationEventSignOut) {
+            _currentUser = null;
+          }
+        });
       }
-    } catch (e) {
-      debugPrint('GoogleSignIn initialization failed: $e');
-    }
+    });
+
+    // Check if user is already signed in (silent sign-in result)
+    GoogleSignIn.instance.attemptLightweightAuthentication()?.then((account) {
+      if (mounted) {
+        setState(() {
+          _currentUser = account;
+        });
+      }
+    }).catchError((e) {
+      debugPrint('Lightweight auth check failed in settings: $e');
+    });
   }
 
   Future<void> _checkNotificationPermission() async {

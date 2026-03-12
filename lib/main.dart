@@ -1,11 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import 'add_task_page.dart';
 import 'settings_page.dart';
 import 'task_detail_page.dart';
+import 'secrets.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  try {
+    // Initialize Google Sign In globally
+    await GoogleSignIn.instance.initialize(
+      serverClientId: googleServerClientId,
+    );
+    // Silent sign in
+    await GoogleSignIn.instance.attemptLightweightAuthentication();
+  } catch (e) {
+    debugPrint('Global GoogleSignIn initialization failed: $e');
+  }
+
   runApp(const CleaningTrackerApp());
 }
 
