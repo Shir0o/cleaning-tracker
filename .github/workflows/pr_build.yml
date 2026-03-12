@@ -3,11 +3,34 @@ name: PR Build
 on:
   pull_request:
     branches: [ "main", "master" ]
+    paths:
+      - 'lib/**'
+      - 'test/**'
+      - 'integration_test/**'
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+      - 'analysis_options.yaml'
+  push:
+    branches: [ "main", "master" ]
+    paths:
+      - 'lib/**'
+      - 'test/**'
+      - 'integration_test/**'
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+      - 'analysis_options.yaml'
+
+# Use concurrency to cancel outdated builds automatically
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build:
-    runs-on: macos-latest
-
+  # Job 1: Static Analysis and Unit Tests (Linux)
+  # Cost: Low (1x)
+  test-and-analyze:
+    name: "Analyze & Unit Tests (Linux)"
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -21,6 +44,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+          cache: true
 
       - name: Install dependencies
         run: flutter pub get
@@ -31,11 +55,70 @@ jobs:
       - name: Analyze project source
         run: flutter analyze
 
-      - name: Run tests
-        run: flutter test || echo "Tests failed or no tests found"
+      - name: Run unit and widget tests
+        # --fail-fast ensures we stop immediately on the first failure
+        run: |
+          find test -name "*_test.dart" ! -name "*_golden_test.dart" | xargs flutter test --fail-fast
+
+  # Job 2: Golden Tests and Platform Builds (macOS)
+  # Cost: High (10x)
+  macos-builds:
+    name: "Golden Tests & Builds (macOS)"
+    runs-on: macos-latest
+    needs: test-and-analyze # Only run if basic tests pass
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run Golden Tests
+        run: flutter test test/*_golden_test.dart --fail-fast
 
       - name: Build Android APK
         run: flutter build apk --debug
 
       - name: Build iOS
         run: flutter build ios --debug --no-codesign
+
+  # Job 3: Integration Tests (macOS Simulator)
+  # Cost: Very High (10x + slow execution)
+  # ONLY runs on PRs and ONLY if all previous steps pass.
+  integration-tests:
+    name: "Integration Tests (Simulator)"
+    if: github.event_name == 'pull_request'
+    runs-on: macos-latest
+    needs: macos-builds # Only run if basic tests and builds pass
+    timeout-minutes: 25 # Safety limit for simulator boot + tests
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Start iOS Simulator
+        run: |
+          # Robust way to find and boot an iPhone simulator
+          UDID=$(xcrun simctl list devices | grep -E "iPhone" | grep -v "unavailable" | head -n 1 | awk -F '[()]' '{print $2}')
+          if [ -z "$UDID" ]; then
+            echo "No iPhone simulator found!"
+            exit 1
+          fi
+          echo "Starting simulator $UDID"
+          xcrun simctl boot $UDID || true # Ignore if already booted
+          xcrun simctl bootstatus $UDID -b
+
+      - name: Run Integration Tests
+        run: |
+          # Fail fast: stop if any integration test fails
+          flutter test integration_test/app_test.dart || exit 1
+          flutter test integration_test/task_detail_page_integration_test.dart || exit 1
