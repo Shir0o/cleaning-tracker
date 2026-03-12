@@ -9,7 +9,9 @@ void main() {
   });
 
   group('LogHistoryPage Golden Tests', () {
-    testWidgets('Log History Page matches golden image', (WidgetTester tester) async {
+    testWidgets('Log History Page matches golden image', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
           debugShowCheckedModeBanner: false,
