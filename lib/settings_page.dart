@@ -15,7 +15,7 @@ class SettingsPage extends StatefulWidget {
   State<SettingsPage> createState() => _SettingsPageState();
 }
 
-class _SettingsPageState extends State<SettingsPage> {
+class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver {
   TextStyle _safeGoogleFont(TextStyle Function() fontFn) {
     if (SettingsPage.testingMode) return const TextStyle();
     return fontFn();
@@ -35,9 +35,23 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _checkNotificationPermission();
     _listenToAuthEvents();
     _loadSettings();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _checkNotificationPermission();
+    }
   }
 
   Future<void> _loadSettings() async {
@@ -351,6 +365,49 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               child: Column(
                 children: [
+                  _buildSettingRow(
+                    icon: Icons.security,
+                    title: 'System Permission',
+                    subtitle: _notificationsEnabled
+                        ? 'Notifications are active'
+                        : 'Notifications are disabled',
+                    trailing: _notificationsEnabled
+                        ? const Icon(
+                            Icons.check_circle_outline,
+                            color: Color(0xFF0038FF),
+                            size: 24,
+                          )
+                        : Container(
+                            decoration: BoxDecoration(
+                              color: Colors.black,
+                              border: Border.all(color: Colors.black, width: 2),
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () =>
+                                    _requestNotificationPermission(true),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 4,
+                                  ),
+                                  child: Text(
+                                    'ENABLE',
+                                    style: _safeGoogleFont(
+                                      () => GoogleFonts.spaceGrotesk(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                        letterSpacing: 1.0,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                  ),
                   _buildSettingRow(
                     onTap: () {
                       _showSelectionDialog(
