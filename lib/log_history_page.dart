@@ -8,7 +8,7 @@ class LogHistoryPage extends StatelessWidget {
 
   TextStyle _safeGoogleFont(String fontName, {TextStyle? style}) {
     if (testingMode) {
-      return (style ?? const TextStyle()).copyWith(fontFamily: 'sans-serif');
+      return (style ?? const TextStyle()).copyWith(fontFamily: 'Ahem');
     }
     return GoogleFonts.getFont(fontName, textStyle: style);
   }
