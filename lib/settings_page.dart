@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'log_history_page.dart';
 import 'secrets.dart';
 
@@ -23,12 +24,160 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _notificationsEnabled = false;
   String _lastBackupTime = 'Never';
   GoogleSignInAccount? _currentUser;
+  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+
+  // New state variables for settings
+  String _notifyBeforeExpiry = '2 DAYS';
+  String _dailyReminderTime = '09:00 AM';
+  String _interfaceTheme = 'LIGHT';
+  String _startOfWeek = 'MONDAY';
 
   @override
   void initState() {
     super.initState();
     _checkNotificationPermission();
     _initGoogleSignIn();
+    _loadSettings();
+  }
+
+  Future<void> _loadSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (mounted) {
+      setState(() {
+        _notifyBeforeExpiry =
+            prefs.getString('notifyBeforeExpiry') ?? '2 DAYS';
+        _dailyReminderTime = prefs.getString('dailyReminderTime') ?? '09:00 AM';
+        _interfaceTheme = prefs.getString('interfaceTheme') ?? 'LIGHT';
+        _startOfWeek = prefs.getString('startOfWeek') ?? 'MONDAY';
+      });
+    }
+  }
+
+  Future<void> _saveSetting(String key, String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(key, value);
+  }
+
+  void _showSelectionDialog({
+    required String title,
+    required List<String> options,
+    required String currentValue,
+    required Function(String) onSelected,
+  }) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: Colors.black, width: 4),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Text(
+                    title.toUpperCase(),
+                    style: _safeGoogleFont(
+                      () => GoogleFonts.spaceGrotesk(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                  ),
+                ),
+                const Divider(color: Colors.black, thickness: 2, height: 0),
+                Flexible(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: options.length,
+                    itemBuilder: (context, index) {
+                      final option = options[index];
+                      final isSelected = option == currentValue;
+
+                      return InkWell(
+                        onTap: () {
+                          onSelected(option);
+                          Navigator.pop(context);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 16,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isSelected ? Colors.black : Colors.white,
+                            border: const Border(
+                              bottom: BorderSide(color: Colors.black),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                option,
+                                style: _safeGoogleFont(
+                                  () => GoogleFonts.chivoMono(
+                                    fontSize: 16,
+                                    fontWeight: isSelected
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    color: isSelected
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
+                                ),
+                              ),
+                              if (isSelected)
+                                const Icon(
+                                  Icons.check,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.black,
+                        side: const BorderSide(color: Colors.black, width: 2),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.zero,
+                        ),
+                      ),
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(
+                        'CANCEL',
+                        style: _safeGoogleFont(
+                          () => GoogleFonts.spaceGrotesk(
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.0,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Future<void> _initGoogleSignIn() async {
@@ -214,9 +363,25 @@ class _SettingsPageState extends State<SettingsPage> {
               child: Column(
                 children: [
                   _buildSettingRow(
+                    onTap: () {
+                      _showSelectionDialog(
+                        title: 'Notify Before',
+                        options: [
+                          '1 DAY',
+                          '2 DAYS',
+                          '3 DAYS',
+                          '1 WEEK',
+                        ],
+                        currentValue: _notifyBeforeExpiry,
+                        onSelected: (val) {
+                          setState(() => _notifyBeforeExpiry = val);
+                          _saveSetting('notifyBeforeExpiry', val);
+                        },
+                      );
+                    },
                     icon: Icons.event,
                     title: 'Notify before expiry',
-                    subtitle: 'Scheduled 48 hours prior',
+                    subtitle: 'Scheduled prior to due date',
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -228,7 +393,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           ),
                           padding: const EdgeInsets.symmetric(horizontal: 4),
                           child: Text(
-                            '2 DAYS',
+                            _notifyBeforeExpiry,
                             style: _safeGoogleFont(
                               () => GoogleFonts.chivoMono(
                                 fontWeight: FontWeight.bold,
@@ -243,6 +408,22 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                   _buildSettingRow(
+                    onTap: () {
+                      _showSelectionDialog(
+                        title: 'Reminder Time',
+                        options: [
+                          '08:00 AM',
+                          '09:00 AM',
+                          '10:00 AM',
+                          '07:00 PM',
+                        ],
+                        currentValue: _dailyReminderTime,
+                        onSelected: (val) {
+                          setState(() => _dailyReminderTime = val);
+                          _saveSetting('dailyReminderTime', val);
+                        },
+                      );
+                    },
                     icon: Icons.notifications_active,
                     title: 'Daily reminder',
                     subtitle: 'Morning digest status',
@@ -257,7 +438,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           ),
                           padding: const EdgeInsets.symmetric(horizontal: 4),
                           child: Text(
-                            '09:00 AM',
+                            _dailyReminderTime,
                             style: _safeGoogleFont(
                               () => GoogleFonts.chivoMono(
                                 fontWeight: FontWeight.bold,
@@ -290,6 +471,17 @@ class _SettingsPageState extends State<SettingsPage> {
               child: Column(
                 children: [
                   _buildSettingRow(
+                    onTap: () {
+                      _showSelectionDialog(
+                        title: 'Interface Theme',
+                        options: ['LIGHT', 'DARK', 'SYSTEM'],
+                        currentValue: _interfaceTheme,
+                        onSelected: (val) {
+                          setState(() => _interfaceTheme = val);
+                          _saveSetting('interfaceTheme', val);
+                        },
+                      );
+                    },
                     icon: Icons.dark_mode,
                     title: 'Interface Theme',
                     trailing: Row(
@@ -303,7 +495,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           ),
                           padding: const EdgeInsets.symmetric(horizontal: 4),
                           child: Text(
-                            'LIGHT',
+                            _interfaceTheme,
                             style: _safeGoogleFont(
                               () => GoogleFonts.chivoMono(
                                 fontWeight: FontWeight.bold,
@@ -318,6 +510,17 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                   _buildSettingRow(
+                    onTap: () {
+                      _showSelectionDialog(
+                        title: 'Start of Week',
+                        options: ['SUNDAY', 'MONDAY', 'SATURDAY'],
+                        currentValue: _startOfWeek,
+                        onSelected: (val) {
+                          setState(() => _startOfWeek = val);
+                          _saveSetting('startOfWeek', val);
+                        },
+                      );
+                    },
                     icon: Icons.calendar_view_week,
                     title: 'Start of Week',
                     trailing: Row(
@@ -331,7 +534,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           ),
                           padding: const EdgeInsets.symmetric(horizontal: 4),
                           child: Text(
-                            'MONDAY',
+                            _startOfWeek,
                             style: _safeGoogleFont(
                               () => GoogleFonts.chivoMono(
                                 fontWeight: FontWeight.bold,
@@ -531,50 +734,54 @@ class _SettingsPageState extends State<SettingsPage> {
     required String title,
     String? subtitle,
     required Widget trailing,
+    VoidCallback? onTap,
   }) {
-    return Container(
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.black, width: 2)),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Icon(icon, color: const Color(0xFF0038FF)), // Primary color
-              const SizedBox(width: 16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title.toUpperCase(),
-                    style: TextStyle(
-                      fontFamily: _safeGoogleFont(
-                        () => GoogleFonts.inter(),
-                      ).fontFamily,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                  ),
-                  if (subtitle != null)
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        decoration: const BoxDecoration(
+          border: Border(bottom: BorderSide(color: Colors.black, width: 2)),
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Icon(icon, color: const Color(0xFF0038FF)), // Primary color
+                const SizedBox(width: 16),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Text(
-                      subtitle,
+                      title.toUpperCase(),
                       style: TextStyle(
                         fontFamily: _safeGoogleFont(
                           () => GoogleFonts.inter(),
                         ).fontFamily,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 12,
-                        color: Colors.grey[500],
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
                       ),
                     ),
-                ],
-              ),
-            ],
-          ),
-          trailing,
-        ],
+                    if (subtitle != null)
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          fontFamily: _safeGoogleFont(
+                            () => GoogleFonts.inter(),
+                          ).fontFamily,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 12,
+                          color: Colors.grey[500],
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+            trailing,
+          ],
+        ),
       ),
     );
   }

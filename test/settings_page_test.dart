@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cleaning_tracker/main.dart';
 import 'package:cleaning_tracker/settings_page.dart';
 import 'package:cleaning_tracker/log_history_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   setUpAll(() {
@@ -11,6 +12,7 @@ void main() {
     LogHistoryPage.testingMode = true;
     DashboardScreen.testingMode = true;
     TaskCard.testingMode = true;
+    SharedPreferences.setMockInitialValues({});
   });
 
   testWidgets('SettingsPage renders correctly', (WidgetTester tester) async {
@@ -71,5 +73,30 @@ void main() {
 
     // Verify we are on the Log History Page
     expect(find.text('ARCHIVE'), findsOneWidget);
+  });
+
+  testWidgets('Settings page selection dialog updates value', (
+    WidgetTester tester,
+  ) async {
+    // Build our app
+    await tester.pumpWidget(const MaterialApp(home: SettingsPage()));
+
+    // Verify initial value
+    expect(find.text('LIGHT'), findsOneWidget);
+
+    // Tap the Interface Theme row
+    await tester.tap(find.text('INTERFACE THEME'));
+    await tester.pumpAndSettle();
+
+    // Verify dialog is shown
+    expect(find.text('INTERFACE THEME'), findsWidgets);
+    expect(find.text('DARK'), findsOneWidget);
+
+    // Tap DARK option
+    await tester.tap(find.text('DARK'));
+    await tester.pumpAndSettle();
+
+    // Verify dialog is closed and value is updated
+    expect(find.text('DARK'), findsOneWidget);
   });
 }
