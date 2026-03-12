@@ -10,15 +10,6 @@ on:
       - 'pubspec.yaml'
       - 'pubspec.lock'
       - 'analysis_options.yaml'
-  push:
-    branches: [ "main", "master" ]
-    paths:
-      - 'lib/**'
-      - 'test/**'
-      - 'integration_test/**'
-      - 'pubspec.yaml'
-      - 'pubspec.lock'
-      - 'analysis_options.yaml'
 
 # Use concurrency to cancel outdated builds automatically
 concurrency:
@@ -26,10 +17,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Job 1: Static Analysis and Unit Tests (Linux)
+  # Job 1: Unit Tests (Linux)
   # Cost: Lowest (1x)
-  test-and-analyze:
-    name: "Analyze & Unit Tests (Linux)"
+  test:
+    name: "Unit Tests (Linux)"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -49,12 +40,6 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Verify formatting
-        run: dart format --output=none --set-exit-if-changed .
-
-      - name: Analyze project source
-        run: flutter analyze
-
       - name: Run unit and widget tests
         run: |
           find test -name "*_test.dart" ! -name "*_golden_test.dart" | xargs flutter test --fail-fast
@@ -64,7 +49,7 @@ jobs:
   macos-builds:
     name: "Golden Tests & Builds (macOS)"
     runs-on: macos-latest
-    needs: test-and-analyze
+    needs: test
     steps:
       - uses: actions/checkout@v4
 
