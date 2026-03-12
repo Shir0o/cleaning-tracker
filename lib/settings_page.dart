@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'log_history_page.dart';
+import 'secrets.dart';
 
 class SettingsPage extends StatefulWidget {
   static bool testingMode = false;
@@ -33,9 +34,8 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _initGoogleSignIn() async {
     try {
       await GoogleSignIn.instance.initialize(
-        // For Android in 7.x, serverClientId is often required even for basic auth
-        // In a real app, this would be your web client ID from Google Cloud Console
-        serverClientId: 'PLACEHOLDER_SERVER_CLIENT_ID',
+        // For Android in 7.x, serverClientId is required to support modern Credential Manager
+        serverClientId: googleServerClientId,
       );
 
       GoogleSignIn.instance.authenticationEvents.listen((event) {
@@ -106,16 +106,22 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _handleSignIn() async {
     try {
+      debugPrint('Attempting Google Sign In...');
       final account = await GoogleSignIn.instance.authenticate();
+      debugPrint('Sign in result: $account');
       if (mounted) {
         setState(() {
           _currentUser = account;
         });
       }
-    } catch (error) {
+    } catch (error, stackTrace) {
+      debugPrint('Sign in error: $error');
+      debugPrint('Stack trace: $stackTrace');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Sign in failed: $error')),
+          SnackBar(
+            content: Text('Sign in failed. Please check your configuration.'),
+          ),
         );
       }
     }
