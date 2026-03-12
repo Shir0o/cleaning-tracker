@@ -17,9 +17,11 @@ class TaskDetailPage extends StatelessWidget {
     required this.isOverdue,
   });
 
-  TextStyle _safeGoogleFont(TextStyle Function() fontFn) {
-    if (testingMode) return const TextStyle();
-    return fontFn();
+  TextStyle _safeGoogleFont(String fontName, {TextStyle? style}) {
+    if (testingMode) {
+      return (style ?? const TextStyle()).copyWith(fontFamily: 'sans-serif');
+    }
+    return GoogleFonts.getFont(fontName, textStyle: style);
   }
 
   @override
@@ -74,7 +76,8 @@ class TaskDetailPage extends StatelessWidget {
         title: Text(
           title,
           style: _safeGoogleFont(
-            () => GoogleFonts.spaceGrotesk(
+            'Space Grotesk',
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 32,
               letterSpacing: -0.5,
@@ -99,11 +102,12 @@ class TaskDetailPage extends StatelessWidget {
                 Text(
                   'REMAINING LIFE',
                   style: _safeGoogleFont(
-                    () => GoogleFonts.inter(
+                    'Inter',
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
                       letterSpacing: 2.0,
-                      color: const Color(0xFF8A8A8A), // muted color from Stitch
+                      color: Color(0xFF8A8A8A), // muted color from Stitch
                     ),
                   ),
                 ),
@@ -111,7 +115,8 @@ class TaskDetailPage extends StatelessWidget {
                 Text(
                   '$remainingPercentage%',
                   style: _safeGoogleFont(
-                    () => GoogleFonts.chivoMono(
+                    'Chivo Mono',
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 80,
                       height: 1.0,
@@ -124,7 +129,8 @@ class TaskDetailPage extends StatelessWidget {
                 Text(
                   'DUE DATE: 2024-10-15', // Static for now based on Stitch prototype
                   style: _safeGoogleFont(
-                    () => GoogleFonts.chivoMono(
+                    'Chivo Mono',
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
                       letterSpacing: 1.0,
@@ -136,7 +142,8 @@ class TaskDetailPage extends StatelessWidget {
                 Text(
                   getStatusText(),
                   style: _safeGoogleFont(
-                    () => GoogleFonts.chivoMono(
+                    'Chivo Mono',
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
                       letterSpacing: 1.0,
@@ -177,7 +184,8 @@ class TaskDetailPage extends StatelessWidget {
                     Text(
                       'RESET SYSTEM',
                       style: _safeGoogleFont(
-                        () => GoogleFonts.spaceGrotesk(
+                        'Space Grotesk',
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
                           letterSpacing: 1.0,
@@ -203,10 +211,11 @@ class TaskDetailPage extends StatelessWidget {
                   Text(
                     'INTERVAL',
                     style: _safeGoogleFont(
-                      () => GoogleFonts.inter(
+                      'Inter',
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
-                        color: const Color(0xFF8A8A8A),
+                        color: Color(0xFF8A8A8A),
                       ),
                     ),
                   ),
@@ -225,7 +234,8 @@ class TaskDetailPage extends StatelessWidget {
                           Text(
                             '90 DAYS',
                             style: _safeGoogleFont(
-                              () => GoogleFonts.chivoMono(
+                              'Chivo Mono',
+                              style: const TextStyle(
                                 fontSize: 16,
                                 color: Colors.black,
                               ),
@@ -270,7 +280,8 @@ class TaskDetailPage extends StatelessWidget {
                       Text(
                         'QUICK SPECS',
                         style: _safeGoogleFont(
-                          () => GoogleFonts.spaceGrotesk(
+                          'Space Grotesk',
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
                             letterSpacing: -0.5,
@@ -301,7 +312,8 @@ class TaskDetailPage extends StatelessWidget {
                   child: Text(
                     'LOG ARCHIVE',
                     style: _safeGoogleFont(
-                      () => GoogleFonts.spaceGrotesk(
+                      'Space Grotesk',
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
                         letterSpacing: -0.5,
@@ -347,17 +359,19 @@ class TaskDetailPage extends StatelessWidget {
           Text(
             label,
             style: _safeGoogleFont(
-              () => GoogleFonts.inter(
+              'Inter',
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
-                color: const Color(0xFF8A8A8A),
+                color: Color(0xFF8A8A8A),
               ),
             ),
           ),
           Text(
             value,
             style: _safeGoogleFont(
-              () => GoogleFonts.chivoMono(fontSize: 16, color: Colors.black),
+              'Chivo Mono',
+              style: const TextStyle(fontSize: 16, color: Colors.black),
             ),
           ),
         ],
@@ -377,7 +391,8 @@ class TaskDetailPage extends StatelessWidget {
           Text(
             'Completed',
             style: _safeGoogleFont(
-              () => GoogleFonts.inter(
+              'Inter',
+              style: const TextStyle(
                 fontWeight: FontWeight.w500,
                 fontSize: 16,
                 color: Colors.black,
@@ -387,9 +402,10 @@ class TaskDetailPage extends StatelessWidget {
           Text(
             date,
             style: _safeGoogleFont(
-              () => GoogleFonts.chivoMono(
+              'Chivo Mono',
+              style: const TextStyle(
                 fontSize: 16,
-                color: const Color(0xFF8A8A8A),
+                color: Color(0xFF8A8A8A),
               ),
             ),
           ),

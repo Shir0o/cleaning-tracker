@@ -6,9 +6,11 @@ class LogHistoryPage extends StatelessWidget {
 
   const LogHistoryPage({super.key});
 
-  TextStyle _safeGoogleFont(TextStyle Function() fontFn) {
-    if (testingMode) return const TextStyle();
-    return fontFn();
+  TextStyle _safeGoogleFont(String fontName, {TextStyle? style}) {
+    if (testingMode) {
+      return (style ?? const TextStyle()).copyWith(fontFamily: 'sans-serif');
+    }
+    return GoogleFonts.getFont(fontName, textStyle: style);
   }
 
   @override
@@ -45,7 +47,8 @@ class LogHistoryPage extends StatelessWidget {
         title: Text(
           'ARCHIVE',
           style: _safeGoogleFont(
-            () => GoogleFonts.spaceGrotesk(
+            'Space Grotesk',
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 32,
               letterSpacing: -0.5,
@@ -85,7 +88,8 @@ class LogHistoryPage extends StatelessWidget {
       child: Text(
         year,
         style: _safeGoogleFont(
-          () => GoogleFonts.spaceGrotesk(
+          'Space Grotesk',
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 24,
             height: 1.0,
@@ -110,7 +114,8 @@ class LogHistoryPage extends StatelessWidget {
             child: Text(
               date,
               style: _safeGoogleFont(
-                () => GoogleFonts.chivoMono(fontSize: 14, color: Colors.black),
+                'Chivo Mono',
+                style: const TextStyle(fontSize: 14, color: Colors.black),
               ),
             ),
           ),
@@ -120,14 +125,14 @@ class LogHistoryPage extends StatelessWidget {
               title.toUpperCase(),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontFamily: _safeGoogleFont(
-                  () => GoogleFonts.inter(),
-                ).fontFamily,
-                fontWeight: FontWeight.w500,
-                fontSize: 16,
-                height: 1.2,
-                color: Colors.black,
+              style: _safeGoogleFont(
+                'Inter',
+                style: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 16,
+                  height: 1.2,
+                  color: Colors.black,
+                ),
               ),
             ),
           ),
@@ -135,7 +140,8 @@ class LogHistoryPage extends StatelessWidget {
           Text(
             'RESET',
             style: _safeGoogleFont(
-              () => GoogleFonts.chivoMono(fontSize: 14, color: Colors.black),
+              'Chivo Mono',
+              style: const TextStyle(fontSize: 14, color: Colors.black),
             ),
           ),
         ],
