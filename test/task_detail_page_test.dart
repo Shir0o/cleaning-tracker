@@ -40,14 +40,15 @@ void main() {
       await tester.pump();
 
       expect(find.text('QUICK SPECS'), findsOneWidget);
-      expect(find.text('FILTER SIZE'), findsOneWidget);
-      expect(find.text('MODEL #'), findsOneWidget);
+      expect(find.text('SPEC 1'), findsOneWidget);
+      expect(find.text('SPEC 2'), findsOneWidget);
 
       // Log Archive Section
       await tester.drag(find.byType(ListView), const Offset(0, -500));
       await tester.pump();
 
       expect(find.text('LOG ARCHIVE'), findsOneWidget);
+      expect(find.text('NO LOGS RECORDED'), findsOneWidget);
     });
 
     testWidgets('calculates 0% and shows appropriate status for overdue', (

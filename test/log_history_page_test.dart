@@ -12,19 +12,16 @@ void main() {
     // Verify header exists
     expect(find.text('ARCHIVE'), findsOneWidget);
 
-    // Verify year dividers exist
-    expect(find.text('2024'), findsOneWidget);
-    expect(find.text('2023'), findsOneWidget);
+    // Verify empty state message exists
+    expect(find.text('NO HISTORY AVAILABLE'), findsOneWidget);
 
-    // Verify some specific log entries exist from the mockup
-    expect(
-      find.text('HVAC FILTER'),
-      findsWidgets,
-    ); // Due to uppercase CSS, checking uppercase or exact case
-    expect(find.text('SMOKE DETECTOR BATTERIES'), findsOneWidget);
-    expect(find.text('FURNACE MAINTENANCE'), findsOneWidget);
+    // Verify year dividers do not exist
+    expect(find.text('2024'), findsNothing);
+    expect(find.text('2023'), findsNothing);
 
-    expect(find.text('10.24'), findsOneWidget);
-    expect(find.text('RESET'), findsWidgets);
+    // Verify log entries do not exist
+    expect(find.text('HVAC FILTER'), findsNothing);
+    expect(find.text('SMOKE DETECTOR BATTERIES'), findsNothing);
+    expect(find.text('FURNACE MAINTENANCE'), findsNothing);
   });
 }

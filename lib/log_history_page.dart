@@ -55,20 +55,17 @@ class LogHistoryPage extends StatelessWidget {
         ),
         centerTitle: false,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.only(bottom: 32),
-        child: Column(
-          children: [
-            _buildYearDivider('2024'),
-            _buildLogRecord('10.24', 'HVAC Filter'),
-            _buildLogRecord('09.15', 'Smoke Detector Batteries'),
-            _buildLogRecord('08.01', 'Water Filter'),
-            _buildLogRecord('07.24', 'HVAC Filter'),
-            _buildYearDivider('2023'),
-            _buildLogRecord('12.10', 'Furnace Maintenance'),
-            _buildLogRecord('11.05', 'Gutter Cleaning'),
-            _buildLogRecord('04.22', 'HVAC Filter'),
-          ],
+      body: Center(
+        child: Text(
+          'NO HISTORY AVAILABLE',
+          style: _safeGoogleFont(
+            () => GoogleFonts.spaceGrotesk(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              letterSpacing: -0.5,
+              color: const Color(0xFF8A8A8A),
+            ),
+          ),
         ),
       ),
     );

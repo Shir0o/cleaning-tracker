@@ -103,44 +103,20 @@ class DashboardScreen extends StatelessWidget {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.only(bottom: 100),
-        children: const [
-          TaskCard(
-            title: 'HVAC FILTER',
-            dueDateText: '14 DAYS',
-            progress: 0.85,
-            isOverdue: false,
-          ),
-          TaskCard(
-            title: 'WATER FILTER',
-            dueDateText: '2 DAYS',
-            progress: 0.15,
-            isOverdue: false,
-          ),
-          TaskCard(
-            title: 'SMOKE ALARMS',
-            dueDateText: '-5 DAYS',
-            progress: 1.0,
-            isOverdue: true,
-          ),
-          TaskCard(
-            title: 'DRYER VENT',
-            dueDateText: '90 DAYS',
-            progress: 1.0,
-            isOverdue: false,
-            isFresh: true,
-          ),
-          TaskCard(
-            title: 'VACUUMING',
-            dueDateText: '3 DAYS',
-            progress: 0.25,
-            isOverdue: false,
-          ),
-          TaskCard(
-            title: 'BATHROOM',
-            dueDateText: '0 DAYS',
-            progress: 1.0,
-            isOverdue: true,
+        padding: const EdgeInsets.all(16),
+        children: [
+          Center(
+            child: Text(
+              'NO SYSTEMS TRACKED',
+              style: _safeGoogleFont(
+                () => GoogleFonts.spaceGrotesk(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  letterSpacing: -0.5,
+                  color: const Color(0xFF8A8A8A),
+                ),
+              ),
+            ),
           ),
         ],
       ),

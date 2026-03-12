@@ -19,7 +19,7 @@ void main() {
 
       // Verify header and items are still found
       expect(find.text('ARCHIVE'), findsOneWidget);
-      expect(find.text('HVAC FILTER'), findsWidgets);
+      expect(find.text('NO HISTORY AVAILABLE'), findsOneWidget);
 
       // Scale down
       await tester.pumpWidget(
@@ -32,31 +32,7 @@ void main() {
       );
 
       expect(find.text('ARCHIVE'), findsOneWidget);
-      expect(find.text('2023'), findsOneWidget);
-    });
-
-    testWidgets('User scrolls through the archive list', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(const MaterialApp(home: LogHistoryPage()));
-
-      // Initially top elements should be visible
-      expect(find.text('ARCHIVE'), findsOneWidget);
-      expect(find.text('2024'), findsOneWidget);
-
-      // HVAC Filter should be visible
-      expect(find.text('HVAC FILTER'), findsWidgets);
-
-      // Attempt scroll (though our list is short, making sure it's scrollable)
-      await tester.drag(
-        find.byType(SingleChildScrollView),
-        const Offset(0, -300),
-      );
-      await tester.pumpAndSettle();
-
-      // Bottom elements should be available/visible
-      expect(find.text('11.05'), findsOneWidget);
-      expect(find.text('GUTTER CLEANING'), findsOneWidget);
+      expect(find.text('NO HISTORY AVAILABLE'), findsOneWidget);
     });
   });
 }

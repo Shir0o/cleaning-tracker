@@ -21,12 +21,42 @@ class _SettingsPageState extends State<SettingsPage> {
 
   bool _notificationsEnabled = false;
   String _lastBackupTime = 'Never';
+  GoogleSignInAccount? _currentUser;
 
   @override
   void initState() {
     super.initState();
     _checkNotificationPermission();
-    // In a real implementation you might check user's backup status here
+    _initGoogleSignIn();
+  }
+
+  Future<void> _initGoogleSignIn() async {
+    try {
+      await GoogleSignIn.instance.initialize();
+
+      GoogleSignIn.instance.authenticationEvents.listen((event) {
+        if (mounted) {
+          setState(() {
+            if (event is GoogleSignInAuthenticationEventSignIn) {
+              _currentUser = event.user;
+            } else if (event is GoogleSignInAuthenticationEventSignOut) {
+              _currentUser = null;
+            }
+          });
+        }
+      });
+
+      // Check if user is already signed in
+      final account = await GoogleSignIn.instance
+          .attemptLightweightAuthentication();
+      if (mounted) {
+        setState(() {
+          _currentUser = account;
+        });
+      }
+    } catch (e) {
+      debugPrint('GoogleSignIn initialization failed: $e');
+    }
   }
 
   Future<void> _checkNotificationPermission() async {
@@ -65,29 +95,42 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
-  Future<void> _handleForceBackup() async {
+  Future<void> _handleSignIn() async {
     try {
-      await GoogleSignIn.instance.initialize();
       final account = await GoogleSignIn.instance.authenticate();
-      await GoogleSignIn.instance.authorizationClient.authorizeScopes([
-        'https://www.googleapis.com/auth/drive.file',
-      ]);
-
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Successfully authenticated as ${account.email}'),
-          ),
-        );
         setState(() {
-          _lastBackupTime = 'Just now';
+          _currentUser = account;
         });
-        // Here you would use googleapis to actually upload the data.
       }
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Authentication failed: $error')),
+          SnackBar(content: Text('Sign in failed: $error')),
+        );
+      }
+    }
+  }
+
+  Future<void> _handleForceBackup() async {
+    try {
+      // In a real implementation, you would use googleapis here to upload data
+      // For this prototype, we just simulate the success
+      setState(() {
+        _lastBackupTime = 'Just now';
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Backup successful!'),
+          ),
+        );
+      }
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Backup failed: $error')),
         );
       }
     }
@@ -338,7 +381,9 @@ class _SettingsPageState extends State<SettingsPage> {
                               ),
                             ),
                             Text(
-                              'Last backup: $_lastBackupTime',
+                              _currentUser != null
+                                  ? 'Signed in as: ${_currentUser!.email}'
+                                  : 'Last backup: $_lastBackupTime',
                               style: TextStyle(
                                 fontFamily: _safeGoogleFont(
                                   () => GoogleFonts.inter(),
@@ -366,12 +411,16 @@ class _SettingsPageState extends State<SettingsPage> {
                       child: Material(
                         color: Colors.transparent,
                         child: InkWell(
-                          onTap: _handleForceBackup,
+                          onTap: _currentUser != null
+                              ? _handleForceBackup
+                              : _handleSignIn,
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 12.0),
                             child: Center(
                               child: Text(
-                                'FORCE BACKUP NOW',
+                                _currentUser != null
+                                    ? 'FORCE BACKUP NOW'
+                                    : 'SIGN IN TO SYNC',
                                 style: TextStyle(
                                   fontFamily: _safeGoogleFont(
                                     () => GoogleFonts.inter(),

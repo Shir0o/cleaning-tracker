@@ -33,7 +33,7 @@ void main() {
     expect(find.text('Interface Theme'.toUpperCase()), findsOneWidget);
     expect(find.text('Start of Week'.toUpperCase()), findsOneWidget);
     expect(find.text('Sync with Google Drive'.toUpperCase()), findsOneWidget);
-    expect(find.text('FORCE BACKUP NOW'), findsOneWidget);
+    expect(find.text('SIGN IN TO SYNC'), findsOneWidget);
     expect(find.text('VIEW ALL LOGS'), findsOneWidget);
   });
 
