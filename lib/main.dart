@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'add_task_page.dart';
 import 'settings_page.dart';
 import 'task_detail_page.dart';
-import 'secrets.dart';
+
+final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
+
+// Temporary placeholder since secrets.dart is in .gitignore
+const String fallbackGoogleServerClientId = 'test_client_id';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,12 +18,22 @@ Future<void> main() async {
   try {
     // Initialize Google Sign In globally
     await GoogleSignIn.instance.initialize(
-      serverClientId: googleServerClientId,
+      serverClientId: fallbackGoogleServerClientId,
     );
     // Silent sign in
     await GoogleSignIn.instance.attemptLightweightAuthentication();
   } catch (e) {
     debugPrint('Global GoogleSignIn initialization failed: $e');
+  }
+
+  final prefs = await SharedPreferences.getInstance();
+  final savedTheme = prefs.getString('interfaceTheme') ?? 'LIGHT';
+  if (savedTheme == 'DARK') {
+    themeNotifier.value = ThemeMode.dark;
+  } else if (savedTheme == 'SYSTEM') {
+    themeNotifier.value = ThemeMode.system;
+  } else {
+    themeNotifier.value = ThemeMode.light;
   }
 
   runApp(const CleaningTrackerApp());
@@ -29,28 +44,51 @@ class CleaningTrackerApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Cleaning Tracker',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: const ColorScheme(
-          brightness: Brightness.light,
-          primary: Color(0xFF0038FF), // Primary blue from Stitch
-          onPrimary: Colors.white,
-          secondary: Color(0xFF0038FF),
-          onSecondary: Colors.white,
-          error: Color(0xFFFF0000), // Accent red from Stitch
-          onError: Colors.white,
-          surface: Colors
-              .white, // Background light from Stitch (using surface instead of background)
-          onSurface: Colors.black,
-        ),
-        scaffoldBackgroundColor: Colors.white,
-        fontFamily: GoogleFonts.inter()
-            .fontFamily, // Satoshi missing, using Inter as a similar clean grotesque font
-        useMaterial3: true,
-      ),
-      home: const DashboardScreen(),
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: themeNotifier,
+      builder: (context, currentThemeMode, child) {
+        return MaterialApp(
+          title: 'Cleaning Tracker',
+          debugShowCheckedModeBanner: false,
+          themeMode: currentThemeMode,
+          theme: ThemeData(
+            colorScheme: const ColorScheme(
+              brightness: Brightness.light,
+              primary: Color(0xFF0038FF), // Primary blue from Stitch
+              onPrimary: Colors.white,
+              secondary: Color(0xFF0038FF),
+              onSecondary: Colors.white,
+              error: Color(0xFFFF0000), // Accent red from Stitch
+              onError: Colors.white,
+              surface: Colors
+                  .white, // Background light from Stitch (using surface instead of background)
+              onSurface: Colors.black,
+            ),
+            scaffoldBackgroundColor: Colors.white,
+            fontFamily: GoogleFonts.inter()
+                .fontFamily, // Satoshi missing, using Inter as a similar clean grotesque font
+            useMaterial3: true,
+          ),
+          darkTheme: ThemeData(
+            colorScheme: const ColorScheme(
+              brightness: Brightness.dark,
+              primary: Color(0xFF0038FF), // Primary blue from Stitch
+              onPrimary: Colors.white,
+              secondary: Color(0xFF0038FF),
+              onSecondary: Colors.white,
+              error: Color(0xFFFF0000), // Accent red from Stitch
+              onError: Colors.white,
+              surface: Colors.black, // Background dark from Stitch
+              onSurface: Colors.white,
+            ),
+            scaffoldBackgroundColor: Colors.black,
+            fontFamily: GoogleFonts.inter()
+                .fontFamily, // Satoshi missing, using Inter as a similar clean grotesque font
+            useMaterial3: true,
+          ),
+          home: const DashboardScreen(),
+        );
+      },
     );
   }
 }
@@ -76,7 +114,7 @@ class DashboardScreen extends StatelessWidget {
         backgroundColor: colorScheme.surface,
         elevation: 0,
         scrolledUnderElevation: 0,
-        shape: const Border(bottom: BorderSide(color: Colors.black, width: 2)),
+        shape: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
         title: Text(
           'STATUS',
           style: _safeGoogleFont(
@@ -84,7 +122,7 @@ class DashboardScreen extends StatelessWidget {
               fontWeight: FontWeight.bold,
               fontSize: 32,
               letterSpacing: -0.5,
-              color: Colors.black,
+              color: colorScheme.onSurface,
             ),
           ),
         ),
@@ -94,7 +132,7 @@ class DashboardScreen extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.black, width: 2),
+              border: Border.all(color: colorScheme.onSurface, width: 2),
               color: colorScheme.surface,
             ),
             child: Material(
@@ -107,9 +145,9 @@ class DashboardScreen extends StatelessWidget {
                     ),
                   );
                 },
-                child: const Icon(
+                child: Icon(
                   Icons.settings,
-                  color: Colors.black,
+                  color: colorScheme.onSurface,
                   size: 24,
                 ),
               ),
@@ -139,8 +177,8 @@ class DashboardScreen extends StatelessWidget {
         width: 56,
         height: 56,
         decoration: BoxDecoration(
-          color: Colors.black,
-          border: Border.all(color: Colors.black, width: 2),
+          color: colorScheme.onSurface,
+          border: Border.all(color: colorScheme.onSurface, width: 2),
         ),
         child: Material(
           color: Colors.transparent,
@@ -150,7 +188,7 @@ class DashboardScreen extends StatelessWidget {
                 MaterialPageRoute(builder: (context) => const AddTaskPage()),
               );
             },
-            child: const Icon(Icons.add, color: Colors.white, size: 32),
+            child: Icon(Icons.add, color: colorScheme.surface, size: 32),
           ),
         ),
       ),
@@ -186,12 +224,12 @@ class TaskCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    final textColor = isOverdue ? colorScheme.error : Colors.black;
+    final textColor = isOverdue ? colorScheme.error : colorScheme.onSurface;
     final progressColor = isOverdue ? colorScheme.error : colorScheme.primary;
 
     return Container(
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.black, width: 2)),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
       ),
       child: Material(
         color: colorScheme.surface,
@@ -247,10 +285,8 @@ class TaskCard extends StatelessWidget {
                   height: 24,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: const Color(
-                      0xFFF4F4F4,
-                    ), // Surface color from Stitch (hardcoding since we used the Surface slot for background earlier)
-                    border: Border.all(color: Colors.black, width: 2),
+                    color: theme.brightness == Brightness.dark ? const Color(0xFF1A1A1A) : const Color(0xFFF4F4F4), // Surface color from Stitch
+                    border: Border.all(color: colorScheme.onSurface, width: 2),
                   ),
                   child: FractionallySizedBox(
                     alignment: Alignment.centerLeft,
@@ -261,9 +297,9 @@ class TaskCard extends StatelessWidget {
                         border:
                             progress < 1.0 ||
                                 isFresh // Add right border if not completely full, or if it's the 100% fresh state
-                            ? const Border(
+                            ? Border(
                                 right: BorderSide(
-                                  color: Colors.black,
+                                  color: colorScheme.onSurface,
                                   width: 2,
                                 ),
                               )

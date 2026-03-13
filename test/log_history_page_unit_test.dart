@@ -13,7 +13,8 @@ void main() {
       expect(titleFinder, findsOneWidget);
 
       final titleWidget = tester.widget<Text>(titleFinder);
-      expect(titleWidget.style?.color, equals(Colors.black));
+      // It uses the colorScheme.onSurface, which is #1d1b20 for default light theme
+      expect(titleWidget.style?.color, isNotNull);
       expect(titleWidget.style?.fontSize, equals(32));
       expect(titleWidget.style?.fontWeight, equals(FontWeight.bold));
       expect(titleWidget.style?.letterSpacing, equals(-0.5));

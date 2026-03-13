@@ -13,10 +13,12 @@ class LogHistoryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: colorScheme.surface,
         elevation: 0,
         scrolledUnderElevation: 0,
         leadingWidth: 72,
@@ -24,7 +26,7 @@ class LogHistoryPage extends StatelessWidget {
           padding: const EdgeInsets.only(left: 16.0, top: 8.0, bottom: 8.0),
           child: Container(
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.black, width: 2),
+              border: Border.all(color: colorScheme.onSurface, width: 2),
             ),
             child: Material(
               color: Colors.transparent,
@@ -32,16 +34,16 @@ class LogHistoryPage extends StatelessWidget {
                 onTap: () {
                   Navigator.of(context).pop();
                 },
-                child: const Icon(
+                child: Icon(
                   Icons.arrow_back,
-                  color: Colors.black,
+                  color: colorScheme.onSurface,
                   size: 24,
                 ),
               ),
             ),
           ),
         ),
-        shape: const Border(bottom: BorderSide(color: Colors.black, width: 2)),
+        shape: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
         title: Text(
           'ARCHIVE',
           style: _safeGoogleFont(
@@ -49,7 +51,7 @@ class LogHistoryPage extends StatelessWidget {
               fontWeight: FontWeight.bold,
               fontSize: 32,
               letterSpacing: -0.5,
-              color: Colors.black,
+              color: colorScheme.onSurface,
             ),
           ),
         ),
@@ -71,13 +73,15 @@ class LogHistoryPage extends StatelessWidget {
     );
   }
 
-  Widget _buildYearDivider(String year) {
+  Widget _buildYearDivider(String year, BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: Colors.black, width: 2)),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        border: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
       ),
       child: Text(
         year,
@@ -86,19 +90,21 @@ class LogHistoryPage extends StatelessWidget {
             fontWeight: FontWeight.bold,
             fontSize: 24,
             height: 1.0,
-            color: Colors.black,
+            color: colorScheme.onSurface,
           ),
         ),
       ),
     );
   }
 
-  Widget _buildLogRecord(String date, String title) {
+  Widget _buildLogRecord(String date, String title, BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return Container(
       height: 56,
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.black, width: 1)),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 1)),
       ),
       child: Row(
         children: [
@@ -107,7 +113,7 @@ class LogHistoryPage extends StatelessWidget {
             child: Text(
               date,
               style: _safeGoogleFont(
-                () => GoogleFonts.chivoMono(fontSize: 14, color: Colors.black),
+                () => GoogleFonts.chivoMono(fontSize: 14, color: theme.brightness == Brightness.dark ? Colors.white60 : Colors.black54),
               ),
             ),
           ),
@@ -124,7 +130,7 @@ class LogHistoryPage extends StatelessWidget {
                 fontWeight: FontWeight.w500,
                 fontSize: 16,
                 height: 1.2,
-                color: Colors.black,
+                color: colorScheme.onSurface,
               ),
             ),
           ),
@@ -132,7 +138,7 @@ class LogHistoryPage extends StatelessWidget {
           Text(
             'RESET',
             style: _safeGoogleFont(
-              () => GoogleFonts.chivoMono(fontSize: 14, color: Colors.black),
+              () => GoogleFonts.chivoMono(fontSize: 14, color: colorScheme.onSurface),
             ),
           ),
         ],

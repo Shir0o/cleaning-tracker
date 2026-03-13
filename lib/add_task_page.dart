@@ -42,7 +42,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.black, width: 2),
+              border: Border.all(color: colorScheme.onSurface, width: 2),
               color: colorScheme.surface,
             ),
             child: Material(
@@ -51,16 +51,16 @@ class _AddTaskPageState extends State<AddTaskPage> {
                 onTap: () {
                   Navigator.of(context).pop();
                 },
-                child: const Icon(
+                child: Icon(
                   Icons.arrow_back,
-                  color: Colors.black,
+                  color: colorScheme.onSurface,
                   size: 24,
                 ),
               ),
             ),
           ),
         ),
-        shape: const Border(bottom: BorderSide(color: Colors.black, width: 2)),
+        shape: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
         title: Text(
           'NEW SYSTEM',
           style: _safeGoogleFont(
@@ -68,7 +68,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
               fontWeight: FontWeight.bold,
               fontSize: 32,
               letterSpacing: -0.5,
-              color: Colors.black,
+              color: colorScheme.onSurface,
             ),
           ),
         ),
@@ -86,7 +86,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
                 controller: _nameController,
                 cursorColor: colorScheme.primary,
                 style: _safeGoogleFont(
-                  () => GoogleFonts.inter(fontSize: 16, color: Colors.black),
+                  () => GoogleFonts.inter(fontSize: 16, color: colorScheme.onSurface),
                 ),
                 decoration: InputDecoration(
                   hintText: 'SYSTEM NAME...',
@@ -97,10 +97,10 @@ class _AddTaskPageState extends State<AddTaskPage> {
                     ),
                   ),
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: colorScheme.surface,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                  enabledBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black, width: 2),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: colorScheme.onSurface, width: 2),
                     borderRadius: BorderRadius.zero,
                   ),
                   focusedBorder: OutlineInputBorder(
@@ -121,7 +121,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                   letterSpacing: -0.5,
-                  color: Colors.black,
+                  color: colorScheme.onSurface,
                 ),
               ),
             ),
@@ -135,10 +135,10 @@ class _AddTaskPageState extends State<AddTaskPage> {
                     2.0, // Adjust this if needed for a 96px height button
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
-                  _buildIntervalButton('7 DAYS'),
-                  _buildIntervalButton('30 DAYS'),
-                  _buildIntervalButton('90 DAYS'),
-                  _buildIntervalButton('CUSTOM'),
+                  _buildIntervalButton('7 DAYS', context),
+                  _buildIntervalButton('30 DAYS', context),
+                  _buildIntervalButton('90 DAYS', context),
+                  _buildIntervalButton('CUSTOM', context),
                 ],
               ),
             ),
@@ -147,16 +147,16 @@ class _AddTaskPageState extends State<AddTaskPage> {
       ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(16),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: Colors.black, width: 2)),
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          border: Border(top: BorderSide(color: colorScheme.onSurface, width: 2)),
         ),
         child: SizedBox(
           height: 64,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
-              foregroundColor: Colors.white,
+              backgroundColor: colorScheme.onSurface,
+              foregroundColor: colorScheme.surface,
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.zero,
               ),
@@ -181,13 +181,15 @@ class _AddTaskPageState extends State<AddTaskPage> {
     );
   }
 
-  Widget _buildIntervalButton(String text) {
+  Widget _buildIntervalButton(String text, BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final isSelected = _selectedInterval == text;
 
     return Container(
       decoration: BoxDecoration(
-        color: isSelected ? Colors.black : Colors.white,
-        border: Border.all(color: Colors.black, width: 2),
+        color: isSelected ? colorScheme.onSurface : colorScheme.surface,
+        border: Border.all(color: colorScheme.onSurface, width: 2),
       ),
       child: Material(
         color: Colors.transparent,
@@ -204,7 +206,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
                 () => GoogleFonts.inter(
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
-                  color: isSelected ? Colors.white : Colors.black,
+                  color: isSelected ? colorScheme.surface : colorScheme.onSurface,
                 ),
               ),
             ),
