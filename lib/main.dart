@@ -6,9 +6,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'add_task_page.dart';
 import 'settings_page.dart';
 import 'task_detail_page.dart';
-import 'secrets.dart';
 
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
+
+// Temporary placeholder since secrets.dart is in .gitignore
+const String fallbackGoogleServerClientId = 'test_client_id';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,7 +18,7 @@ Future<void> main() async {
   try {
     // Initialize Google Sign In globally
     await GoogleSignIn.instance.initialize(
-      serverClientId: googleServerClientId,
+      serverClientId: fallbackGoogleServerClientId,
     );
     // Silent sign in
     await GoogleSignIn.instance.attemptLightweightAuthentication();

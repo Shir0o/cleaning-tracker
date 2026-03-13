@@ -4,7 +4,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'log_history_page.dart';
-import 'secrets.dart';
 import 'main.dart' show themeNotifier;
 
 class SettingsPage extends StatefulWidget {
