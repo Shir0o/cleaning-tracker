@@ -130,8 +130,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _startLoadingTimer() {
-    // Minimum animation timer to prevent flashing (e.g., 800ms)
-    _loadingTimer = Timer(const Duration(milliseconds: 800), () {
+    // Minimum animation timer to prevent flashing (e.g., 1500ms)
+    _loadingTimer = Timer(const Duration(milliseconds: 1500), () {
       if (mounted) {
         setState(() {
           _isLoading = false;

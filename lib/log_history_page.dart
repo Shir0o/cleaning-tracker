@@ -32,7 +32,7 @@ class _LogHistoryPageState extends State<LogHistoryPage> {
   }
 
   void _startLoadingTimer() {
-    _loadingTimer = Timer(const Duration(milliseconds: 800), () {
+    _loadingTimer = Timer(const Duration(milliseconds: 1500), () {
       if (mounted) {
         setState(() {
           _isLoading = false;
