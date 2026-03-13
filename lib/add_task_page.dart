@@ -163,7 +163,9 @@ class _AddTaskPageState extends State<AddTaskPage> {
               elevation: 0,
             ),
             onPressed: () {
-              // Initialize tracker action
+              if (_nameController.text.isNotEmpty) {
+                Navigator.of(context).pop(_nameController.text);
+              }
             },
             child: Text(
               'INITIALIZE TRACKER',

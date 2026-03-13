@@ -110,6 +110,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   GoogleSignInAccount? _currentUser;
   bool _isLoading = true;
   Timer? _loadingTimer;
+  final List<String> _tasks = [];
 
   StreamSubscription? _authSubscription;
 
@@ -252,29 +253,36 @@ class _DashboardScreenState extends State<DashboardScreen> {
               padding: const EdgeInsets.all(16),
               itemBuilder: (context, index) => const ShimmerCard(),
             )
-          : ListView(
-              padding: const EdgeInsets.all(16),
-              children: const [
-                TaskCard(
-                  title: 'HVAC FILTER',
-                  dueDateText: 'DUE IN 12D',
-                  progress: 0.85,
-                  isOverdue: false,
+          : _tasks.isEmpty
+              ? ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    Center(
+                      child: Text(
+                        'NO SYSTEMS TRACKED',
+                        style: _safeGoogleFont(
+                          () => GoogleFonts.spaceGrotesk(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            letterSpacing: -0.5,
+                            color: const Color(0xFF8A8A8A),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: _tasks.length,
+                  itemBuilder: (context, index) => TaskCard(
+                    title: _tasks[index],
+                    dueDateText: 'FRESH START',
+                    progress: 1.0,
+                    isOverdue: false,
+                    isFresh: true,
+                  ),
                 ),
-                TaskCard(
-                  title: 'SMOKE DETECTOR',
-                  dueDateText: 'DUE IN 2D',
-                  progress: 0.98,
-                  isOverdue: false,
-                ),
-                TaskCard(
-                  title: 'AIR PURIFIER',
-                  dueDateText: 'DUE IN 45D',
-                  progress: 0.5,
-                  isOverdue: false,
-                ),
-              ],
-            ),
       floatingActionButton: Container(
         width: 56,
         height: 56,
@@ -285,10 +293,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: () {
-              Navigator.of(context).push(
+            onTap: () async {
+              final result = await Navigator.of(context).push<String>(
                 MaterialPageRoute(builder: (context) => const AddTaskPage()),
               );
+              if (result != null && mounted) {
+                setState(() {
+                  _tasks.add(result);
+                });
+              }
             },
             child: Icon(Icons.add, color: colorScheme.surface, size: 32),
           ),

@@ -16,8 +16,24 @@ void main() {
 
     // Verify we are on Dashboard
     expect(find.text('STATUS'), findsOneWidget);
+    expect(find.text('NO SYSTEMS TRACKED'), findsOneWidget);
 
-    // Find and tap the first TaskCard (HVAC FILTER)
+    // Tap add button
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpAndSettle();
+
+    // Type name
+    await tester.enterText(find.byType(TextField), 'HVAC FILTER');
+    await tester.pumpAndSettle();
+
+    // Initialize tracker
+    await tester.tap(find.text('INITIALIZE TRACKER'));
+    await tester.pumpAndSettle();
+
+    // Verify back on Dashboard and task exists
+    expect(find.text('HVAC FILTER'), findsOneWidget);
+
+    // Find and tap the TaskCard (HVAC FILTER)
     final hvacFilterCard = find.text('HVAC FILTER');
     expect(hvacFilterCard, findsOneWidget);
 

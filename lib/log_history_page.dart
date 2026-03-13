@@ -98,14 +98,18 @@ class _LogHistoryPageState extends State<LogHistoryPage> {
               itemCount: 5,
               itemBuilder: (context, index) => const ShimmerLogRecord(),
             )
-          : ListView(
-              children: [
-                _buildYearDivider('2024', context),
-                _buildLogRecord('OCT 12', 'HVAC FILTER', context),
-                _buildLogRecord('SEP 01', 'SMOKE DETECTOR BATTERIES', context),
-                _buildYearDivider('2023', context),
-                _buildLogRecord('DEC 15', 'FURNACE MAINTENANCE', context),
-              ],
+          : Center(
+              child: Text(
+                'NO HISTORY AVAILABLE',
+                style: _safeGoogleFont(
+                  () => GoogleFonts.spaceGrotesk(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    letterSpacing: -0.5,
+                    color: const Color(0xFF8A8A8A),
+                  ),
+                ),
+              ),
             ),
     );
   }

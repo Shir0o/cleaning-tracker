@@ -21,14 +21,17 @@ void main() {
       expect(titleWidget.style, isNotNull);
     });
 
-    testWidgets('Mock data renders when not loading', (
+    testWidgets('Empty state renders when no logs available', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(const MaterialApp(home: LogHistoryPage()));
 
       // Since testingMode = true, isLoading = false immediately
-      expect(find.text('2024'), findsOneWidget);
-      expect(find.text('HVAC FILTER'), findsOneWidget);
+      final emptyFinder = find.text('NO HISTORY AVAILABLE');
+      expect(emptyFinder, findsOneWidget);
+
+      final emptyWidget = tester.widget<Text>(emptyFinder);
+      expect(emptyWidget.style, isNotNull);
     });
   });
 }

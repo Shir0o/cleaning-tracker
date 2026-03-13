@@ -36,6 +36,6 @@ void main() {
 
     // Verify we reach the Archive
     expect(find.text('ARCHIVE'), findsOneWidget);
-    expect(find.text('2024'), findsOneWidget);
+    expect(find.text('NO HISTORY AVAILABLE'), findsOneWidget);
   });
 }
