@@ -5,6 +5,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'log_history_page.dart';
+import 'drive_service.dart';
+import 'secrets.dart';
 import 'main.dart' show themeNotifier;
 
 class SettingsPage extends StatefulWidget {
@@ -38,17 +40,28 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _checkNotificationPermission();
-    _listenToAuthEvents();
     _loadSettings();
+    _checkNotificationPermission();
+    DriveService().addListener(_onDriveServiceChange);
+    _currentUser = DriveService().currentUser;
+  }
+
+  void _onDriveServiceChange() {
+    if (mounted) {
+      setState(() {
+        _currentUser = DriveService().currentUser;
+      });
+    }
   }
 
   @override
   void dispose() {
+    DriveService().removeListener(_onDriveServiceChange);
     _authSubscription?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
+
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -199,21 +212,6 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
     );
   }
 
-  void _listenToAuthEvents() {
-    // Listen for changes
-    _authSubscription = GoogleSignIn.instance.authenticationEvents.listen((event) {
-      if (mounted) {
-        setState(() {
-          if (event is GoogleSignInAuthenticationEventSignIn) {
-            _currentUser = event.user;
-          } else if (event is GoogleSignInAuthenticationEventSignOut) {
-            _currentUser = null;
-          }
-        });
-      }
-    });
-  }
-
   Future<void> _checkNotificationPermission() async {
     final status = await Permission.notification.status;
     setState(() {
@@ -253,13 +251,8 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
   Future<void> _handleSignIn() async {
     try {
       debugPrint('Attempting Google Sign In...');
-      final account = await GoogleSignIn.instance.authenticate();
+      final account = await DriveService().authenticate();
       debugPrint('Sign in result: $account');
-      if (mounted) {
-        setState(() {
-          _currentUser = account;
-        });
-      }
     } catch (error, stackTrace) {
       debugPrint('Sign in error: $error');
       debugPrint('Stack trace: $stackTrace');

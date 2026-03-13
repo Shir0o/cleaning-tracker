@@ -1,0 +1,151 @@
+import 'package:flutter/foundation.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:googleapis/drive/v3.dart' as drive;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'dart:async';
+
+class GoogleAuthClient extends http.BaseClient {
+  final Map<String, String> _headers;
+  final http.Client _client = http.Client();
+
+  GoogleAuthClient(this._headers);
+
+  @override
+  Future<http.StreamedResponse> send(http.BaseRequest request) {
+    return _client.send(request..headers.addAll(_headers));
+  }
+}
+
+class DriveService extends ChangeNotifier {
+  static final DriveService _instance = DriveService._internal();
+  factory DriveService() => _instance;
+  
+  DriveService._internal() {
+    _listenToAuth();
+  }
+
+  static const String _syncEnabledKey = 'drive_sync_enabled';
+  
+  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+  drive.DriveApi? _driveApi;
+  bool _isDriveSyncEnabled = false;
+  GoogleSignInAccount? _currentUser;
+
+  bool get isDriveSyncEnabled => _isDriveSyncEnabled;
+  GoogleSignInAccount? get currentUser => _currentUser;
+
+  void _listenToAuth() {
+    _googleSignIn.authenticationEvents.listen((event) {
+      if (event is GoogleSignInAuthenticationEventSignIn) {
+        _currentUser = event.user;
+        _initDriveApi();
+      } else if (event is GoogleSignInAuthenticationEventSignOut) {
+        _currentUser = null;
+        _driveApi = null;
+      }
+      notifyListeners();
+    });
+  }
+
+  Future<void> init() async {
+    final prefs = await SharedPreferences.getInstance();
+    _isDriveSyncEnabled = prefs.getBool(_syncEnabledKey) ?? false;
+    
+    if (_isDriveSyncEnabled) {
+      await signInSilently();
+      if (_currentUser != null) {
+        syncFiles().catchError((e) => debugPrint('Initial sync failed: $e'));
+      }
+    }
+  }
+
+  Future<void> setSyncEnabled(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_syncEnabledKey, enabled);
+    _isDriveSyncEnabled = enabled;
+    notifyListeners();
+    
+    if (enabled && _currentUser == null) {
+      await authenticate();
+    } else if (enabled && _currentUser != null) {
+      await syncFiles();
+    }
+  }
+
+  Future<void> signInSilently() async {
+    try {
+      final account = await _googleSignIn.attemptLightweightAuthentication();
+      if (account != null) {
+        _currentUser = account;
+        await _initDriveApi();
+      }
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Silent sign in failed: $e');
+    }
+  }
+
+  Future<GoogleSignInAccount?> authenticate() async {
+    try {
+      final account = await _googleSignIn.authenticate();
+      if (account != null) {
+        _currentUser = account;
+        await _initDriveApi();
+      }
+      notifyListeners();
+      return account;
+    } catch (e) {
+      debugPrint('Authentication failed: $e');
+      return null;
+    }
+  }
+
+  Future<void> signOut() async {
+    await _googleSignIn.signOut();
+    _currentUser = null;
+    _driveApi = null;
+    notifyListeners();
+  }
+
+  Future<void> _initDriveApi() async {
+    final account = _currentUser;
+    if (account == null) return;
+
+    final auth = await account.authentication;
+    final Map<String, String> headers = {
+      'Authorization': 'Bearer ${auth.idToken}',
+      'X-Goog-AuthUser': '0',
+    };
+    final authenticateClient = GoogleAuthClient(headers);
+    _driveApi = drive.DriveApi(authenticateClient);
+  }
+
+  Future<void> syncFiles() async {
+    if (!_isDriveSyncEnabled) return;
+
+    if (_driveApi == null) {
+      if (_currentUser != null) {
+        await _initDriveApi();
+      } else {
+        await signInSilently();
+        if (_currentUser != null) {
+          await _initDriveApi();
+        }
+      }
+    }
+
+    if (_driveApi == null) {
+      debugPrint('Cannot sync: Drive API not initialized');
+      return;
+    }
+
+    try {
+      // Implementation for syncing files would go here
+      debugPrint('Syncing files to Google Drive...');
+    } catch (e) {
+      debugPrint('Sync failed: $e');
+      rethrow;
+    }
+  }
+}

@@ -4,11 +4,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:googleapis/drive/v3.dart' as drive;
 
 import 'add_task_page.dart';
 import 'settings_page.dart';
 import 'task_detail_page.dart';
 import 'secrets.dart';
+import 'drive_service.dart';
 
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 
@@ -24,10 +26,10 @@ Future<void> main() async {
       await GoogleSignIn.instance.initialize(
         serverClientId: googleServerClientId,
       );
-      // Attempt silent sign-in in the background without blocking startup
-      GoogleSignIn.instance.attemptLightweightAuthentication();
+      // Initialize DriveService
+      await DriveService().init();
     } catch (e) {
-      debugPrint('Global GoogleSignIn initialization failed: $e');
+      debugPrint('Global initialization failed: $e');
     }
   }
 
@@ -44,8 +46,35 @@ Future<void> main() async {
   runApp(const CleaningTrackerApp());
 }
 
-class CleaningTrackerApp extends StatelessWidget {
+class CleaningTrackerApp extends StatefulWidget {
   const CleaningTrackerApp({super.key});
+
+  @override
+  State<CleaningTrackerApp> createState() => _CleaningTrackerAppState();
+}
+
+class _CleaningTrackerAppState extends State<CleaningTrackerApp> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      // Trigger sync when app is backgrounded
+      DriveService().syncFiles().catchError((e) {
+        debugPrint('Background sync failed: $e');
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
