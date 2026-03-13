@@ -1,14 +1,50 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shimmer/shimmer.dart';
 
-class LogHistoryPage extends StatelessWidget {
+class LogHistoryPage extends StatefulWidget {
   static bool testingMode = false;
 
   const LogHistoryPage({super.key});
 
+  @override
+  State<LogHistoryPage> createState() => _LogHistoryPageState();
+}
+
+class _LogHistoryPageState extends State<LogHistoryPage> {
+  bool _isLoading = true;
+  Timer? _loadingTimer;
+
   TextStyle _safeGoogleFont(TextStyle Function() fontFn) {
-    if (testingMode) return const TextStyle();
+    if (LogHistoryPage.testingMode) return const TextStyle();
     return fontFn();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (LogHistoryPage.testingMode) {
+      _isLoading = false;
+    } else {
+      _startLoadingTimer();
+    }
+  }
+
+  void _startLoadingTimer() {
+    _loadingTimer = Timer(const Duration(milliseconds: 800), () {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _loadingTimer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -57,19 +93,20 @@ class LogHistoryPage extends StatelessWidget {
         ),
         centerTitle: false,
       ),
-      body: Center(
-        child: Text(
-          'NO HISTORY AVAILABLE',
-          style: _safeGoogleFont(
-            () => GoogleFonts.spaceGrotesk(
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-              letterSpacing: -0.5,
-              color: const Color(0xFF8A8A8A),
+      body: _isLoading
+          ? ListView.builder(
+              itemCount: 5,
+              itemBuilder: (context, index) => const ShimmerLogRecord(),
+            )
+          : ListView(
+              children: [
+                _buildYearDivider('2024', context),
+                _buildLogRecord('OCT 12', 'HVAC FILTER', context),
+                _buildLogRecord('SEP 01', 'SMOKE DETECTOR BATTERIES', context),
+                _buildYearDivider('2023', context),
+                _buildLogRecord('DEC 15', 'FURNACE MAINTENANCE', context),
+              ],
             ),
-          ),
-        ),
-      ),
     );
   }
 
@@ -113,7 +150,11 @@ class LogHistoryPage extends StatelessWidget {
             child: Text(
               date,
               style: _safeGoogleFont(
-                () => GoogleFonts.chivoMono(fontSize: 14, color: theme.brightness == Brightness.dark ? Colors.white60 : Colors.black54),
+                () => GoogleFonts.chivoMono(
+                    fontSize: 14,
+                    color: theme.brightness == Brightness.dark
+                        ? Colors.white60
+                        : Colors.black54),
               ),
             ),
           ),
@@ -142,6 +183,51 @@ class LogHistoryPage extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class ShimmerLogRecord extends StatelessWidget {
+  const ShimmerLogRecord({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Container(
+      height: 56,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 1)),
+      ),
+      child: Shimmer.fromColors(
+        baseColor: isDark ? Colors.grey[800]! : Colors.grey[300]!,
+        highlightColor: isDark ? Colors.grey[700]! : Colors.grey[100]!,
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 14,
+              color: Colors.white,
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Container(
+                height: 16,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Container(
+              width: 48,
+              height: 14,
+              color: Colors.white,
+            ),
+          ],
+        ),
       ),
     );
   }

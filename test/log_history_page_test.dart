@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:cleaning_tracker/log_history_page.dart';
 
 void main() {
+  setUp(() {
+    LogHistoryPage.testingMode = true;
+  });
+
   testWidgets('LogHistoryPage renders correctly with header and logs', (
     WidgetTester tester,
   ) async {

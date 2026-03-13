@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shimmer/shimmer.dart';
 
 import 'add_task_page.dart';
 import 'settings_page.dart';
@@ -105,6 +106,8 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   GoogleSignInAccount? _currentUser;
+  bool _isLoading = true;
+  Timer? _loadingTimer;
 
   StreamSubscription? _authSubscription;
 
@@ -117,11 +120,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
     _listenToAuthEvents();
+    if (DashboardScreen.testingMode) {
+      _isLoading = false;
+    } else {
+      _startLoadingTimer();
+    }
+  }
+
+  void _startLoadingTimer() {
+    // Minimum animation timer to prevent flashing (e.g., 800ms)
+    _loadingTimer = Timer(const Duration(milliseconds: 800), () {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    });
   }
 
   @override
   void dispose() {
     _authSubscription?.cancel();
+    _loadingTimer?.cancel();
     super.dispose();
   }
 
@@ -222,24 +242,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          Center(
-            child: Text(
-              'NO SYSTEMS TRACKED',
-              style: _safeGoogleFont(
-                () => GoogleFonts.spaceGrotesk(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  letterSpacing: -0.5,
-                  color: const Color(0xFF8A8A8A),
+      body: _isLoading
+          ? ListView.builder(
+              itemCount: 3,
+              padding: const EdgeInsets.all(16),
+              itemBuilder: (context, index) => const ShimmerCard(),
+            )
+          : ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                Center(
+                  child: Text(
+                    'NO SYSTEMS TRACKED',
+                    style: _safeGoogleFont(
+                      () => GoogleFonts.spaceGrotesk(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        letterSpacing: -0.5,
+                        color: const Color(0xFF8A8A8A),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
-          ),
-        ],
-      ),
       floatingActionButton: Container(
         width: 56,
         height: 56,
@@ -257,6 +283,50 @@ class _DashboardScreenState extends State<DashboardScreen> {
             },
             child: Icon(Icons.add, color: colorScheme.surface, size: 32),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class ShimmerCard extends StatelessWidget {
+  const ShimmerCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: Colors.black, width: 2)),
+      ),
+      padding: const EdgeInsets.all(16.0),
+      child: Shimmer.fromColors(
+        baseColor: Colors.grey[300]!,
+        highlightColor: Colors.grey[100]!,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  width: 120,
+                  height: 24,
+                  color: Colors.white,
+                ),
+                Container(
+                  width: 80,
+                  height: 16,
+                  color: Colors.white,
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Container(
+              height: 24,
+              width: double.infinity,
+              color: Colors.white,
+            ),
+          ],
         ),
       ),
     );

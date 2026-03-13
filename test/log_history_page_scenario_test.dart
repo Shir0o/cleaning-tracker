@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:cleaning_tracker/log_history_page.dart';
 
 void main() {
+  setUp(() {
+    LogHistoryPage.testingMode = true;
+  });
+
   group('LogHistoryPage Scenario Tests', () {
     testWidgets('User scales text up and down, layout still constrains', (
       WidgetTester tester,
