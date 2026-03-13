@@ -212,17 +212,6 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
         });
       }
     });
-
-    // Check if user is already signed in (silent sign-in result)
-    GoogleSignIn.instance.attemptLightweightAuthentication()?.then((account) {
-      if (mounted) {
-        setState(() {
-          _currentUser = account;
-        });
-      }
-    }).catchError((e) {
-      debugPrint('Lightweight auth check failed in settings: $e');
-    });
   }
 
   Future<void> _checkNotificationPermission() async {
