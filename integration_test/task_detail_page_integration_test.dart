@@ -10,6 +10,7 @@ void main() {
   testWidgets('Tap TaskCard to go to TaskDetailPage, then tap back', (
     tester,
   ) async {
+    app.DashboardScreen.testingMode = true;
     app.main();
     await tester.pumpAndSettle();
 

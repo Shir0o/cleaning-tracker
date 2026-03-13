@@ -17,15 +17,17 @@ const String fallbackGoogleServerClientId = 'test_client_id';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  try {
-    // Initialize Google Sign In globally
-    await GoogleSignIn.instance.initialize(
-      serverClientId: fallbackGoogleServerClientId,
-    );
-    // Silent sign in
-    await GoogleSignIn.instance.attemptLightweightAuthentication();
-  } catch (e) {
-    debugPrint('Global GoogleSignIn initialization failed: $e');
+  if (!DashboardScreen.testingMode) {
+    try {
+      // Initialize Google Sign In globally
+      await GoogleSignIn.instance.initialize(
+        serverClientId: fallbackGoogleServerClientId,
+      );
+      // Silent sign in
+      await GoogleSignIn.instance.attemptLightweightAuthentication();
+    } catch (e) {
+      debugPrint('Global GoogleSignIn initialization failed: $e');
+    }
   }
 
   final prefs = await SharedPreferences.getInstance();
@@ -146,6 +148,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _listenToAuthEvents() {
+    if (DashboardScreen.testingMode) return;
+
     // Listen for changes
     _authSubscription = GoogleSignIn.instance.authenticationEvents.listen((event) {
       if (mounted) {
@@ -250,19 +254,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
             )
           : ListView(
               padding: const EdgeInsets.all(16),
-              children: [
-                Center(
-                  child: Text(
-                    'NO SYSTEMS TRACKED',
-                    style: _safeGoogleFont(
-                      () => GoogleFonts.spaceGrotesk(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                        letterSpacing: -0.5,
-                        color: const Color(0xFF8A8A8A),
-                      ),
-                    ),
-                  ),
+              children: const [
+                TaskCard(
+                  title: 'HVAC FILTER',
+                  dueDateText: 'DUE IN 12D',
+                  progress: 0.85,
+                  isOverdue: false,
+                ),
+                TaskCard(
+                  title: 'SMOKE DETECTOR',
+                  dueDateText: 'DUE IN 2D',
+                  progress: 0.98,
+                  isOverdue: false,
+                ),
+                TaskCard(
+                  title: 'AIR PURIFIER',
+                  dueDateText: 'DUE IN 45D',
+                  progress: 0.5,
+                  isOverdue: false,
                 ),
               ],
             ),

@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:flutter/material.dart';
 import 'package:cleaning_tracker/main.dart' as app;
+import 'package:cleaning_tracker/log_history_page.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -9,6 +10,8 @@ void main() {
   testWidgets('End-to-end: Dashboard to Settings to Log History', (
     WidgetTester tester,
   ) async {
+    app.DashboardScreen.testingMode = true;
+    LogHistoryPage.testingMode = true;
     app.main();
     await tester.pumpAndSettle();
 

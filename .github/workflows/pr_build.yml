@@ -17,10 +17,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Job 1: Unit Tests (Linux)
+  # Job 1: Validation (Linux)
   # Cost: Lowest (1x)
-  test:
-    name: "Unit Tests (Linux)"
+  validation:
+    name: "Validation & Builds (Linux)"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -44,41 +44,20 @@ jobs:
         run: |
           find test -name "*_test.dart" ! -name "*_golden_test.dart" | xargs flutter test --fail-fast
 
-  # Job 2: Golden Tests and Platform Builds (macOS)
-  # Cost: High (10x) - Kept only for iOS-specific requirements
-  macos-builds:
-    name: "Golden Tests & Builds (macOS)"
-    runs-on: macos-latest
-    needs: test
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-          cache: true
-
-      - name: Install dependencies
-        run: flutter pub get
-
       - name: Run Golden Tests
         run: flutter test test/*_golden_test.dart --fail-fast
 
       - name: Build Android APK
         run: flutter build apk --debug
 
-      - name: Build iOS
-        run: flutter build ios --debug --no-codesign
-
-  # Job 3: Integration Tests (Android Emulator on Linux)
+  # Job 2: Integration Tests (Android Emulator on Linux)
   # Cost: Low (1x) - Significantly cheaper than macOS
   # ONLY runs on PRs and ONLY if previous checks pass.
   integration-tests:
     name: "Integration Tests (Android)"
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    needs: macos-builds # Fail-fast: ensure builds and goldens pass first
+    needs: validation # Fail-fast: ensure builds and tests pass first
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4

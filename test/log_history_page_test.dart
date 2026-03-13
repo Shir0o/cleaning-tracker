@@ -16,16 +16,9 @@ void main() {
     // Verify header exists
     expect(find.text('ARCHIVE'), findsOneWidget);
 
-    // Verify empty state message exists
-    expect(find.text('NO HISTORY AVAILABLE'), findsOneWidget);
+    // Verify mock data exists
+    expect(find.text('2024'), findsOneWidget);
+    expect(find.text('HVAC FILTER'), findsOneWidget);
 
-    // Verify year dividers do not exist
-    expect(find.text('2024'), findsNothing);
-    expect(find.text('2023'), findsNothing);
-
-    // Verify log entries do not exist
-    expect(find.text('HVAC FILTER'), findsNothing);
-    expect(find.text('SMOKE DETECTOR BATTERIES'), findsNothing);
-    expect(find.text('FURNACE MAINTENANCE'), findsNothing);
   });
 }

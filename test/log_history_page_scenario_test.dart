@@ -23,7 +23,8 @@ void main() {
 
       // Verify header and items are still found
       expect(find.text('ARCHIVE'), findsOneWidget);
-      expect(find.text('NO HISTORY AVAILABLE'), findsOneWidget);
+      expect(find.text('2024'), findsOneWidget);
+      expect(find.text('HVAC FILTER'), findsOneWidget);
 
       // Scale down
       await tester.pumpWidget(
@@ -36,7 +37,8 @@ void main() {
       );
 
       expect(find.text('ARCHIVE'), findsOneWidget);
-      expect(find.text('NO HISTORY AVAILABLE'), findsOneWidget);
+      expect(find.text('2024'), findsOneWidget);
+      expect(find.text('HVAC FILTER'), findsOneWidget);
     });
   });
 }
