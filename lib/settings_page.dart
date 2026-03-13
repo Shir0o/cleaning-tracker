@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -25,6 +26,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
   String _lastBackupTime = 'Never';
   GoogleSignInAccount? _currentUser;
   final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+  StreamSubscription? _authSubscription;
 
   // New state variables for settings
   String _notifyBeforeExpiry = '2 DAYS';
@@ -43,6 +45,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
 
   @override
   void dispose() {
+    _authSubscription?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -198,7 +201,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
 
   void _listenToAuthEvents() {
     // Listen for changes
-    GoogleSignIn.instance.authenticationEvents.listen((event) {
+    _authSubscription = GoogleSignIn.instance.authenticationEvents.listen((event) {
       if (mounted) {
         setState(() {
           if (event is GoogleSignInAuthenticationEventSignIn) {

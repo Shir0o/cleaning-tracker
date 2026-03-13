@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -93,14 +94,61 @@ class CleaningTrackerApp extends StatelessWidget {
   }
 }
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   static bool testingMode = false;
 
   const DashboardScreen({super.key});
 
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  GoogleSignInAccount? _currentUser;
+
+  StreamSubscription? _authSubscription;
+
   TextStyle _safeGoogleFont(TextStyle Function() fontFn) {
-    if (testingMode) return const TextStyle();
+    if (DashboardScreen.testingMode) return const TextStyle();
     return fontFn();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _listenToAuthEvents();
+  }
+
+  @override
+  void dispose() {
+    _authSubscription?.cancel();
+    super.dispose();
+  }
+
+  void _listenToAuthEvents() {
+    // Listen for changes
+    _authSubscription = GoogleSignIn.instance.authenticationEvents.listen((event) {
+      if (mounted) {
+        setState(() {
+          if (event is GoogleSignInAuthenticationEventSignIn) {
+            _currentUser = event.user;
+          } else if (event is GoogleSignInAuthenticationEventSignOut) {
+            _currentUser = null;
+          }
+        });
+      }
+    });
+
+    // Check if user is already signed in (silent sign-in result)
+    GoogleSignIn.instance.attemptLightweightAuthentication()?.then((account) {
+      if (mounted) {
+        setState(() {
+          _currentUser = account;
+        });
+      }
+    }).catchError((e) {
+      debugPrint('Lightweight auth check failed in dashboard: $e');
+    });
   }
 
   @override
@@ -127,6 +175,25 @@ class DashboardScreen extends StatelessWidget {
           ),
         ),
         actions: [
+          if (_currentUser != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: Tooltip(
+                message: _currentUser!.email,
+                child: CircleAvatar(
+                  radius: 16,
+                  backgroundColor: colorScheme.primary,
+                  child: Text(
+                    _currentUser!.email[0].toUpperCase(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ),
+            ),
           Container(
             margin: const EdgeInsets.only(right: 16),
             width: 40,
