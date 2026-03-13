@@ -24,6 +24,8 @@ Future<void> main() async {
       await GoogleSignIn.instance.initialize(
         serverClientId: googleServerClientId,
       );
+      // Start silent sign-in as early as possible
+      GoogleSignIn.instance.attemptLightweightAuthentication();
     } catch (e) {
       debugPrint('Global GoogleSignIn initialization failed: $e');
     }
@@ -162,9 +164,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         });
       }
     });
-
-    // Trigger silent sign-in in the background
-    GoogleSignIn.instance.attemptLightweightAuthentication();
   }
 
   @override
