@@ -162,6 +162,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         });
       }
     });
+
+    // Trigger silent sign-in in the background
+    GoogleSignIn.instance.attemptLightweightAuthentication();
   }
 
   @override
