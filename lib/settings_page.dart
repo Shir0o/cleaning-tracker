@@ -5,6 +5,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'log_history_page.dart';
 import 'secrets.dart';
+import 'main.dart' show themeNotifier;
 
 class SettingsPage extends StatefulWidget {
   static bool testingMode = false;
@@ -81,12 +82,13 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
     showDialog(
       context: context,
       builder: (context) {
+        final colorScheme = Theme.of(context).colorScheme;
         return Dialog(
           shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: Colors.black, width: 4),
+              color: colorScheme.surface,
+              border: Border.all(color: colorScheme.onSurface, width: 4),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -101,11 +103,12 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                         fontWeight: FontWeight.bold,
                         fontSize: 24,
                         letterSpacing: -0.5,
+                        color: colorScheme.onSurface,
                       ),
                     ),
                   ),
                 ),
-                const Divider(color: Colors.black, thickness: 2, height: 0),
+                Divider(color: colorScheme.onSurface, thickness: 2, height: 0),
                 Flexible(
                   child: ListView.builder(
                     shrinkWrap: true,
@@ -125,9 +128,9 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                             vertical: 16,
                           ),
                           decoration: BoxDecoration(
-                            color: isSelected ? Colors.black : Colors.white,
-                            border: const Border(
-                              bottom: BorderSide(color: Colors.black),
+                            color: isSelected ? colorScheme.onSurface : colorScheme.surface,
+                            border: Border(
+                              bottom: BorderSide(color: colorScheme.onSurface),
                             ),
                           ),
                           child: Row(
@@ -142,15 +145,15 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                                         ? FontWeight.bold
                                         : FontWeight.normal,
                                     color: isSelected
-                                        ? Colors.white
-                                        : Colors.black,
+                                        ? colorScheme.surface
+                                        : colorScheme.onSurface,
                                   ),
                                 ),
                               ),
                               if (isSelected)
-                                const Icon(
+                                Icon(
                                   Icons.check,
-                                  color: Colors.white,
+                                  color: colorScheme.surface,
                                   size: 20,
                                 ),
                             ],
@@ -167,8 +170,8 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                     height: 48,
                     child: OutlinedButton(
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.black,
-                        side: const BorderSide(color: Colors.black, width: 2),
+                        foregroundColor: colorScheme.onSurface,
+                        side: BorderSide(color: colorScheme.onSurface, width: 2),
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.zero,
                         ),
@@ -319,7 +322,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
           padding: const EdgeInsets.only(left: 16.0, top: 8.0, bottom: 8.0),
           child: Container(
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.black, width: 2),
+              border: Border.all(color: colorScheme.onSurface, width: 2),
             ),
             child: Material(
               color: Colors.transparent,
@@ -327,16 +330,16 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                 onTap: () {
                   Navigator.of(context).pop();
                 },
-                child: const Icon(
+                child: Icon(
                   Icons.arrow_back,
-                  color: Colors.black,
+                  color: colorScheme.onSurface,
                   size: 24,
                 ),
               ),
             ),
           ),
         ),
-        shape: const Border(bottom: BorderSide(color: Colors.black, width: 2)),
+        shape: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
         title: Text(
           'SYSTEM SETTINGS',
           style: _safeGoogleFont(
@@ -345,7 +348,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
               fontSize:
                   28, // Scaled down slightly from 32 for screen fit with back button
               letterSpacing: -0.5,
-              color: Colors.black,
+              color: colorScheme.onSurface,
             ),
           ),
         ),
@@ -358,14 +361,15 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
             // Notification Preferences
             _buildSectionHeader('01. Notification Preferences'),
             Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 border: Border(
-                  bottom: BorderSide(color: Colors.black, width: 2),
+                  bottom: BorderSide(color: colorScheme.onSurface, width: 2),
                 ),
               ),
               child: Column(
                 children: [
                   _buildSettingRow(
+                    context: context,
                     icon: Icons.security,
                     title: 'System Permission',
                     subtitle: _notificationsEnabled
@@ -379,8 +383,8 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                           )
                         : Container(
                             decoration: BoxDecoration(
-                              color: Colors.black,
-                              border: Border.all(color: Colors.black, width: 2),
+                              color: colorScheme.onSurface,
+                              border: Border.all(color: colorScheme.onSurface, width: 2),
                             ),
                             child: Material(
                               color: Colors.transparent,
@@ -396,7 +400,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                                     'ENABLE',
                                     style: _safeGoogleFont(
                                       () => GoogleFonts.spaceGrotesk(
-                                        color: Colors.white,
+                                        color: colorScheme.surface,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 12,
                                         letterSpacing: 1.0,
@@ -409,6 +413,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                           ),
                   ),
                   _buildSettingRow(
+                    context: context,
                     onTap: () {
                       _showSelectionDialog(
                         title: 'Notify Before',
@@ -432,9 +437,9 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Container(
-                          decoration: const BoxDecoration(
+                          decoration: BoxDecoration(
                             border: Border(
-                              bottom: BorderSide(color: Colors.black, width: 2),
+                              bottom: BorderSide(color: colorScheme.onSurface, width: 2),
                             ),
                           ),
                           padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -454,6 +459,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                     ),
                   ),
                   _buildSettingRow(
+                    context: context,
                     onTap: () {
                       _showSelectionDialog(
                         title: 'Reminder Time',
@@ -477,9 +483,9 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Container(
-                          decoration: const BoxDecoration(
+                          decoration: BoxDecoration(
                             border: Border(
-                              bottom: BorderSide(color: Colors.black, width: 2),
+                              bottom: BorderSide(color: colorScheme.onSurface, width: 2),
                             ),
                           ),
                           padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -489,6 +495,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                               () => GoogleFonts.chivoMono(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,
+                                color: colorScheme.onSurface,
                               ),
                             ),
                           ),
@@ -498,6 +505,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                         _buildBrutalSwitch(
                           _notificationsEnabled,
                           _requestNotificationPermission,
+                          context,
                         ),
                       ],
                     ),
@@ -509,14 +517,15 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
             // Global Preferences
             _buildSectionHeader('02. Global Preferences'),
             Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 border: Border(
-                  bottom: BorderSide(color: Colors.black, width: 2),
+                  bottom: BorderSide(color: colorScheme.onSurface, width: 2),
                 ),
               ),
               child: Column(
                 children: [
                   _buildSettingRow(
+                    context: context,
                     onTap: () {
                       _showSelectionDialog(
                         title: 'Interface Theme',
@@ -525,6 +534,14 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                         onSelected: (val) {
                           setState(() => _interfaceTheme = val);
                           _saveSetting('interfaceTheme', val);
+
+                          if (val == 'DARK') {
+                            themeNotifier.value = ThemeMode.dark;
+                          } else if (val == 'SYSTEM') {
+                            themeNotifier.value = ThemeMode.system;
+                          } else {
+                            themeNotifier.value = ThemeMode.light;
+                          }
                         },
                       );
                     },
@@ -534,9 +551,9 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Container(
-                          decoration: const BoxDecoration(
+                          decoration: BoxDecoration(
                             border: Border(
-                              bottom: BorderSide(color: Colors.black, width: 2),
+                              bottom: BorderSide(color: colorScheme.onSurface, width: 2),
                             ),
                           ),
                           padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -546,16 +563,18 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                               () => GoogleFonts.chivoMono(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,
+                                color: colorScheme.onSurface,
                               ),
                             ),
                           ),
                         ),
                         const SizedBox(width: 8),
-                        const Icon(Icons.expand_more, size: 20),
+                        Icon(Icons.expand_more, size: 20, color: colorScheme.onSurface),
                       ],
                     ),
                   ),
                   _buildSettingRow(
+                    context: context,
                     onTap: () {
                       _showSelectionDialog(
                         title: 'Start of Week',
@@ -573,9 +592,9 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Container(
-                          decoration: const BoxDecoration(
+                          decoration: BoxDecoration(
                             border: Border(
-                              bottom: BorderSide(color: Colors.black, width: 2),
+                              bottom: BorderSide(color: colorScheme.onSurface, width: 2),
                             ),
                           ),
                           padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -585,12 +604,13 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                               () => GoogleFonts.chivoMono(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,
+                                color: colorScheme.onSurface,
                               ),
                             ),
                           ),
                         ),
                         const SizedBox(width: 8),
-                        const Icon(Icons.expand_more, size: 20),
+                        Icon(Icons.expand_more, size: 20, color: colorScheme.onSurface),
                       ],
                     ),
                   ),
@@ -602,16 +622,16 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
             _buildSectionHeader('03. Data & Sync'),
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 border: Border(
-                  bottom: BorderSide(color: Colors.black, width: 2),
+                  bottom: BorderSide(color: colorScheme.onSurface, width: 2),
                 ),
               ),
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC), // slate-50
-                  border: Border.all(color: Colors.black, width: 2),
+                  color: theme.brightness == Brightness.dark ? const Color(0xFF1A1A1A) : const Color(0xFFF8FAFC),
+                  border: Border.all(color: colorScheme.onSurface, width: 2),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -622,8 +642,8 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                           width: 40,
                           height: 40,
                           decoration: BoxDecoration(
-                            color: Colors.white,
-                            border: Border.all(color: Colors.black, width: 2),
+                            color: colorScheme.surface,
+                            border: Border.all(color: colorScheme.onSurface, width: 2),
                           ),
                           child: Icon(
                             Icons.cloud_upload,
@@ -642,6 +662,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                                 ).fontFamily,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,
+                                color: colorScheme.onSurface,
                               ),
                             ),
                             Text(
@@ -655,7 +676,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                                 fontWeight: FontWeight.w500,
                                 fontSize: 12,
                                 fontStyle: FontStyle.italic,
-                                color: Colors.grey[600],
+                                color: Colors.grey[500],
                               ),
                             ),
                           ],
@@ -666,10 +687,10 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                     Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: Colors.black,
-                        border: Border.all(color: Colors.black, width: 2),
-                        boxShadow: const [
-                          BoxShadow(color: Colors.black, offset: Offset(4, 4)),
+                        color: colorScheme.onSurface,
+                        border: Border.all(color: colorScheme.onSurface, width: 2),
+                        boxShadow: [
+                          BoxShadow(color: colorScheme.onSurface, offset: const Offset(4, 4)),
                         ],
                       ),
                       child: Material(
@@ -692,7 +713,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                                   fontWeight: FontWeight.bold,
                                   fontSize: 12,
                                   letterSpacing: 1.5,
-                                  color: Colors.white,
+                                  color: colorScheme.surface,
                                 ),
                               ),
                             ),
@@ -711,8 +732,8 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
               padding: const EdgeInsets.only(left: 16.0, right: 16, bottom: 16),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: Colors.black, width: 2),
+                  color: colorScheme.surface,
+                  border: Border.all(color: colorScheme.onSurface, width: 2),
                 ),
                 child: Material(
                   color: Colors.transparent,
@@ -741,11 +762,12 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                                   ).fontFamily,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 14,
+                                  color: colorScheme.onSurface,
                                 ),
                               ),
                             ],
                           ),
-                          const Icon(Icons.arrow_forward),
+                          Icon(Icons.arrow_forward, color: colorScheme.onSurface),
                         ],
                       ),
                     ),
@@ -776,17 +798,19 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
   }
 
   Widget _buildSettingRow({
+    required BuildContext context,
     required IconData icon,
     required String title,
     String? subtitle,
     required Widget trailing,
     VoidCallback? onTap,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
     return InkWell(
       onTap: onTap,
       child: Container(
-        decoration: const BoxDecoration(
-          border: Border(bottom: BorderSide(color: Colors.black, width: 2)),
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
         ),
         padding: const EdgeInsets.all(16),
         child: Row(
@@ -807,6 +831,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                         ).fontFamily,
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
+                        color: colorScheme.onSurface,
                       ),
                     ),
                     if (subtitle != null)
@@ -832,15 +857,18 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
     );
   }
 
-  Widget _buildBrutalSwitch(bool value, Function(bool) onChanged) {
+  Widget _buildBrutalSwitch(bool value, Function(bool) onChanged, BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return GestureDetector(
       onTap: () => onChanged(!value),
       child: Container(
         width: 44,
         height: 24,
         decoration: BoxDecoration(
-          color: Colors.grey[200],
-          border: Border.all(color: Colors.black, width: 2),
+          color: theme.brightness == Brightness.dark ? Colors.black : Colors.grey[200],
+          border: Border.all(color: colorScheme.onSurface, width: 2),
         ),
         child: Stack(
           children: [
@@ -852,7 +880,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
               bottom: 0,
               child: Container(
                 width: 16,
-                color: value ? Colors.white : Colors.black,
+                color: value ? colorScheme.onSurface : colorScheme.onSurface,
               ),
             ),
             if (value)

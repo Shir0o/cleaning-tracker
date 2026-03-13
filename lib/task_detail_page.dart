@@ -52,7 +52,7 @@ class TaskDetailPage extends StatelessWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.black, width: 2),
+              border: Border.all(color: colorScheme.onSurface, width: 2),
               color: colorScheme.surface,
             ),
             child: Material(
@@ -61,16 +61,16 @@ class TaskDetailPage extends StatelessWidget {
                 onTap: () {
                   Navigator.of(context).pop();
                 },
-                child: const Icon(
+                child: Icon(
                   Icons.arrow_back,
-                  color: Colors.black,
+                  color: colorScheme.onSurface,
                   size: 24,
                 ),
               ),
             ),
           ),
         ),
-        shape: const Border(bottom: BorderSide(color: Colors.black, width: 2)),
+        shape: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
         title: Text(
           title,
           style: _safeGoogleFont(
@@ -78,7 +78,7 @@ class TaskDetailPage extends StatelessWidget {
               fontWeight: FontWeight.bold,
               fontSize: 32,
               letterSpacing: -0.5,
-              color: Colors.black,
+              color: colorScheme.onSurface,
             ),
           ),
         ),
@@ -90,9 +90,9 @@ class TaskDetailPage extends StatelessWidget {
           // Status Display
           Container(
             padding: const EdgeInsets.symmetric(vertical: 40),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(bottom: BorderSide(color: Colors.black, width: 2)),
+            decoration: BoxDecoration(
+              color: colorScheme.surface,
+              border: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
             ),
             child: Column(
               children: [
@@ -151,8 +151,8 @@ class TaskDetailPage extends StatelessWidget {
           // Reset Action
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: const BoxDecoration(
-              border: Border(bottom: BorderSide(color: Colors.black, width: 2)),
+            decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
             ),
             child: Column(
               children: [
@@ -231,8 +231,8 @@ class TaskDetailPage extends StatelessWidget {
 
           // Interval Editable Section
           Container(
-            decoration: const BoxDecoration(
-              border: Border(bottom: BorderSide(color: Colors.black, width: 2)),
+            decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
             ),
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -254,9 +254,9 @@ class TaskDetailPage extends StatelessWidget {
                       // Edit interval action
                     },
                     child: Container(
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         border: Border(
-                          bottom: BorderSide(color: Colors.black, width: 1),
+                          bottom: BorderSide(color: colorScheme.onSurface, width: 1),
                         ),
                       ),
                       child: Row(
@@ -266,7 +266,7 @@ class TaskDetailPage extends StatelessWidget {
                             style: _safeGoogleFont(
                               () => GoogleFonts.chivoMono(
                                 fontSize: 16,
-                                color: Colors.black,
+                                color: colorScheme.onSurface,
                               ),
                             ),
                           ),
@@ -287,8 +287,8 @@ class TaskDetailPage extends StatelessWidget {
 
           // Quick Specs Section
           Container(
-            decoration: const BoxDecoration(
-              border: Border(bottom: BorderSide(color: Colors.black, width: 2)),
+            decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
             ),
             child: Column(
               children: [
@@ -297,10 +297,10 @@ class TaskDetailPage extends StatelessWidget {
                     horizontal: 16,
                     vertical: 12,
                   ),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFF4F4F4), // Surface color
+                  decoration: BoxDecoration(
+                    color: theme.brightness == Brightness.dark ? const Color(0xFF1A1A1A) : const Color(0xFFF4F4F4), // Surface color
                     border: Border(
-                      bottom: BorderSide(color: Colors.black, width: 1),
+                      bottom: BorderSide(color: colorScheme.onSurface, width: 1),
                     ),
                   ),
                   child: Row(
@@ -313,15 +313,16 @@ class TaskDetailPage extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
                             letterSpacing: -0.5,
+                            color: colorScheme.onSurface,
                           ),
                         ),
                       ),
-                      const Icon(Icons.edit, size: 20),
+                      Icon(Icons.edit, size: 20, color: colorScheme.onSurface),
                     ],
                   ),
                 ),
-                _buildSpecRow('SPEC 1', 'N/A'),
-                _buildSpecRow('SPEC 2', 'N/A', isLast: true),
+                _buildSpecRow('SPEC 1', 'N/A', context),
+                _buildSpecRow('SPEC 2', 'N/A', context, isLast: true),
               ],
             ),
           ),
@@ -344,15 +345,16 @@ class TaskDetailPage extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
                         letterSpacing: -0.5,
+                        color: colorScheme.onSurface,
                       ),
                     ),
                   ),
                 ),
                 Container(
                   padding: const EdgeInsets.all(16),
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     border: Border(
-                      top: BorderSide(color: Colors.black, width: 2),
+                      top: BorderSide(color: colorScheme.onSurface, width: 2),
                     ),
                   ),
                   child: Text(
@@ -373,13 +375,14 @@ class TaskDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSpecRow(String label, String value, {bool isLast = false}) {
+  Widget _buildSpecRow(String label, String value, BuildContext context, {bool isLast = false}) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         border: isLast
             ? null
-            : const Border(bottom: BorderSide(color: Colors.black, width: 1)),
+            : Border(bottom: BorderSide(color: colorScheme.onSurface, width: 1)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -397,7 +400,7 @@ class TaskDetailPage extends StatelessWidget {
           Text(
             value,
             style: _safeGoogleFont(
-              () => GoogleFonts.chivoMono(fontSize: 16, color: Colors.black),
+              () => GoogleFonts.chivoMono(fontSize: 16, color: colorScheme.onSurface),
             ),
           ),
         ],
@@ -405,11 +408,12 @@ class TaskDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildLogRow(String date) {
+  Widget _buildLogRow(String date, BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.black, width: 1)),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 1)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -420,7 +424,7 @@ class TaskDetailPage extends StatelessWidget {
               () => GoogleFonts.inter(
                 fontWeight: FontWeight.w500,
                 fontSize: 16,
-                color: Colors.black,
+                color: colorScheme.onSurface,
               ),
             ),
           ),
@@ -439,6 +443,7 @@ class TaskDetailPage extends StatelessWidget {
   }
 
   void _showDeleteConfirmation(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -446,8 +451,8 @@ class TaskDetailPage extends StatelessWidget {
           shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: Colors.black, width: 4),
+              color: colorScheme.surface,
+              border: Border.all(color: colorScheme.onSurface, width: 4),
             ),
             padding: const EdgeInsets.all(24),
             child: Column(
@@ -461,7 +466,7 @@ class TaskDetailPage extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                       fontSize: 24,
                       letterSpacing: -0.5,
-                      color: Colors.black,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                 ),
@@ -472,7 +477,7 @@ class TaskDetailPage extends StatelessWidget {
                     () => GoogleFonts.inter(
                       fontWeight: FontWeight.w500,
                       fontSize: 14,
-                      color: Colors.black,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                 ),
@@ -484,9 +489,9 @@ class TaskDetailPage extends StatelessWidget {
                         height: 48,
                         child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.black,
-                            side: const BorderSide(
-                              color: Colors.black,
+                            foregroundColor: colorScheme.onSurface,
+                            side: BorderSide(
+                              color: colorScheme.onSurface,
                               width: 2,
                             ),
                             shape: const RoundedRectangleBorder(
