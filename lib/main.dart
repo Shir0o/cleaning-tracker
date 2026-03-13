@@ -8,6 +8,7 @@ import 'package:shimmer/shimmer.dart';
 import 'add_task_page.dart';
 import 'settings_page.dart';
 import 'task_detail_page.dart';
+import 'secrets.dart';
 
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 
@@ -21,7 +22,7 @@ Future<void> main() async {
     try {
       // Initialize Google Sign In globally
       await GoogleSignIn.instance.initialize(
-        serverClientId: fallbackGoogleServerClientId,
+        serverClientId: googleServerClientId,
       );
       // Silent sign in
       await GoogleSignIn.instance.attemptLightweightAuthentication();
