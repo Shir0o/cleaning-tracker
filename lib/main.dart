@@ -201,25 +201,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ),
         actions: [
-          if (_currentUser != null)
-            Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: Tooltip(
-                message: _currentUser!.email,
-                child: CircleAvatar(
-                  radius: 16,
-                  backgroundColor: colorScheme.primary,
-                  child: Text(
-                    _currentUser!.email[0].toUpperCase(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-              ),
-            ),
           Container(
             margin: const EdgeInsets.only(right: 16),
             width: 40,
