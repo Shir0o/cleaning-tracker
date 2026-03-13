@@ -24,8 +24,6 @@ Future<void> main() async {
       await GoogleSignIn.instance.initialize(
         serverClientId: googleServerClientId,
       );
-      // Silent sign in
-      await GoogleSignIn.instance.attemptLightweightAuthentication();
     } catch (e) {
       debugPrint('Global GoogleSignIn initialization failed: $e');
     }
