@@ -251,14 +251,13 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
   Future<void> _handleSignIn() async {
     try {
       debugPrint('Attempting Google Sign In...');
-      final account = await DriveService().authenticate();
-      debugPrint('Sign in result: $account');
+      await DriveService().setSyncEnabled(true);
     } catch (error, stackTrace) {
       debugPrint('Sign in error: $error');
       debugPrint('Stack trace: $stackTrace');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Sign in failed. Please check your configuration.'),
           ),
         );

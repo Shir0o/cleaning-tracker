@@ -52,23 +52,26 @@ class DriveService extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     _isDriveSyncEnabled = prefs.getBool(_syncEnabledKey) ?? false;
     
-    if (_isDriveSyncEnabled) {
-      await signInSilently();
-      if (_currentUser != null) {
-        syncFiles().catchError((e) => debugPrint('Initial sync failed: $e'));
-      }
+    // Always attempt to restore sign in status so the UI reflects the current user
+    await signInSilently();
+    
+    if (_isDriveSyncEnabled && _currentUser != null) {
+      syncFiles().catchError((e) => debugPrint('Initial sync failed: $e'));
     }
   }
 
   Future<void> setSyncEnabled(bool enabled) async {
+    if (enabled && _currentUser == null) {
+      final account = await authenticate();
+      if (account == null) return; // Don't enable if sign-in failed
+    }
+
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_syncEnabledKey, enabled);
     _isDriveSyncEnabled = enabled;
     notifyListeners();
     
-    if (enabled && _currentUser == null) {
-      await authenticate();
-    } else if (enabled && _currentUser != null) {
+    if (enabled && _currentUser != null) {
       await syncFiles();
     }
   }
