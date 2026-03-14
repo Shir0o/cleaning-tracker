@@ -353,6 +353,9 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                 children: [
                   _buildSettingRow(
                     context: context,
+                    onTap: _notificationsEnabled
+                        ? null
+                        : () => _requestNotificationPermission(true),
                     icon: Icons.security,
                     title: 'System Permission',
                     subtitle: _notificationsEnabled
