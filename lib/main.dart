@@ -9,7 +9,6 @@ import 'package:googleapis/drive/v3.dart' as drive;
 import 'add_task_page.dart';
 import 'settings_page.dart';
 import 'task_detail_page.dart';
-import 'secrets.dart';
 import 'drive_service.dart';
 
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
@@ -24,7 +23,7 @@ Future<void> main() async {
     try {
       // Initialize Google Sign In globally
       await GoogleSignIn.instance.initialize(
-        serverClientId: googleServerClientId,
+        serverClientId: fallbackGoogleServerClientId,
       );
       // Initialize DriveService
       await DriveService().init();
