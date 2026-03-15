@@ -99,4 +99,38 @@ void main() {
     // Verify dialog is closed and value is updated
     expect(find.text('DARK'), findsOneWidget);
   });
+
+  testWidgets('Settings page shows all notify before options', (
+    WidgetTester tester,
+  ) async {
+    // Build our app
+    await tester.pumpWidget(const MaterialApp(home: SettingsPage()));
+
+    // Tap the Notify before expiry row
+    await tester.tap(find.text('NOTIFY BEFORE EXPIRY'));
+    await tester.pumpAndSettle();
+
+    // Verify dialog title is shown
+    expect(find.text('NOTIFY BEFORE'), findsWidgets);
+
+    // Verify all options are present
+    final options = [
+      'SAME DAY',
+      '1 DAY',
+      '2 DAYS',
+      '3 DAYS',
+      '4 DAYS',
+      '5 DAYS',
+      '1 WEEK',
+      '2 WEEKS',
+    ];
+
+    for (final option in options) {
+      if (option == '2 DAYS') {
+        expect(find.text(option), findsWidgets); // Found in list and on background page
+      } else {
+        expect(find.text(option), findsOneWidget);
+      }
+    }
+  });
 }

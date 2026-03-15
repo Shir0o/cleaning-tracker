@@ -47,9 +47,6 @@ jobs:
       - name: Run Golden Tests
         run: flutter test test/*_golden_test.dart --fail-fast
 
-      - name: Build Android APK
-        run: flutter build apk --debug
-
   # Job 2: Integration Tests (Android Emulator on Linux)
   # Cost: Low (1x) - Significantly cheaper than macOS
   # ONLY runs on PRs and ONLY if previous checks pass.

@@ -403,10 +403,14 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                       _showSelectionDialog(
                         title: 'Notify Before',
                         options: [
+                          'SAME DAY',
                           '1 DAY',
                           '2 DAYS',
                           '3 DAYS',
+                          '4 DAYS',
+                          '5 DAYS',
                           '1 WEEK',
+                          '2 WEEKS',
                         ],
                         currentValue: _notifyBeforeExpiry,
                         onSelected: (val) {
