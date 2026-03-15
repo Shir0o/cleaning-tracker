@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'presets_page.dart';
+
 class AddTaskPage extends StatefulWidget {
   static bool testingMode = false;
 
@@ -79,6 +81,67 @@ class _AddTaskPageState extends State<AddTaskPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SizedBox(height: 16),
+            InkWell(
+              onTap: () async {
+                final result = await Navigator.of(context).push<Map<String, String>>(
+                  MaterialPageRoute(builder: (context) => const PresetsPage()),
+                );
+                if (result != null) {
+                  setState(() {
+                    _nameController.text = result['name']!;
+                    _selectedInterval = result['interval']!;
+                  });
+                }
+              },
+              child: Container(
+                height: 64,
+                decoration: BoxDecoration(
+                  color: colorScheme.surface,
+                  border: Border.all(color: colorScheme.onSurface, width: 2),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'CHOOSE FROM PRESETS',
+                      style: _safeGoogleFont(
+                        () => GoogleFonts.spaceGrotesk(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          letterSpacing: 1.0,
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                    ),
+                    Icon(
+                      Icons.chevron_right,
+                      color: colorScheme.onSurface,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(child: Container(height: 1, color: colorScheme.onSurface)),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Text(
+                    'OR CREATE CUSTOM',
+                    style: _safeGoogleFont(
+                      () => GoogleFonts.chivoMono(
+                        fontSize: 10,
+                        color: const Color(0xFF8A8A8A),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(child: Container(height: 1, color: colorScheme.onSurface)),
+              ],
+            ),
             const SizedBox(height: 16),
             SizedBox(
               height: 56,
@@ -186,7 +249,11 @@ class _AddTaskPageState extends State<AddTaskPage> {
   Widget _buildIntervalButton(String text, BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final isSelected = _selectedInterval == text;
+    bool isSelected = _selectedInterval == text;
+
+    if (text == 'CUSTOM' && !['7 DAYS', '30 DAYS', '90 DAYS'].contains(_selectedInterval)) {
+      isSelected = true;
+    }
 
     return Container(
       decoration: BoxDecoration(
