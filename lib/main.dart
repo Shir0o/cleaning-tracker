@@ -4,17 +4,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:googleapis/drive/v3.dart' as drive;
 
 import 'add_task_page.dart';
 import 'settings_page.dart';
 import 'task_detail_page.dart';
+import 'secrets.dart';
 import 'drive_service.dart';
 
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
-
-// Temporary placeholder since secrets.dart is in .gitignore
-const String fallbackGoogleServerClientId = 'test_client_id';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,7 +20,7 @@ Future<void> main() async {
     try {
       // Initialize Google Sign In globally
       await GoogleSignIn.instance.initialize(
-        serverClientId: fallbackGoogleServerClientId,
+        serverClientId: googleServerClientId,
       );
       // Initialize DriveService
       await DriveService().init();
