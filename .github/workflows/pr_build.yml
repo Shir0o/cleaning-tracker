@@ -72,7 +72,7 @@ jobs:
           cache: true
 
       - name: Run Integration Tests
-        uses: reactive-circus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
           arch: x86_64
