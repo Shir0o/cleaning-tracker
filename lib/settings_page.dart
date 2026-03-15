@@ -6,8 +6,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'log_history_page.dart';
 import 'drive_service.dart';
-import 'secrets.dart';
-import 'main.dart' show themeNotifier;
+import 'main.dart' show themeNotifier, fallbackGoogleServerClientId;
 
 class SettingsPage extends StatefulWidget {
   static bool testingMode = false;
