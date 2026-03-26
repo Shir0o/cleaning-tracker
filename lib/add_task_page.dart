@@ -15,6 +15,8 @@ class AddTaskPage extends StatefulWidget {
 class _AddTaskPageState extends State<AddTaskPage> {
   String _selectedInterval = '7 DAYS';
   final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _customIntervalController = TextEditingController(text: '14');
+  String _customIntervalUnit = 'DAYS';
 
   TextStyle _safeGoogleFont(TextStyle Function() fontFn) {
     if (AddTaskPage.testingMode) return const TextStyle();
@@ -24,6 +26,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
   @override
   void dispose() {
     _nameController.dispose();
+    _customIntervalController.dispose();
     super.dispose();
   }
 
@@ -76,13 +79,14 @@ class _AddTaskPageState extends State<AddTaskPage> {
         ),
         centerTitle: false,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 16),
-            InkWell(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 16),
+              InkWell(
               onTap: () async {
                 final result = await Navigator.of(context).push<Map<String, String>>(
                   MaterialPageRoute(builder: (context) => const PresetsPage()),
@@ -188,9 +192,9 @@ class _AddTaskPageState extends State<AddTaskPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: GridView.count(
+              const SizedBox(height: 16),
+              GridView.count(
+                shrinkWrap: true,
                 crossAxisCount: 2,
                 mainAxisSpacing: 16,
                 crossAxisSpacing: 16,
@@ -204,8 +208,95 @@ class _AddTaskPageState extends State<AddTaskPage> {
                   _buildIntervalButton('CUSTOM', context),
                 ],
               ),
-            ),
-          ],
+              if (_selectedInterval == 'CUSTOM') ...[
+                const SizedBox(height: 32),
+                Text(
+                  'CUSTOM INTERVAL',
+                  style: _safeGoogleFont(
+                    () => GoogleFonts.spaceGrotesk(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      letterSpacing: -0.5,
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: SizedBox(
+                        height: 56,
+                        child: TextField(
+                          controller: _customIntervalController,
+                          keyboardType: TextInputType.number,
+                          cursorColor: colorScheme.primary,
+                          style: _safeGoogleFont(
+                            () => GoogleFonts.chivoMono(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.onSurface,
+                            ),
+                          ),
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: colorScheme.surface,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: colorScheme.onSurface, width: 2),
+                              borderRadius: BorderRadius.zero,
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                              borderRadius: BorderRadius.zero,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 24),
+                    Container(
+                      width: 120,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        border: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: _customIntervalUnit,
+                          icon: Icon(Icons.expand_more, color: colorScheme.onSurface),
+                          isExpanded: true,
+                          style: _safeGoogleFont(
+                            () => GoogleFonts.spaceGrotesk(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.onSurface,
+                            ),
+                          ),
+                          dropdownColor: colorScheme.surface,
+                          onChanged: (String? newValue) {
+                            if (newValue != null) {
+                              setState(() {
+                                _customIntervalUnit = newValue;
+                              });
+                            }
+                          },
+                          items: <String>['DAYS', 'WEEKS', 'MONTHS']
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: Container(
