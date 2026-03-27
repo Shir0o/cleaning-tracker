@@ -40,14 +40,13 @@ void main() {
       // Interval Section
       expect(find.text('INTERVAL'), findsOneWidget);
 
-      // Quick Specs Section
+      // Notes Section
       // We might need to scroll for these
       await tester.drag(find.byType(ListView), const Offset(0, -300));
       await tester.pump();
 
-      expect(find.text('QUICK SPECS'), findsOneWidget);
-      expect(find.text('SPEC 1'), findsOneWidget);
-      expect(find.text('SPEC 2'), findsOneWidget);
+      expect(find.text('NOTES'), findsOneWidget);
+      expect(find.text('NO NOTES'), findsOneWidget);
 
       // Log Archive Section
       await tester.drag(find.byType(ListView), const Offset(0, -500));

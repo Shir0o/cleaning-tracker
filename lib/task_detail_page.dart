@@ -129,11 +129,8 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     );
   }
 
-  void _showSpecsDialog() {
-    final Map<String, TextEditingController> controllers = {};
-    _currentTask.specs.forEach((key, value) {
-      controllers[key] = TextEditingController(text: value);
-    });
+  void _showNotesDialog() {
+    final controller = TextEditingController(text: _currentTask.notes);
 
     showDialog(
       context: context,
@@ -149,25 +146,44 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ...controllers.entries.map((entry) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: TextField(
-                      controller: entry.value,
-                      decoration: InputDecoration(labelText: entry.key),
+                Text(
+                  'EDIT NOTES',
+                  style: _safeGoogleFont(
+                    () => GoogleFonts.spaceGrotesk(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
+                      color: colorScheme.onSurface,
                     ),
-                  );
-                }),
-                ElevatedButton(
-                  onPressed: () {
-                    final newSpecs = controllers.map((key, controller) => MapEntry(key, controller.text));
-                    setState(() {
-                      _currentTask = _currentTask.copyWith(specs: newSpecs);
-                    });
-                    Navigator.pop(context);
-                  },
-                  child: const Text('SAVE SPECS'),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: controller,
+                  maxLines: 5,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: 'Enter notes here...',
+                  ),
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: colorScheme.onSurface,
+                      foregroundColor: colorScheme.surface,
+                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _currentTask = _currentTask.copyWith(notes: controller.text);
+                      });
+                      Navigator.pop(context);
+                    },
+                    child: const Text('SAVE NOTES'),
+                  ),
                 )
               ],
             ),
@@ -578,15 +594,16 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
               ),
             ),
   
-            // Quick Specs Section
+            // Notes Section
             Container(
               decoration: BoxDecoration(
                 border: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
               ),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   InkWell(
-                    onTap: _showSpecsDialog,
+                    onTap: _showNotesDialog,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
@@ -602,7 +619,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'QUICK SPECS',
+                            'NOTES',
                             style: _safeGoogleFont(
                               () => GoogleFonts.spaceGrotesk(
                                 fontWeight: FontWeight.bold,
@@ -617,7 +634,19 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                       ),
                     ),
                   ),
-                  ..._currentTask.specs.entries.map((entry) => _buildSpecRow(entry.key, entry.value, context)),
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text(
+                      _currentTask.notes.isEmpty ? 'NO NOTES' : _currentTask.notes,
+                      style: _safeGoogleFont(
+                        () => GoogleFonts.inter(
+                          fontSize: 16,
+                          height: 1.5,
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -667,39 +696,6 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildSpecRow(String label, String value, BuildContext context, {bool isLast = false}) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        border: isLast
-            ? null
-            : Border(bottom: BorderSide(color: colorScheme.onSurface, width: 1)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: _safeGoogleFont(
-              () => GoogleFonts.inter(
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-                color: const Color(0xFF8A8A8A),
-              ),
-            ),
-          ),
-          Text(
-            value,
-            style: _safeGoogleFont(
-              () => GoogleFonts.chivoMono(fontSize: 16, color: colorScheme.onSurface),
-            ),
-          ),
-        ],
       ),
     );
   }

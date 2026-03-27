@@ -20,29 +20,29 @@ class Task {
   final String interval;
   final DateTime lastCompleted;
   final String category;
-  final Map<String, String> specs;
+  final String notes;
 
   Task({
     required this.title,
     required this.interval,
     required this.lastCompleted,
     this.category = 'GENERAL',
-    Map<String, String>? specs,
-  }) : specs = specs ?? {'SPEC 1': 'N/A', 'SPEC 2': 'N/A'};
+    this.notes = '',
+  });
 
   Task copyWith({
     String? title,
     String? interval,
     DateTime? lastCompleted,
     String? category,
-    Map<String, String>? specs,
+    String? notes,
   }) {
     return Task(
       title: title ?? this.title,
       interval: interval ?? this.interval,
       lastCompleted: lastCompleted ?? this.lastCompleted,
       category: category ?? this.category,
-      specs: specs ?? this.specs,
+      notes: notes ?? this.notes,
     );
   }
 
@@ -51,7 +51,7 @@ class Task {
         'interval': interval,
         'lastCompleted': lastCompleted.toIso8601String(),
         'category': category,
-        'specs': specs,
+        'notes': notes,
       };
 
   factory Task.fromJson(Map<String, dynamic> json) => Task(
@@ -61,9 +61,7 @@ class Task {
             ? DateTime.parse(json['lastCompleted'] as String)
             : DateTime.now(),
         category: (json['category'] as String?) ?? 'GENERAL',
-        specs: json['specs'] != null
-            ? Map<String, String>.from(json['specs'] as Map)
-            : null,
+        notes: (json['notes'] as String?) ?? '',
       );
 
   Duration get intervalDuration {
