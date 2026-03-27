@@ -24,7 +24,7 @@ void main() {
 
     // Verify custom interval fields are shown
     expect(find.text('CUSTOM INTERVAL'), findsOneWidget);
-    expect(find.byType(TextField), findsNWidgets(2)); // Name field and custom interval field
+    expect(find.byType(TextField), findsNWidgets(3)); // Name, category, and custom interval field
     expect(find.text('14'), findsOneWidget); // Default value
     expect(find.text('DAYS'), findsOneWidget); // Default unit
   });

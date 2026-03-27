@@ -33,6 +33,10 @@ void main() {
       // Reset Button
       expect(find.text('RESET SYSTEM'), findsOneWidget);
 
+      // Category Section
+      expect(find.text('CATEGORY'), findsOneWidget);
+      expect(find.text('GENERAL'), findsOneWidget);
+
       // Interval Section
       expect(find.text('INTERVAL'), findsOneWidget);
 

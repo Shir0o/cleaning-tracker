@@ -19,12 +19,14 @@ class Task {
   final String title;
   final String interval;
   final DateTime lastCompleted;
+  final String category;
   final Map<String, String> specs;
 
   Task({
     required this.title,
     required this.interval,
     required this.lastCompleted,
+    this.category = 'GENERAL',
     Map<String, String>? specs,
   }) : specs = specs ?? {'SPEC 1': 'N/A', 'SPEC 2': 'N/A'};
 
@@ -32,12 +34,14 @@ class Task {
     String? title,
     String? interval,
     DateTime? lastCompleted,
+    String? category,
     Map<String, String>? specs,
   }) {
     return Task(
       title: title ?? this.title,
       interval: interval ?? this.interval,
       lastCompleted: lastCompleted ?? this.lastCompleted,
+      category: category ?? this.category,
       specs: specs ?? this.specs,
     );
   }
@@ -46,6 +50,7 @@ class Task {
         'title': title,
         'interval': interval,
         'lastCompleted': lastCompleted.toIso8601String(),
+        'category': category,
         'specs': specs,
       };
 
@@ -55,6 +60,7 @@ class Task {
         lastCompleted: json['lastCompleted'] != null
             ? DateTime.parse(json['lastCompleted'] as String)
             : DateTime.now(),
+        category: (json['category'] as String?) ?? 'GENERAL',
         specs: json['specs'] != null
             ? Map<String, String>.from(json['specs'] as Map)
             : null,
@@ -380,46 +386,79 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ],
                 )
-              : ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: _tasks.length,
-                  itemBuilder: (context, index) {
-                    final task = _tasks[index];
-                    final now = DateTime.now();
-                    final health = task.health(now);
-                    final isOverdue = health < 0;
+              : () {
+              final Map<String, List<Task>> groupedTasks = {};
+              for (var task in _tasks) {
+                groupedTasks.putIfAbsent(task.category, () => []).add(task);
+              }
+              final categories = groupedTasks.keys.toList()..sort();
 
-                    return TaskCard(
-                      title: task.title,
-                      interval: task.interval,
-                      dueDateText: task.dueDateText(now),
-                      progress: health,
-                      isOverdue: isOverdue,
-                      isFresh: now.difference(task.lastCompleted).inSeconds < 3600, // Show fresh if completed in last hour
-                      onTap: () async {
-                        final result = await Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => TaskDetailPage(
-                              task: task,
+              return ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: categories.length,
+                itemBuilder: (context, catIndex) {
+                  final category = categories[catIndex];
+                  final tasksInCategory = groupedTasks[category]!;
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16, bottom: 8),
+                        child: Text(
+                          category,
+                          style: _safeGoogleFont(
+                            () => GoogleFonts.spaceGrotesk(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              letterSpacing: 2.0,
+                              color: colorScheme.onSurface.withValues(alpha: 0.6),
                             ),
                           ),
-                        );
+                        ),
+                      ),
+                      ...tasksInCategory.map((task) {
+                        final taskIndex = _tasks.indexOf(task);
+                        final now = DateTime.now();
+                        final health = task.health(now);
+                        final isOverdue = health < 0;
 
-                        if (result == 'delete') {
-                          setState(() {
-                            _tasks.removeAt(index);
-                          });
-                          await _saveTasks();
-                        } else if (result is Task) {
-                          setState(() {
-                            _tasks[index] = result;
-                          });
-                          await _saveTasks();
-                        }
-                      },
-                    );
-                  },
-                ),
+                        return TaskCard(
+                          title: task.title,
+                          interval: task.interval,
+                          dueDateText: task.dueDateText(now),
+                          progress: health,
+                          isOverdue: isOverdue,
+                          isFresh: now.difference(task.lastCompleted).inSeconds <
+                              3600, // Show fresh if completed in last hour
+                          onTap: () async {
+                            final result = await Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => TaskDetailPage(
+                                  task: task,
+                                ),
+                              ),
+                            );
+
+                            if (result == 'delete') {
+                              setState(() {
+                                _tasks.removeAt(taskIndex);
+                              });
+                              await _saveTasks();
+                            } else if (result is Task) {
+                              setState(() {
+                                _tasks[taskIndex] = result;
+                              });
+                              await _saveTasks();
+                            }
+                          },
+                        );
+                      }),
+                    ],
+                  );
+                },
+              );
+            }(),
       floatingActionButton: Container(
         width: 56,
         height: 56,
@@ -439,6 +478,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   _tasks.add(Task(
                     title: result['name']!,
                     interval: result['interval']!,
+                    category: result['category'] ?? 'GENERAL',
                     lastCompleted: DateTime.now(),
                   ));
                 });

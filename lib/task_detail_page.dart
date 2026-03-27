@@ -177,6 +177,77 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     );
   }
 
+  void _showCategoryDialog() {
+    final controller = TextEditingController(text: _currentTask.category);
+    showDialog(
+      context: context,
+      builder: (context) {
+        final colorScheme = Theme.of(context).colorScheme;
+        return Dialog(
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: colorScheme.surface,
+              border: Border.all(color: colorScheme.onSurface, width: 4),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'EDIT CATEGORY',
+                  style: _safeGoogleFont(
+                    () => GoogleFonts.spaceGrotesk(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: controller,
+                  decoration: const InputDecoration(
+                    hintText: 'CATEGORY...',
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black),
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black, width: 2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: colorScheme.onSurface,
+                      foregroundColor: colorScheme.surface,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.zero,
+                      ),
+                    ),
+                    onPressed: () {
+                      if (controller.text.isNotEmpty) {
+                        setState(() {
+                          _currentTask = _currentTask.copyWith(category: controller.text.toUpperCase());
+                        });
+                        Navigator.pop(context);
+                      }
+                    },
+                    child: const Text('SAVE'),
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -396,6 +467,60 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                     ),
                   ),
                 ],
+              ),
+            ),
+  
+            // Category Section
+            Container(
+              decoration: BoxDecoration(
+                border: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'CATEGORY',
+                      style: _safeGoogleFont(
+                        () => GoogleFonts.inter(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: const Color(0xFF8A8A8A),
+                        ),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: _showCategoryDialog,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(color: colorScheme.onSurface, width: 1),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Text(
+                              _currentTask.category,
+                              style: _safeGoogleFont(
+                                () => GoogleFonts.chivoMono(
+                                  fontSize: 16,
+                                  color: colorScheme.onSurface,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            const Icon(
+                              Icons.edit,
+                              size: 18,
+                              color: Color(0xFF8A8A8A),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
   

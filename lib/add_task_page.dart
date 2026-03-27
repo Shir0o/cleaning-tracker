@@ -15,6 +15,7 @@ class AddTaskPage extends StatefulWidget {
 class _AddTaskPageState extends State<AddTaskPage> {
   String _selectedInterval = '7 DAYS';
   final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _categoryController = TextEditingController();
   final TextEditingController _customIntervalController = TextEditingController(text: '14');
   String _customIntervalUnit = 'DAYS';
 
@@ -26,6 +27,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
   @override
   void dispose() {
     _nameController.dispose();
+    _categoryController.dispose();
     _customIntervalController.dispose();
     super.dispose();
   }
@@ -132,8 +134,11 @@ class _AddTaskPageState extends State<AddTaskPage> {
                   MaterialPageRoute(builder: (context) => const PresetsPage()),
                 );
                 if (result != null) {
-                  _nameController.text = result['name']!;
-                  _parseAndSetInterval(result['interval']!);
+                  setState(() {
+                    _nameController.text = result['name']!;
+                    _categoryController.text = result['category'] ?? '';
+                    _parseAndSetInterval(result['interval']!);
+                  });
                 }
               },
               child: Container(
@@ -195,6 +200,40 @@ class _AddTaskPageState extends State<AddTaskPage> {
                 ),
                 decoration: InputDecoration(
                   hintText: 'SYSTEM NAME...',
+                  hintStyle: _safeGoogleFont(
+                    () => GoogleFonts.inter(
+                      fontSize: 16,
+                      color: const Color(0xFF8A8A8A),
+                    ),
+                  ),
+                  filled: true,
+                  fillColor: colorScheme.surface,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: colorScheme.onSurface, width: 2),
+                    borderRadius: BorderRadius.zero,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: colorScheme.primary,
+                      width: 2,
+                    ),
+                    borderRadius: BorderRadius.zero,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 56,
+              child: TextField(
+                controller: _categoryController,
+                cursorColor: colorScheme.primary,
+                style: _safeGoogleFont(
+                  () => GoogleFonts.inter(fontSize: 16, color: colorScheme.onSurface),
+                ),
+                decoration: InputDecoration(
+                  hintText: 'CATEGORY (E.G. KITCHEN)...',
                   hintStyle: _safeGoogleFont(
                     () => GoogleFonts.inter(
                       fontSize: 16,
@@ -363,6 +402,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
                 Navigator.of(context).pop({
                   'name': _nameController.text,
                   'interval': interval,
+                  'category': _categoryController.text.isEmpty ? 'GENERAL' : _categoryController.text.toUpperCase(),
                 });
               }
             },

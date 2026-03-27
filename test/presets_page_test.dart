@@ -60,5 +60,6 @@ void main() {
     expect(selectedPreset, isNotNull);
     expect(selectedPreset!['name'], 'WASH DISHES');
     expect(selectedPreset!['interval'], 'DAILY');
+    expect(selectedPreset!['category'], 'KITCHEN');
   });
 }
