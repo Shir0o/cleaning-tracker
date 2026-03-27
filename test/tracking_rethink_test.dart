@@ -1,5 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:cleaning_tracker/main.dart' show Task;
+import 'package:cleaning_tracker/main.dart' show Task, TaskCard;
 
 void main() {
   group('Task Tracking Rethink Tests', () {
@@ -82,6 +83,26 @@ void main() {
       );
       // Due date was now - 2 days = March 25
       expect(overdueTask.dueDateText(now), 'MAR 25 (-2 DAYS)');
+    });
+
+    testWidgets('TaskCard handles long titles without overflow', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: TaskCard(
+              title: 'THIS IS AN EXTREMELY LONG TASK TITLE THAT SHOULD DEFINITELY OVERFLOW IF NOT HANDLED PROPERLY BY THE EXPANDED WIDGET',
+              interval: '7 DAYS',
+              dueDateText: 'MAR 30 (3 DAYS)',
+              progress: 0.5,
+              isOverdue: false,
+            ),
+          ),
+        ),
+      );
+
+      // Verify no overflow exception was thrown and title is rendered (partially)
+      expect(find.textContaining('THIS IS AN EXTREMELY LONG'), findsOneWidget);
+      expect(find.text('MAR 30 (3 DAYS)'), findsOneWidget);
     });
   });
 }

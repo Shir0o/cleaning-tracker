@@ -549,16 +549,20 @@ class TaskCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      title,
-                      style: _safeGoogleFont(
-                        () => GoogleFonts.spaceGrotesk(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                          color: textColor,
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: _safeGoogleFont(
+                          () => GoogleFonts.spaceGrotesk(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                            color: textColor,
+                          ),
                         ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
+                    const SizedBox(width: 8),
                     Text(
                       dueDateText,
                       style: _safeGoogleFont(
