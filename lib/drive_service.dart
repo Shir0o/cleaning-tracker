@@ -4,6 +4,8 @@ import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
+import 'dart:convert';
+import 'package:meta/meta.dart';
 
 class GoogleAuthClient extends http.BaseClient {
   final Map<String, String> _headers;
@@ -34,6 +36,12 @@ class DriveService extends ChangeNotifier {
 
   bool get isDriveSyncEnabled => _isDriveSyncEnabled;
   GoogleSignInAccount? get currentUser => _currentUser;
+
+  @visibleForTesting
+  set driveApi(drive.DriveApi? api) => _driveApi = api;
+
+  @visibleForTesting
+  set isDriveSyncEnabled(bool enabled) => _isDriveSyncEnabled = enabled;
 
   void _listenToAuth() {
     _googleSignIn.authenticationEvents.listen((event) {
@@ -144,8 +152,40 @@ class DriveService extends ChangeNotifier {
     }
 
     try {
-      // Implementation for syncing files would go here
       debugPrint('Syncing files to Google Drive...');
+      final prefs = await SharedPreferences.getInstance();
+      final keys = prefs.getKeys();
+      final Map<String, dynamic> data = {};
+      for (final key in keys) {
+        data[key] = prefs.get(key);
+      }
+
+      final jsonString = jsonEncode(data);
+      final jsonBytes = utf8.encode(jsonString);
+      final jsonContent = Stream.value(jsonBytes);
+
+      final media = drive.Media(jsonContent, jsonBytes.length);
+      final driveFile = drive.File();
+      driveFile.name = 'cleaning_tracker_backup.json';
+      
+      // Look for existing backup file
+      final fileList = await _driveApi!.files.list(
+        q: "name = 'cleaning_tracker_backup.json' and trashed = false",
+        spaces: 'drive',
+      );
+
+      if (fileList.files != null && fileList.files!.isNotEmpty) {
+        final existingFileId = fileList.files!.first.id!;
+        await _driveApi!.files.update(driveFile, existingFileId, uploadMedia: media);
+        debugPrint('Updated existing backup on Google Drive');
+      } else {
+        await _driveApi!.files.create(driveFile, uploadMedia: media);
+        debugPrint('Created new backup on Google Drive');
+      }
+      
+      // Save last backup time
+      await prefs.setString('last_backup_time', DateTime.now().toIso8601String());
+      notifyListeners();
     } catch (e) {
       debugPrint('Sync failed: $e');
       rethrow;

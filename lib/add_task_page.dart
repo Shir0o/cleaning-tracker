@@ -30,10 +30,50 @@ class _AddTaskPageState extends State<AddTaskPage> {
     super.dispose();
   }
 
+  void _parseAndSetInterval(String interval) {
+    setState(() {
+      _selectedInterval = interval;
+      
+      // Map common intervals to our standard buttons if they match exactly
+      if (interval == '7 DAYS' || interval == '30 DAYS' || interval == '90 DAYS') {
+        return;
+      }
+      
+      // Handle special cases and parse others as CUSTOM
+      if (interval == 'DAILY') {
+        _customIntervalController.text = '1';
+        _customIntervalUnit = 'DAYS';
+      } else if (interval == 'WEEKLY') {
+        _customIntervalController.text = '1';
+        _customIntervalUnit = 'WEEKS';
+      } else if (interval == 'MONTHLY') {
+        _customIntervalController.text = '1';
+        _customIntervalUnit = 'MONTHS';
+      } else if (interval == '1 YEAR') {
+        _customIntervalController.text = '12';
+        _customIntervalUnit = 'MONTHS';
+      } else {
+        // Parse "X DAYS", "X MONTHS", etc.
+        final parts = interval.split(' ');
+        if (parts.length == 2) {
+          final value = parts[0];
+          final unit = parts[1];
+          _customIntervalController.text = value;
+          // Ensure unit matches our dropdown exactly
+          if (['DAYS', 'WEEKS', 'MONTHS'].contains(unit)) {
+            _customIntervalUnit = unit;
+          }
+        }
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+
+    final bool isStandardInterval = ['7 DAYS', '30 DAYS', '90 DAYS'].contains(_selectedInterval);
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -92,10 +132,8 @@ class _AddTaskPageState extends State<AddTaskPage> {
                   MaterialPageRoute(builder: (context) => const PresetsPage()),
                 );
                 if (result != null) {
-                  setState(() {
-                    _nameController.text = result['name']!;
-                    _selectedInterval = result['interval']!;
-                  });
+                  _nameController.text = result['name']!;
+                  _parseAndSetInterval(result['interval']!);
                 }
               },
               child: Container(
@@ -208,7 +246,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
                   _buildIntervalButton('CUSTOM', context),
                 ],
               ),
-              if (_selectedInterval == 'CUSTOM') ...[
+              if (!isStandardInterval) ...[
                 const SizedBox(height: 32),
                 Text(
                   'CUSTOM INTERVAL',

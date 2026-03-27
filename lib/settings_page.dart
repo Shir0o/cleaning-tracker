@@ -47,6 +47,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
 
   void _onDriveServiceChange() {
     if (mounted) {
+      _loadSettings();
       setState(() {
         _currentUser = DriveService().currentUser;
       });
@@ -78,6 +79,21 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
         _dailyReminderTime = prefs.getString('dailyReminderTime') ?? '09:00 AM';
         _interfaceTheme = prefs.getString('interfaceTheme') ?? 'LIGHT';
         _startOfWeek = prefs.getString('startOfWeek') ?? 'MONDAY';
+        
+        final lastBackup = prefs.getString('last_backup_time');
+        if (lastBackup != null) {
+          final dt = DateTime.parse(lastBackup);
+          final diff = DateTime.now().difference(dt);
+          if (diff.inMinutes < 1) {
+            _lastBackupTime = 'Just now';
+          } else if (diff.inHours < 1) {
+            _lastBackupTime = '${diff.inMinutes}m ago';
+          } else if (diff.inDays < 1) {
+            _lastBackupTime = '${diff.inHours}h ago';
+          } else {
+            _lastBackupTime = '${diff.inDays}d ago';
+          }
+        }
       });
     }
   }
@@ -266,11 +282,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
 
   Future<void> _handleForceBackup() async {
     try {
-      // In a real implementation, you would use googleapis here to upload data
-      // For this prototype, we just simulate the success
-      setState(() {
-        _lastBackupTime = 'Just now';
-      });
+      await DriveService().syncFiles();
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

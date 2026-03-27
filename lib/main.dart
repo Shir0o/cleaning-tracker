@@ -136,7 +136,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   GoogleSignInAccount? _currentUser;
   bool _isLoading = true;
   Timer? _loadingTimer;
-  final List<String> _tasks = [];
+  List<String> _tasks = [];
 
   StreamSubscription? _authSubscription;
 
@@ -148,12 +148,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
+    _loadTasks();
     _listenToAuthEvents();
     if (DashboardScreen.testingMode) {
       _isLoading = false;
     } else {
       _startLoadingTimer();
     }
+  }
+
+  Future<void> _loadTasks() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (mounted) {
+      setState(() {
+        _tasks = prefs.getStringList('tasks') ?? [];
+      });
+    }
+  }
+
+  Future<void> _saveTasks() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('tasks', _tasks);
   }
 
   void _startLoadingTimer() {
@@ -297,6 +312,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 setState(() {
                   _tasks.add(result);
                 });
+                await _saveTasks();
               }
             },
             child: Icon(Icons.add, color: colorScheme.surface, size: 32),
