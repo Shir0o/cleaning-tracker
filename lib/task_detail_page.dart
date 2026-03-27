@@ -6,20 +6,10 @@ import 'main.dart' show Task;
 class TaskDetailPage extends StatefulWidget {
   static bool testingMode = false;
 
-  final String title;
-  final String interval;
-  final double progress;
-  final String dueDateText;
-  final bool isOverdue;
   final Task task;
 
   const TaskDetailPage({
     super.key,
-    required this.title,
-    required this.interval,
-    required this.progress,
-    required this.dueDateText,
-    required this.isOverdue,
     required this.task,
   });
 
@@ -198,11 +188,8 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     final diff = dueDate.difference(now);
     final isOverdue = diff.isNegative;
     
-    final totalInterval = _currentTask.intervalDuration.inSeconds;
-    final elapsed = now.difference(_currentTask.lastCompleted).inSeconds;
-    final progress = (elapsed / totalInterval).clamp(0.0, 1.0);
-
-    final remainingPercentage = ((1.0 - progress).clamp(0.0, 1.0) * 100).round();
+    final health = _currentTask.health(now);
+    final remainingPercentage = (health * 100).round();
 
     String getStatusText() {
       if (isOverdue) {

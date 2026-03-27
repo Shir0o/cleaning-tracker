@@ -76,6 +76,12 @@ class Task {
     if (interval == '3 MONTHS') return const Duration(days: 90);
     return const Duration(days: 7); // Default
   }
+
+  double health(DateTime now) {
+    final total = intervalDuration.inSeconds;
+    final elapsed = now.difference(lastCompleted).inSeconds;
+    return (total - elapsed) / total;
+  }
 }
 
 Future<void> main() async {
@@ -371,27 +377,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       dueDateText = '$days DAYS';
                     }
 
-                    // Progress: (now - lastCompleted) / totalInterval
-                    final totalInterval = task.intervalDuration.inSeconds;
-                    final elapsed = now.difference(task.lastCompleted).inSeconds;
-                    final progress = (elapsed / totalInterval).clamp(0.0, 1.0);
+                    final health = task.health(now);
 
                     return TaskCard(
                       title: task.title,
                       interval: task.interval,
                       dueDateText: dueDateText,
-                      progress: progress,
+                      progress: health,
                       isOverdue: isOverdue,
-                      isFresh: elapsed < 3600, // Show fresh if completed in last hour
+                      isFresh: now.difference(task.lastCompleted).inSeconds < 3600, // Show fresh if completed in last hour
                       onTap: () async {
                         final result = await Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => TaskDetailPage(
-                              title: task.title,
-                              interval: task.interval,
-                              dueDateText: dueDateText,
-                              progress: progress,
-                              isOverdue: isOverdue,
                               task: task,
                             ),
                           ),
@@ -576,20 +574,19 @@ class TaskCard extends StatelessWidget {
                   ),
                   child: FractionallySizedBox(
                     alignment: Alignment.centerLeft,
-                    widthFactor: progress,
+                    widthFactor: isOverdue ? 1.0 : progress.clamp(0.0, 1.0),
                     child: Container(
                       decoration: BoxDecoration(
                         color: progressColor,
                         border:
-                            progress < 1.0 ||
-                                isFresh // Add right border if not completely full, or if it's the 100% fresh state
-                            ? Border(
+                            (isOverdue) || (progress <= 0.0) || (!isFresh && progress >= 1.0)
+                            ? null // Full bar has no inner border
+                            : Border(
                                 right: BorderSide(
                                   color: colorScheme.onSurface,
                                   width: 2,
                                 ),
-                              )
-                            : null, // Full overdue bar has no inner border
+                              ),
                       ),
                     ),
                   ),

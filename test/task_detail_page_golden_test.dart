@@ -14,11 +14,6 @@ void main() {
       MaterialApp(
         debugShowCheckedModeBanner: false,
         home: TaskDetailPage(
-          title: 'HVAC FILTER',
-          interval: '90 DAYS',
-          progress: 0.15,
-          dueDateText: '14 DAYS',
-          isOverdue: false,
           task: Task(
             title: 'HVAC FILTER',
             interval: '90 DAYS',

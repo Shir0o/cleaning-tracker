@@ -14,11 +14,6 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: TaskDetailPage(
-            title: 'HVAC FILTER',
-            interval: '90 DAYS',
-            progress: 0.15, // 0.15 elapsed means 85% remaining life
-            dueDateText: '14 DAYS',
-            isOverdue: false,
             task: Task(
               title: 'HVAC FILTER',
               interval: '90 DAYS',
@@ -58,17 +53,12 @@ void main() {
       expect(find.text('NO LOGS RECORDED'), findsOneWidget);
     });
 
-    testWidgets('calculates 0% and shows appropriate status for overdue', (
+    testWidgets('calculates negative percentage and shows appropriate status for overdue', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: TaskDetailPage(
-            title: 'SMOKE ALARMS',
-            interval: '365 DAYS',
-            progress: 1.0,
-            dueDateText: '-5 DAYS',
-            isOverdue: true,
             task: Task(
               title: 'SMOKE ALARMS',
               interval: '365 DAYS',
@@ -78,8 +68,8 @@ void main() {
         ),
       );
 
-      // Progress is sent as 1.0 (100% elapsed). Remaining life should show 0%.
-      expect(find.text('0%'), findsOneWidget);
+      // Progress is sent as negative health. Remaining life should show negative.
+      expect(find.text('-1%'), findsOneWidget);
       expect(find.text('STATUS: 5 DAYS OVERDUE'), findsOneWidget);
     });
   });
