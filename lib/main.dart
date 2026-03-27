@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:intl/intl.dart';
 
 import 'add_task_page.dart';
 import 'settings_page.dart';
@@ -81,6 +82,27 @@ class Task {
     final total = intervalDuration.inSeconds;
     final elapsed = now.difference(lastCompleted).inSeconds;
     return (total - elapsed) / total;
+  }
+
+  String statusText(DateTime now) {
+    final h = health(now);
+    if (h >= 0.85) return 'OPERATIONAL';
+    if (h >= 0.25) return 'DEGRADING';
+    if (h >= 0.0) return 'CRITICAL';
+    final diff = lastCompleted.add(intervalDuration).difference(now);
+    return '${diff.inDays.abs()} DAYS OVERDUE';
+  }
+
+  String dueDateText(DateTime now) {
+    final dueDate = lastCompleted.add(intervalDuration);
+    final diff = dueDate.difference(now);
+    final absoluteDate = DateFormat('MMM d').format(dueDate).toUpperCase();
+    
+    if (diff.isNegative) {
+      return '$absoluteDate (-${diff.inDays.abs()} DAYS)';
+    } else {
+      return '$absoluteDate (${diff.inDays} DAYS)';
+    }
   }
 }
 
@@ -364,25 +386,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   itemBuilder: (context, index) {
                     final task = _tasks[index];
                     final now = DateTime.now();
-                    final dueDate = task.lastCompleted.add(task.intervalDuration);
-                    final diff = dueDate.difference(now);
-                    final isOverdue = diff.isNegative;
-                    
-                    String dueDateText;
-                    if (isOverdue) {
-                      final days = diff.inDays.abs();
-                      dueDateText = '-$days DAYS';
-                    } else {
-                      final days = diff.inDays;
-                      dueDateText = '$days DAYS';
-                    }
-
                     final health = task.health(now);
+                    final isOverdue = health < 0;
 
                     return TaskCard(
                       title: task.title,
                       interval: task.interval,
-                      dueDateText: dueDateText,
+                      dueDateText: task.dueDateText(now),
                       progress: health,
                       isOverdue: isOverdue,
                       isFresh: now.difference(task.lastCompleted).inSeconds < 3600, // Show fresh if completed in last hour

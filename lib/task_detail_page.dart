@@ -184,24 +184,17 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
 
     // Recalculate based on _currentTask
     final now = DateTime.now();
-    final dueDate = _currentTask.lastCompleted.add(_currentTask.intervalDuration);
-    final diff = dueDate.difference(now);
-    final isOverdue = diff.isNegative;
+    final isOverdue = _currentTask.health(now) < 0;
     
     final health = _currentTask.health(now);
     final remainingPercentage = (health * 100).round();
 
     String getStatusText() {
-      if (isOverdue) {
-        final days = diff.inDays.abs();
-        return 'STATUS: $days DAYS OVERDUE';
-      }
-      return 'STATUS: ON TRACK';
+      return 'STATUS: ${_currentTask.statusText(now)}';
     }
 
     String getDueDateText() {
-      final days = diff.inDays.abs();
-      return 'DUE DATE: ${isOverdue ? "-" : ""}$days DAYS';
+      return 'DUE DATE: ${_currentTask.dueDateText(now)}';
     }
 
     return PopScope(
@@ -294,7 +287,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    getDueDateText(),
+                    getStatusText(),
                     style: _safeGoogleFont(
                       () => GoogleFonts.chivoMono(
                         fontWeight: FontWeight.bold,
@@ -306,7 +299,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    getStatusText(),
+                    getDueDateText(),
                     style: _safeGoogleFont(
                       () => GoogleFonts.chivoMono(
                         fontWeight: FontWeight.bold,
