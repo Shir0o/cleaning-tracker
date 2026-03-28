@@ -14,3 +14,7 @@ When working on this project (`cleaning-tracker`), please follow these guideline
 
 ## Git Guidelines
 - **Modularity**: Break up commits into logical, modular units. Avoid monolithic commits that combine unrelated changes or features.
+
+## Repository Maintenance
+- **Cleanup**: Proactively clean up temporary files, test artifacts (e.g., `test/failures/`), and other generated files that do not need to be pushed.
+- **Gitignore**: Monitor for files that should not be tracked by the repository. If unsure, ask the user before adding them to `.gitignore`.
