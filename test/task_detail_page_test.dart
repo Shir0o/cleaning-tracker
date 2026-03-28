@@ -31,7 +31,7 @@ void main() {
       expect(find.text('85%'), findsOneWidget);
 
       // Reset Button
-      expect(find.text('RESET SYSTEM'), findsOneWidget);
+      expect(find.text('I JUST DID IT!'), findsOneWidget);
 
       // Category Section
       expect(find.text('CATEGORY'), findsOneWidget);

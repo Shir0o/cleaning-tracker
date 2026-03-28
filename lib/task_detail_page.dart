@@ -266,10 +266,32 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     );
   }
 
+  Color _getSurfaceColor(ThemeData theme) {
+    return theme.brightness == Brightness.dark ? const Color(0xFF1A1A1A) : const Color(0xFFF4F4F4);
+  }
+
+  Widget _buildSectionTitle(String title, BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 16, top: 32, bottom: 8),
+      child: Text(
+        title.toUpperCase(),
+        style: _safeGoogleFont(
+          () => GoogleFonts.spaceGrotesk(
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            letterSpacing: 2.0,
+            color: const Color(0xFF8A8A8A),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final surfaceColor = _getSurfaceColor(theme);
 
     // Recalculate based on _currentTask
     final now = DateTime.now();
@@ -343,7 +365,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
             Container(
               padding: const EdgeInsets.symmetric(vertical: 40),
               decoration: BoxDecoration(
-                color: colorScheme.surface,
+                color: surfaceColor,
                 border: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
               ),
               child: Column(
@@ -404,6 +426,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
+                color: colorScheme.surface,
                 border: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
               ),
               child: Column(
@@ -440,7 +463,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                           const Icon(Icons.restart_alt, size: 24),
                           const SizedBox(width: 8),
                           Text(
-                            'RESET SYSTEM',
+                            'I JUST DID IT!',
                             style: _safeGoogleFont(
                               () => GoogleFonts.spaceGrotesk(
                                 fontWeight: FontWeight.bold,
@@ -475,7 +498,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                           const Icon(Icons.delete_outline, size: 24),
                           const SizedBox(width: 8),
                           Text(
-                            'DELETE SYSTEM',
+                            'DELETE',
                             style: _safeGoogleFont(
                               () => GoogleFonts.spaceGrotesk(
                                 fontWeight: FontWeight.bold,
@@ -491,204 +514,311 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                 ],
               ),
             ),
-  
-            // Category Section
+
+            // SYSTEM DETAILS SECTION
+            _buildSectionTitle('01. System Details', context),
             Container(
               decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'CATEGORY',
-                      style: _safeGoogleFont(
-                        () => GoogleFonts.inter(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                          color: const Color(0xFF8A8A8A),
-                        ),
-                      ),
-                    ),
-                    InkWell(
-                      onTap: _showCategoryDialog,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(color: colorScheme.onSurface, width: 1),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Text(
-                              _currentTask.category,
-                              style: _safeGoogleFont(
-                                () => GoogleFonts.chivoMono(
-                                  fontSize: 16,
-                                  color: colorScheme.onSurface,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            const Icon(
-                              Icons.edit,
-                              size: 18,
-                              color: Color(0xFF8A8A8A),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+                color: colorScheme.surface,
+                border: Border(
+                  top: BorderSide(color: colorScheme.onSurface, width: 2),
+                  bottom: BorderSide(color: colorScheme.onSurface, width: 2),
                 ),
-              ),
-            ),
-  
-            // Interval Editable Section
-            Container(
-              decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'INTERVAL',
-                      style: _safeGoogleFont(
-                        () => GoogleFonts.inter(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                          color: const Color(0xFF8A8A8A),
-                        ),
-                      ),
-                    ),
-                    InkWell(
-                      onTap: _showIntervalDialog,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(color: colorScheme.onSurface, width: 1),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Text(
-                              _currentTask.interval,
-                              style: _safeGoogleFont(
-                                () => GoogleFonts.chivoMono(
-                                  fontSize: 16,
-                                  color: colorScheme.onSurface,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            const Icon(
-                              Icons.edit,
-                              size: 18,
-                              color: Color(0xFF8A8A8A),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-  
-            // Notes Section
-            Container(
-              decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
               ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  InkWell(
-                    onTap: _showNotesDialog,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                      decoration: BoxDecoration(
-                        color: theme.brightness == Brightness.dark ? const Color(0xFF1A1A1A) : const Color(0xFFF4F4F4),
-                        border: Border(
-                          bottom: BorderSide(color: colorScheme.onSurface, width: 1),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'NOTES',
-                            style: _safeGoogleFont(
-                              () => GoogleFonts.spaceGrotesk(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                                letterSpacing: -0.5,
-                                color: colorScheme.onSurface,
-                              ),
+                  // Category
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: surfaceColor,
+                      border: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 1)),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'CATEGORY',
+                          style: _safeGoogleFont(
+                            () => GoogleFonts.inter(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: const Color(0xFF8A8A8A),
                             ),
                           ),
-                          Icon(Icons.edit, size: 20, color: colorScheme.onSurface),
-                        ],
-                      ),
+                        ),
+                        Icon(Icons.category_outlined, size: 18, color: const Color(0xFF8A8A8A)),
+                      ],
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(16),
-                    child: Text(
-                      _currentTask.notes.isEmpty ? 'NO NOTES' : _currentTask.notes,
-                      style: _safeGoogleFont(
-                        () => GoogleFonts.inter(
-                          fontSize: 16,
-                          height: 1.5,
-                          color: colorScheme.onSurface,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          _currentTask.category,
+                          style: _safeGoogleFont(
+                            () => GoogleFonts.chivoMono(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.onSurface,
+                            ),
+                          ),
                         ),
-                      ),
+                        InkWell(
+                          onTap: _showCategoryDialog,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(color: colorScheme.onSurface, width: 1),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'EDIT',
+                                  style: _safeGoogleFont(
+                                    () => GoogleFonts.spaceGrotesk(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: colorScheme.onSurface,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                const Icon(
+                                  Icons.edit,
+                                  size: 16,
+                                  color: Color(0xFF8A8A8A),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Divider(color: colorScheme.onSurface, thickness: 1, height: 0),
+                  // Interval
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: surfaceColor,
+                      border: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 1)),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'INTERVAL',
+                          style: _safeGoogleFont(
+                            () => GoogleFonts.inter(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: const Color(0xFF8A8A8A),
+                            ),
+                          ),
+                        ),
+                        Icon(Icons.timer_outlined, size: 18, color: const Color(0xFF8A8A8A)),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          _currentTask.interval,
+                          style: _safeGoogleFont(
+                            () => GoogleFonts.chivoMono(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.onSurface,
+                            ),
+                          ),
+                        ),
+                        InkWell(
+                          onTap: _showIntervalDialog,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(color: colorScheme.onSurface, width: 1),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'EDIT',
+                                  style: _safeGoogleFont(
+                                    () => GoogleFonts.spaceGrotesk(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: colorScheme.onSurface,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                const Icon(
+                                  Icons.edit,
+                                  size: 16,
+                                  color: Color(0xFF8A8A8A),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
   
-            // History Section
-            Padding(
-              padding: const EdgeInsets.only(top: 32),
+            // NOTES SECTION
+            _buildSectionTitle('02. Notes', context),
+            Container(
+              decoration: BoxDecoration(
+                color: colorScheme.surface,
+                border: Border(
+                  top: BorderSide(color: colorScheme.onSurface, width: 2),
+                  bottom: BorderSide(color: colorScheme.onSurface, width: 2),
+                ),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
+                  Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
-                      vertical: 8,
+                      vertical: 12,
                     ),
-                    child: Text(
-                      'HISTORY',
-                      style: _safeGoogleFont(
-                        () => GoogleFonts.spaceGrotesk(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                          letterSpacing: -0.5,
-                          color: colorScheme.onSurface,
-                        ),
+                    decoration: BoxDecoration(
+                      color: surfaceColor,
+                      border: Border(
+                        bottom: BorderSide(color: colorScheme.onSurface, width: 1),
                       ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'NOTES',
+                          style: _safeGoogleFont(
+                            () => GoogleFonts.inter(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: const Color(0xFF8A8A8A),
+                            ),
+                          ),
+                        ),
+                        Icon(Icons.notes, size: 18, color: const Color(0xFF8A8A8A)),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _currentTask.notes.isEmpty ? 'NO NOTES' : _currentTask.notes,
+                          style: _safeGoogleFont(
+                            () => GoogleFonts.inter(
+                              fontSize: 16,
+                              height: 1.5,
+                              color: colorScheme.onSurface,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        InkWell(
+                          onTap: _showNotesDialog,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(color: colorScheme.onSurface, width: 1),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'EDIT NOTES',
+                                  style: _safeGoogleFont(
+                                    () => GoogleFonts.spaceGrotesk(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: colorScheme.onSurface,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                const Icon(
+                                  Icons.edit,
+                                  size: 16,
+                                  color: Color(0xFF8A8A8A),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+  
+            // HISTORY SECTION
+            _buildSectionTitle('03. History', context),
+            Container(
+              decoration: BoxDecoration(
+                color: colorScheme.surface,
+                border: Border(
+                  top: BorderSide(color: colorScheme.onSurface, width: 2),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: surfaceColor,
+                      border: Border(
+                        bottom: BorderSide(color: colorScheme.onSurface, width: 2),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'HISTORY',
+                          style: _safeGoogleFont(
+                            () => GoogleFonts.inter(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: const Color(0xFF8A8A8A),
+                            ),
+                          ),
+                        ),
+                        Icon(Icons.history, size: 18, color: const Color(0xFF8A8A8A)),
+                      ],
                     ),
                   ),
                   _currentTask.completions.isEmpty
                       ? Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
+                            color: colorScheme.surface,
                             border: Border(
-                              top: BorderSide(
-                                color: colorScheme.onSurface,
-                                width: 2,
-                              ),
+                              bottom: BorderSide(color: colorScheme.onSurface, width: 1),
                             ),
                           ),
                           child: Text(
@@ -725,8 +855,9 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
       height: 56,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
+        color: colorScheme.surface,
         border: Border(
-          top: BorderSide(color: colorScheme.onSurface, width: 2),
+          bottom: BorderSide(color: colorScheme.onSurface, width: 1),
         ),
       ),
       child: Row(
