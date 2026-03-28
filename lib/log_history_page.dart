@@ -89,7 +89,7 @@ class _LogHistoryPageState extends State<LogHistoryPage> {
         ),
         shape: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
         title: Text(
-          'ARCHIVE',
+          'HISTORY',
           style: _safeGoogleFont(
             () => GoogleFonts.spaceGrotesk(
               fontWeight: FontWeight.bold,

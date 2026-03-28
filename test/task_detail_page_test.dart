@@ -27,7 +27,7 @@ void main() {
       expect(find.text('HVAC FILTER'), findsOneWidget);
 
       // Status Section
-      expect(find.text('REMAINING LIFE'), findsOneWidget);
+      expect(find.text('CLEANLINESS'), findsOneWidget);
       expect(find.text('85%'), findsOneWidget);
 
       // Reset Button
@@ -48,11 +48,11 @@ void main() {
       expect(find.text('NOTES'), findsOneWidget);
       expect(find.text('NO NOTES'), findsOneWidget);
 
-      // Log Archive Section
+      // History Section
       await tester.drag(find.byType(ListView), const Offset(0, -500));
       await tester.pump();
 
-      expect(find.text('LOG ARCHIVE'), findsOneWidget);
+      expect(find.text('HISTORY'), findsOneWidget);
       expect(find.text('NO LOGS RECORDED'), findsOneWidget);
     });
 
@@ -71,7 +71,7 @@ void main() {
         ),
       );
 
-      // Progress is sent as negative health. Remaining life should show negative.
+      // Progress is sent as negative health. Cleanliness should show negative.
       expect(find.text('-1%'), findsOneWidget);
       expect(find.text('STATUS: 5 DAYS OVERDUE'), findsOneWidget);
     });

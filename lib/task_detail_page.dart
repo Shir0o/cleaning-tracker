@@ -350,7 +350,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
               child: Column(
                 children: [
                   Text(
-                    'REMAINING LIFE',
+                    'CLEANLINESS',
                     style: _safeGoogleFont(
                       () => GoogleFonts.inter(
                         fontWeight: FontWeight.bold,
@@ -658,7 +658,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
               ),
             ),
   
-            // Log Archive Section
+            // History Section
             Padding(
               padding: const EdgeInsets.only(top: 32),
               child: Column(
@@ -670,7 +670,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                       vertical: 8,
                     ),
                     child: Text(
-                      'LOG ARCHIVE',
+                      'HISTORY',
                       style: _safeGoogleFont(
                         () => GoogleFonts.spaceGrotesk(
                           fontWeight: FontWeight.bold,
@@ -705,7 +705,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                       : Column(
                           children: _currentTask.completions.reversed
                               .take(5)
-                              .map((completion) => _buildArchiveRow(completion, context))
+                              .map((completion) => _buildHistoryRow(completion, context))
                               .toList(),
                         ),
                 ],
@@ -717,7 +717,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     );
   }
 
-  Widget _buildArchiveRow(DateTime completion, BuildContext context) {
+  Widget _buildHistoryRow(DateTime completion, BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final dateStr = DateFormat('MM.dd').format(completion);
     final yearStr = DateFormat('yyyy').format(completion);

@@ -42,7 +42,7 @@ void main() {
 
     // Verify we are on the TaskDetailPage
     expect(find.byType(TaskDetailPage), findsOneWidget);
-    expect(find.text('REMAINING LIFE'), findsOneWidget);
+    expect(find.text('CLEANLINESS'), findsOneWidget);
 
     // Tap the back button
     final backButton = find.byIcon(Icons.arrow_back);

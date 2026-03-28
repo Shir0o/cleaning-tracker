@@ -32,7 +32,7 @@ void main() {
     await tester.pump(); // No need for long pump since testingMode = true
 
     // Verify header exists
-    expect(find.text('ARCHIVE'), findsOneWidget);
+    expect(find.text('HISTORY'), findsOneWidget);
 
     // Verify year dividers exist
     expect(find.text(now.year.toString()), findsOneWidget);

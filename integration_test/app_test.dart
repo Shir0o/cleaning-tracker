@@ -29,13 +29,13 @@ void main() {
     // Verify we are on settings page
     expect(find.text('SYSTEM SETTINGS'), findsOneWidget);
 
-    // Scroll down to find the "VIEW ALL LOGS" button in case it's off-screen on small mock devices
-    await tester.ensureVisible(find.text('VIEW ALL LOGS'));
-    await tester.tap(find.text('VIEW ALL LOGS'));
+    // Scroll down to find the "VIEW HISTORY" button in case it's off-screen on small mock devices
+    await tester.ensureVisible(find.text('VIEW HISTORY'));
+    await tester.tap(find.text('VIEW HISTORY'));
     await tester.pumpAndSettle();
 
-    // Verify we reach the Archive
-    expect(find.text('ARCHIVE'), findsOneWidget);
+    // Verify we reach the History
+    expect(find.text('HISTORY'), findsOneWidget);
     expect(find.text('NO HISTORY AVAILABLE'), findsOneWidget);
   });
 }

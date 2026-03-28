@@ -36,7 +36,7 @@ void main() {
     expect(find.text('Start of Week'.toUpperCase()), findsOneWidget);
     expect(find.text('Sync with Google Drive'.toUpperCase()), findsOneWidget);
     expect(find.text('SIGN IN TO SYNC'), findsOneWidget);
-    expect(find.text('VIEW ALL LOGS'), findsOneWidget);
+    expect(find.text('VIEW HISTORY'), findsOneWidget);
   });
 
   testWidgets('Dashboard settings icon navigates to SettingsPage', (
@@ -57,22 +57,22 @@ void main() {
     expect(find.text('SYSTEM SETTINGS'), findsOneWidget);
   });
 
-  testWidgets('Settings page "VIEW ALL LOGS" navigates to LogHistoryPage', (
+  testWidgets('Settings page "VIEW HISTORY" navigates to LogHistoryPage', (
     WidgetTester tester,
   ) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const MaterialApp(home: SettingsPage()));
 
-    // Verify the view all logs button is present
-    expect(find.text('VIEW ALL LOGS'), findsOneWidget);
+    // Verify the view history button is present
+    expect(find.text('VIEW HISTORY'), findsOneWidget);
 
-    // Tap the view all logs button
-    await tester.ensureVisible(find.text('VIEW ALL LOGS'));
-    await tester.tap(find.text('VIEW ALL LOGS'));
+    // Tap the view history button
+    await tester.ensureVisible(find.text('VIEW HISTORY'));
+    await tester.tap(find.text('VIEW HISTORY'));
     await tester.pumpAndSettle(); // Wait for navigation animation
 
     // Verify we are on the Log History Page
-    expect(find.text('ARCHIVE'), findsOneWidget);
+    expect(find.text('HISTORY'), findsOneWidget);
   });
 
   testWidgets('Settings page selection dialog updates value', (

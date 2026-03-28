@@ -13,7 +13,7 @@ void main() {
     ) async {
       await tester.pumpWidget(const MaterialApp(home: LogHistoryPage()));
 
-      final titleFinder = find.text('ARCHIVE');
+      final titleFinder = find.text('HISTORY');
       expect(titleFinder, findsOneWidget);
 
       final titleWidget = tester.widget<Text>(titleFinder);

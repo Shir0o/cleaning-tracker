@@ -761,7 +761,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                               Icon(Icons.history, color: colorScheme.primary),
                               const SizedBox(width: 16),
                               Text(
-                                'VIEW ALL LOGS',
+                                'VIEW HISTORY',
                                 style: TextStyle(
                                   fontFamily: _safeGoogleFont(
                                     () => GoogleFonts.inter(),
