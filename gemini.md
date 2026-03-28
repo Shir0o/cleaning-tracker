@@ -11,3 +11,6 @@ When working on this project (`cleaning-tracker`), please follow these guideline
 ## Code Quality
 - Ensure new code is accompanied by corresponding unit, widget, golden, scenario, and integration tests in the `test/` or `integration_test/` directory.
 - Verify tests pass using `flutter test` and the code aligns with rules in `flutter analyze`.
+
+## Git Guidelines
+- **Modularity**: Break up commits into logical, modular units. Avoid monolithic commits that combine unrelated changes or features.
