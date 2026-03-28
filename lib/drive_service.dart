@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
-import 'package:meta/meta.dart';
+import 'database_service.dart';
 
 class GoogleAuthClient extends http.BaseClient {
   final Map<String, String> _headers;
@@ -124,8 +124,14 @@ class DriveService extends ChangeNotifier {
     if (account == null) return;
 
     final auth = await account.authentication;
+    final idToken = auth.idToken;
+    if (idToken == null) {
+      debugPrint('No ID token available');
+      return;
+    }
+
     final Map<String, String> headers = {
-      'Authorization': 'Bearer ${auth.idToken}',
+      'Authorization': 'Bearer $idToken',
       'X-Goog-AuthUser': '0',
     };
     final authenticateClient = GoogleAuthClient(headers);
@@ -154,11 +160,18 @@ class DriveService extends ChangeNotifier {
     try {
       debugPrint('Syncing files to Google Drive...');
       final prefs = await SharedPreferences.getInstance();
-      final keys = prefs.getKeys();
+      
+      // Collect settings from SharedPreferences
       final Map<String, dynamic> data = {};
-      for (final key in keys) {
+      for (final key in prefs.getKeys()) {
+        // Skip large data that is now in DB or shouldn't be backed up
+        if (key == 'tasks') continue; 
         data[key] = prefs.get(key);
       }
+
+      // Collect tasks from DatabaseService
+      final tasks = await DatabaseService().getTasks();
+      data['db_tasks'] = tasks.map((t) => t.toJson()).toList();
 
       final jsonString = jsonEncode(data);
       final jsonBytes = utf8.encode(jsonString);
