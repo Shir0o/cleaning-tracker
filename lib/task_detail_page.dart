@@ -527,149 +527,81 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
               ),
               child: Column(
                 children: [
-                  // Category
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: surfaceColor,
-                      border: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 1)),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'CATEGORY',
-                          style: _safeGoogleFont(
-                            () => GoogleFonts.inter(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                              color: const Color(0xFF8A8A8A),
-                            ),
-                          ),
-                        ),
-                        Icon(Icons.category_outlined, size: 18, color: const Color(0xFF8A8A8A)),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          _currentTask.category,
-                          style: _safeGoogleFont(
-                            () => GoogleFonts.chivoMono(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: colorScheme.onSurface,
-                            ),
-                          ),
-                        ),
-                        InkWell(
-                          onTap: _showCategoryDialog,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              border: Border(
-                                bottom: BorderSide(color: colorScheme.onSurface, width: 1),
+                  // Category Row
+                  InkWell(
+                    onTap: _showCategoryDialog,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'CATEGORY',
+                            style: _safeGoogleFont(
+                              () => GoogleFonts.inter(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                                color: const Color(0xFF8A8A8A),
                               ),
                             ),
-                            child: Row(
-                              children: [
-                                Text(
-                                  'EDIT',
-                                  style: _safeGoogleFont(
-                                    () => GoogleFonts.spaceGrotesk(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: colorScheme.onSurface,
-                                    ),
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                _currentTask.category,
+                                style: _safeGoogleFont(
+                                  () => GoogleFonts.chivoMono(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: colorScheme.onSurface,
                                   ),
                                 ),
-                                const SizedBox(width: 4),
-                                const Icon(
-                                  Icons.edit,
-                                  size: 16,
-                                  color: Color(0xFF8A8A8A),
-                                ),
-                              ],
-                            ),
+                              ),
+                              const SizedBox(width: 8),
+                              const Icon(Icons.edit, size: 16, color: Color(0xFF8A8A8A)),
+                            ],
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                   Divider(color: colorScheme.onSurface, thickness: 1, height: 0),
-                  // Interval
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: surfaceColor,
-                      border: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 1)),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'INTERVAL',
-                          style: _safeGoogleFont(
-                            () => GoogleFonts.inter(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                              color: const Color(0xFF8A8A8A),
-                            ),
-                          ),
-                        ),
-                        Icon(Icons.timer_outlined, size: 18, color: const Color(0xFF8A8A8A)),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          _currentTask.interval,
-                          style: _safeGoogleFont(
-                            () => GoogleFonts.chivoMono(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: colorScheme.onSurface,
-                            ),
-                          ),
-                        ),
-                        InkWell(
-                          onTap: _showIntervalDialog,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              border: Border(
-                                bottom: BorderSide(color: colorScheme.onSurface, width: 1),
+                  // Interval Row
+                  InkWell(
+                    onTap: _showIntervalDialog,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'INTERVAL',
+                            style: _safeGoogleFont(
+                              () => GoogleFonts.inter(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                                color: const Color(0xFF8A8A8A),
                               ),
                             ),
-                            child: Row(
-                              children: [
-                                Text(
-                                  'EDIT',
-                                  style: _safeGoogleFont(
-                                    () => GoogleFonts.spaceGrotesk(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: colorScheme.onSurface,
-                                    ),
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                _currentTask.interval,
+                                style: _safeGoogleFont(
+                                  () => GoogleFonts.chivoMono(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: colorScheme.onSurface,
                                   ),
                                 ),
-                                const SizedBox(width: 4),
-                                const Icon(
-                                  Icons.edit,
-                                  size: 16,
-                                  color: Color(0xFF8A8A8A),
-                                ),
-                              ],
-                            ),
+                              ),
+                              const SizedBox(width: 8),
+                              const Icon(Icons.edit, size: 16, color: Color(0xFF8A8A8A)),
+                            ],
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -689,82 +621,39 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: surfaceColor,
-                      border: Border(
-                        bottom: BorderSide(color: colorScheme.onSurface, width: 1),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'NOTES',
-                          style: _safeGoogleFont(
-                            () => GoogleFonts.inter(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                              color: const Color(0xFF8A8A8A),
+                  InkWell(
+                    onTap: _showNotesDialog,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'NOTES',
+                            style: _safeGoogleFont(
+                              () => GoogleFonts.inter(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                                color: const Color(0xFF8A8A8A),
+                              ),
                             ),
                           ),
-                        ),
-                        Icon(Icons.notes, size: 18, color: const Color(0xFF8A8A8A)),
-                      ],
+                          const Icon(Icons.edit, size: 16, color: Color(0xFF8A8A8A)),
+                        ],
+                      ),
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _currentTask.notes.isEmpty ? 'NO NOTES' : _currentTask.notes,
-                          style: _safeGoogleFont(
-                            () => GoogleFonts.inter(
-                              fontSize: 16,
-                              height: 1.5,
-                              color: colorScheme.onSurface,
-                            ),
-                          ),
+                    padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                    child: Text(
+                      _currentTask.notes.isEmpty ? 'NO NOTES RECORDED' : _currentTask.notes,
+                      style: _safeGoogleFont(
+                        () => GoogleFonts.inter(
+                          fontSize: 16,
+                          height: 1.5,
+                          color: colorScheme.onSurface,
                         ),
-                        const SizedBox(height: 16),
-                        InkWell(
-                          onTap: _showNotesDialog,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              border: Border(
-                                bottom: BorderSide(color: colorScheme.onSurface, width: 1),
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  'EDIT NOTES',
-                                  style: _safeGoogleFont(
-                                    () => GoogleFonts.spaceGrotesk(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: colorScheme.onSurface,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                const Icon(
-                                  Icons.edit,
-                                  size: 16,
-                                  color: Color(0xFF8A8A8A),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ],
@@ -783,40 +672,11 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: surfaceColor,
-                      border: Border(
-                        bottom: BorderSide(color: colorScheme.onSurface, width: 2),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'HISTORY',
-                          style: _safeGoogleFont(
-                            () => GoogleFonts.inter(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                              color: const Color(0xFF8A8A8A),
-                            ),
-                          ),
-                        ),
-                        Icon(Icons.history, size: 18, color: const Color(0xFF8A8A8A)),
-                      ],
-                    ),
-                  ),
                   _currentTask.completions.isEmpty
                       ? Container(
                           padding: const EdgeInsets.all(16),
+                          width: double.infinity,
                           decoration: BoxDecoration(
-                            color: colorScheme.surface,
                             border: Border(
                               bottom: BorderSide(color: colorScheme.onSurface, width: 1),
                             ),
