@@ -1,7 +1,9 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:intl/intl.dart';
+
+import 'database_service.dart';
 
 class LogHistoryPage extends StatefulWidget {
   static bool testingMode = false;
@@ -14,7 +16,7 @@ class LogHistoryPage extends StatefulWidget {
 
 class _LogHistoryPageState extends State<LogHistoryPage> {
   bool _isLoading = true;
-  Timer? _loadingTimer;
+  List<TaskCompletion> _completions = [];
 
   TextStyle _safeGoogleFont(TextStyle Function() fontFn) {
     if (LogHistoryPage.testingMode) return const TextStyle();
@@ -24,33 +26,39 @@ class _LogHistoryPageState extends State<LogHistoryPage> {
   @override
   void initState() {
     super.initState();
-    if (LogHistoryPage.testingMode) {
-      _isLoading = false;
-    } else {
-      _startLoadingTimer();
-    }
+    _loadHistory();
   }
 
-  void _startLoadingTimer() {
-    _loadingTimer = Timer(const Duration(milliseconds: 1500), () {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+  Future<void> _loadHistory() async {
+    final tasks = await DatabaseService().getTasks();
+    
+    final List<TaskCompletion> allCompletions = [];
+    
+    for (var task in tasks) {
+      for (var completionDate in task.completions) {
+        allCompletions.add(TaskCompletion(
+          taskTitle: task.title,
+          completionDate: completionDate,
+        ));
       }
-    });
-  }
+    }
+    
+    // Sort by date descending
+    allCompletions.sort((a, b) => b.completionDate.compareTo(a.completionDate));
 
-  @override
-  void dispose() {
-    _loadingTimer?.cancel();
-    super.dispose();
+    if (mounted) {
+      setState(() {
+        _completions = allCompletions;
+        _isLoading = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: AppBar(
@@ -95,22 +103,39 @@ class _LogHistoryPageState extends State<LogHistoryPage> {
       ),
       body: _isLoading
           ? ListView.builder(
-              itemCount: 5,
+              itemCount: 10,
               itemBuilder: (context, index) => const ShimmerLogRecord(),
             )
-          : Center(
-              child: Text(
-                'NO HISTORY AVAILABLE',
-                style: _safeGoogleFont(
-                  () => GoogleFonts.spaceGrotesk(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    letterSpacing: -0.5,
-                    color: const Color(0xFF8A8A8A),
+          : _completions.isEmpty
+              ? Center(
+                  child: Text(
+                    'NO HISTORY AVAILABLE',
+                    style: _safeGoogleFont(
+                      () => GoogleFonts.spaceGrotesk(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        letterSpacing: -0.5,
+                        color: const Color(0xFF8A8A8A),
+                      ),
+                    ),
                   ),
+                )
+              : ListView.builder(
+                  itemCount: _completions.length,
+                  itemBuilder: (context, index) {
+                    final completion = _completions[index];
+                    final showYear = index == 0 || 
+                      completion.completionDate.year != _completions[index - 1].completionDate.year;
+                    
+                    return Column(
+                      children: [
+                        if (showYear) 
+                          _buildYearDivider(completion.completionDate.year.toString(), context),
+                        _buildLogRecord(completion, context),
+                      ],
+                    );
+                  },
                 ),
-              ),
-            ),
     );
   }
 
@@ -138,9 +163,11 @@ class _LogHistoryPageState extends State<LogHistoryPage> {
     );
   }
 
-  Widget _buildLogRecord(String date, String title, BuildContext context) {
+  Widget _buildLogRecord(TaskCompletion completion, BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final dateStr = DateFormat('MM.dd').format(completion.completionDate);
+
     return Container(
       height: 56,
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -152,20 +179,19 @@ class _LogHistoryPageState extends State<LogHistoryPage> {
           SizedBox(
             width: 48,
             child: Text(
-              date,
+              dateStr,
               style: _safeGoogleFont(
                 () => GoogleFonts.chivoMono(
                     fontSize: 14,
-                    color: theme.brightness == Brightness.dark
-                        ? Colors.white60
-                        : Colors.black54),
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.onSurface),
               ),
             ),
           ),
           const SizedBox(width: 16),
           Expanded(
             child: Text(
-              title.toUpperCase(),
+              completion.taskTitle.toUpperCase(),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -183,13 +209,23 @@ class _LogHistoryPageState extends State<LogHistoryPage> {
           Text(
             'RESET',
             style: _safeGoogleFont(
-              () => GoogleFonts.chivoMono(fontSize: 14, color: colorScheme.onSurface),
+              () => GoogleFonts.chivoMono(
+                fontSize: 14, 
+                color: const Color(0xFF8A8A8A),
+              ),
             ),
           ),
         ],
       ),
     );
   }
+}
+
+class TaskCompletion {
+  final String taskTitle;
+  final DateTime completionDate;
+
+  TaskCompletion({required this.taskTitle, required this.completionDate});
 }
 
 class ShimmerLogRecord extends StatelessWidget {
