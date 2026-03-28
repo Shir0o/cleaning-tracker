@@ -397,7 +397,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
               if (_nameController.text.isNotEmpty) {
                 String interval = _selectedInterval;
                 if (_selectedInterval == 'CUSTOM') {
-                  interval = '${_customIntervalController.text} ${_customIntervalUnit}';
+                  interval = '${_customIntervalController.text} $_customIntervalUnit';
                 }
                 Navigator.of(context).pop({
                   'name': _nameController.text,
