@@ -6,6 +6,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'log_history_page.dart';
 import 'drive_service.dart';
+import 'notification_service.dart';
 import 'main.dart' show themeNotifier;
 
 class SettingsPage extends StatefulWidget {
@@ -26,7 +27,6 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
   bool _notificationsEnabled = false;
   String _lastBackupTime = 'Never';
   GoogleSignInAccount? _currentUser;
-  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
   StreamSubscription? _authSubscription;
 
   // New state variables for settings
@@ -240,6 +240,9 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
       setState(() {
         _notificationsEnabled = status.isGranted;
       });
+      if (status.isGranted) {
+        await NotificationService().rescheduleAll();
+      }
       if (status.isPermanentlyDenied && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -425,9 +428,10 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                           '2 WEEKS',
                         ],
                         currentValue: _notifyBeforeExpiry,
-                        onSelected: (val) {
+                        onSelected: (val) async {
                           setState(() => _notifyBeforeExpiry = val);
-                          _saveSetting('notifyBeforeExpiry', val);
+                          await _saveSetting('notifyBeforeExpiry', val);
+                          await NotificationService().rescheduleAll();
                         },
                       );
                     },
@@ -471,9 +475,10 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                           '07:00 PM',
                         ],
                         currentValue: _dailyReminderTime,
-                        onSelected: (val) {
+                        onSelected: (val) async {
                           setState(() => _dailyReminderTime = val);
-                          _saveSetting('dailyReminderTime', val);
+                          await _saveSetting('dailyReminderTime', val);
+                          await NotificationService().rescheduleAll();
                         },
                       );
                     },

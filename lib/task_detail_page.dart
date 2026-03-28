@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 import 'main.dart' show Task;
+import 'database_service.dart';
 
 class TaskDetailPage extends StatefulWidget {
   static bool testingMode = false;
@@ -289,7 +291,6 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
       onPopInvokedWithResult: (didPop, result) {
         if (didPop && result == null) {
           // If popped via back button, return the updated task
-          // Result might already be set by our internal pops
         }
       },
       child: Scaffold(
@@ -420,9 +421,15 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                         ),
                         elevation: 0,
                       ),
-                      onPressed: () {
+                      onPressed: () async {
+                        final now = DateTime.now();
+                        await DatabaseService().addCompletion(_currentTask.id!, now);
+                        if (!context.mounted) return;
                         setState(() {
-                          _currentTask = _currentTask.copyWith(lastCompleted: DateTime.now());
+                          _currentTask = _currentTask.copyWith(
+                            lastCompleted: now,
+                            completions: [..._currentTask.completions, now],
+                          );
                         });
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('System Reset Successful')),
@@ -674,28 +681,93 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                       ),
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      border: Border(
-                        top: BorderSide(color: colorScheme.onSurface, width: 2),
-                      ),
-                    ),
-                    child: Text(
-                      'NO LOGS RECORDED',
-                      style: _safeGoogleFont(
-                        () => GoogleFonts.inter(
-                          fontSize: 14,
-                          color: const Color(0xFF8A8A8A),
+                  _currentTask.completions.isEmpty
+                      ? Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              top: BorderSide(
+                                color: colorScheme.onSurface,
+                                width: 2,
+                              ),
+                            ),
+                          ),
+                          child: Text(
+                            'NO LOGS RECORDED',
+                            style: _safeGoogleFont(
+                              () => GoogleFonts.inter(
+                                fontSize: 14,
+                                color: const Color(0xFF8A8A8A),
+                              ),
+                            ),
+                          ),
+                        )
+                      : Column(
+                          children: _currentTask.completions.reversed
+                              .take(5)
+                              .map((completion) => _buildArchiveRow(completion, context))
+                              .toList(),
                         ),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildArchiveRow(DateTime completion, BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final dateStr = DateFormat('MM.dd').format(completion);
+    final yearStr = DateFormat('yyyy').format(completion);
+
+    return Container(
+      height: 56,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(color: colorScheme.onSurface, width: 2),
+        ),
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 48,
+            child: Text(
+              dateStr,
+              style: _safeGoogleFont(
+                () => GoogleFonts.chivoMono(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.onSurface,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              'COMPLETION REGISTERED',
+              style: _safeGoogleFont(
+                () => GoogleFonts.inter(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                  color: colorScheme.onSurface,
+                ),
+              ),
+            ),
+          ),
+          Text(
+            yearStr,
+            style: _safeGoogleFont(
+              () => GoogleFonts.chivoMono(
+                fontSize: 14,
+                color: const Color(0xFF8A8A8A),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

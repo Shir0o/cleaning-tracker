@@ -11,50 +11,62 @@ import 'settings_page.dart';
 import 'task_detail_page.dart';
 import 'secrets.dart';
 import 'drive_service.dart';
-import 'dart:convert';
+import 'notification_service.dart';
+import 'database_service.dart';
 
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 
 class Task {
+  final int? id;
   final String title;
   final String interval;
   final DateTime lastCompleted;
   final String category;
   final String notes;
+  final List<DateTime> completions;
 
   Task({
+    this.id,
     required this.title,
     required this.interval,
     required this.lastCompleted,
     this.category = 'GENERAL',
     this.notes = '',
+    this.completions = const [],
   });
 
   Task copyWith({
+    int? id,
     String? title,
     String? interval,
     DateTime? lastCompleted,
     String? category,
     String? notes,
+    List<DateTime>? completions,
   }) {
     return Task(
+      id: id ?? this.id,
       title: title ?? this.title,
       interval: interval ?? this.interval,
       lastCompleted: lastCompleted ?? this.lastCompleted,
       category: category ?? this.category,
       notes: notes ?? this.notes,
+      completions: completions ?? this.completions,
     );
   }
 
   Map<String, dynamic> toJson() => {
+        if (id != null) 'id': id,
         'title': title,
         'interval': interval,
         'lastCompleted': lastCompleted.toIso8601String(),
         'category': category,
         'notes': notes,
+        'completions': completions.map((e) => e.toIso8601String()).toList(),
       };
 
   factory Task.fromJson(Map<String, dynamic> json) => Task(
+        id: json['id'] as int?,
         title: json['title'] as String,
         interval: json['interval'] as String,
         lastCompleted: json['lastCompleted'] != null
@@ -62,6 +74,10 @@ class Task {
             : DateTime.now(),
         category: (json['category'] as String?) ?? 'GENERAL',
         notes: (json['notes'] as String?) ?? '',
+        completions: (json['completions'] as List<dynamic>?)
+                ?.map((e) => DateTime.parse(e as String))
+                .toList() ??
+            [],
       );
 
   Duration get intervalDuration {
@@ -121,6 +137,10 @@ Future<void> main() async {
       );
       // Initialize DriveService
       await DriveService().init();
+      // Initialize Database and Migrate
+      await DatabaseService().migrateFromSharedPreferences();
+      // Initialize NotificationService
+      await NotificationService().init();
     } catch (e) {
       debugPrint('Global initialization failed: $e');
     }
@@ -230,9 +250,7 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  GoogleSignInAccount? _currentUser;
   bool _isLoading = true;
-  Timer? _loadingTimer;
   List<Task> _tasks = [];
 
   StreamSubscription? _authSubscription;
@@ -247,46 +265,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
     super.initState();
     _loadTasks();
     _listenToAuthEvents();
-    if (DashboardScreen.testingMode) {
-      _isLoading = false;
-    } else {
-      _startLoadingTimer();
-    }
   }
 
   Future<void> _loadTasks() async {
-    final prefs = await SharedPreferences.getInstance();
     if (mounted) {
-      final taskStrings = prefs.getStringList('tasks') ?? [];
+      final tasks = await DatabaseService().getTasks();
       setState(() {
-        _tasks = taskStrings
-            .map((s) => Task.fromJson(jsonDecode(s) as Map<String, dynamic>))
-            .toList();
+        _tasks = tasks;
+        _isLoading = false;
       });
     }
   }
 
-  Future<void> _saveTasks() async {
-    final prefs = await SharedPreferences.getInstance();
-    final taskStrings = _tasks.map((t) => jsonEncode(t.toJson())).toList();
-    await prefs.setStringList('tasks', taskStrings);
-  }
-
-  void _startLoadingTimer() {
-    // Minimum animation timer to prevent flashing (e.g., 1500ms)
-    _loadingTimer = Timer(const Duration(milliseconds: 1500), () {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    });
+  Future<void> _refreshTasks() async {
+    final tasks = await DatabaseService().getTasks();
+    if (mounted) {
+      setState(() {
+        _tasks = tasks;
+      });
+    }
+    // Update notifications whenever tasks are refreshed/changed
+    NotificationService().rescheduleAll(_tasks);
   }
 
   @override
   void dispose() {
     _authSubscription?.cancel();
-    _loadingTimer?.cancel();
     super.dispose();
   }
 
@@ -297,11 +301,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _authSubscription = GoogleSignIn.instance.authenticationEvents.listen((event) {
       if (mounted) {
         setState(() {
-          if (event is GoogleSignInAuthenticationEventSignIn) {
-            _currentUser = event.user;
-          } else if (event is GoogleSignInAuthenticationEventSignOut) {
-            _currentUser = null;
-          }
+          // Trigger refresh if needed
         });
       }
     });
@@ -416,7 +416,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                       ),
                       ...tasksInCategory.map((task) {
-                        final taskIndex = _tasks.indexOf(task);
                         final now = DateTime.now();
                         final health = task.health(now);
                         final isOverdue = health < 0;
@@ -439,15 +438,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             );
 
                             if (result == 'delete') {
-                              setState(() {
-                                _tasks.removeAt(taskIndex);
-                              });
-                              await _saveTasks();
+                              await DatabaseService().deleteTask(task.id!);
+                              await _refreshTasks();
                             } else if (result is Task) {
-                              setState(() {
-                                _tasks[taskIndex] = result;
-                              });
-                              await _saveTasks();
+                              await DatabaseService().updateTask(result);
+                              await _refreshTasks();
                             }
                           },
                         );
@@ -472,15 +467,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 MaterialPageRoute(builder: (context) => const AddTaskPage()),
               );
               if (result != null && mounted) {
-                setState(() {
-                  _tasks.add(Task(
-                    title: result['name']!,
-                    interval: result['interval']!,
-                    category: result['category'] ?? 'GENERAL',
-                    lastCompleted: DateTime.now(),
-                  ));
-                });
-                await _saveTasks();
+                final newTask = Task(
+                  title: result['name']!,
+                  interval: result['interval']!,
+                  category: result['category'] ?? 'GENERAL',
+                  lastCompleted: DateTime.now(),
+                );
+                await DatabaseService().insertTask(newTask);
+                await _refreshTasks();
               }
             },
             child: Icon(Icons.add, color: colorScheme.surface, size: 32),
