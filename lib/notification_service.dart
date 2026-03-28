@@ -18,7 +18,8 @@ class NotificationService {
   Future<void> init() async {
     // Initialize timezone
     tz.initializeTimeZones();
-    final String timeZoneName = await FlutterTimezone.getLocalTimezone();
+    final timezoneInfo = await FlutterTimezone.getLocalTimezone();
+    final String timeZoneName = timezoneInfo.identifier;
     tz.setLocalLocation(tz.getLocation(timeZoneName));
 
     const AndroidInitializationSettings initializationSettingsAndroid =
@@ -37,7 +38,7 @@ class NotificationService {
     );
 
     await _notificationsPlugin.initialize(
-      initializationSettings,
+      settings: initializationSettings,
       onDidReceiveNotificationResponse: (details) {
         // Handle notification tap
       },
@@ -91,11 +92,11 @@ class NotificationService {
     final id = task.title.hashCode.abs();
 
     await _notificationsPlugin.zonedSchedule(
-      id,
-      'CLEANING REQUIRED',
-      'Task "${task.title}" is due soon.',
-      tz.TZDateTime.from(scheduledDate, tz.local),
-      const NotificationDetails(
+      id: id,
+      title: 'CLEANING REQUIRED',
+      body: 'Task "${task.title}" is due soon.',
+      scheduledDate: tz.TZDateTime.from(scheduledDate, tz.local),
+      notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
           'cleaning_reminders',
           'Cleaning Reminders',
@@ -106,8 +107,6 @@ class NotificationService {
         iOS: DarwinNotificationDetails(),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
     );
     
     debugPrint('Scheduled notification for ${task.title} at $scheduledDate (ID: $id)');
@@ -115,7 +114,7 @@ class NotificationService {
 
   Future<void> cancelTaskNotification(String title) async {
     final id = title.hashCode.abs();
-    await _notificationsPlugin.cancel(id);
+    await _notificationsPlugin.cancel(id: id);
     debugPrint('Cancelled notification for $title (ID: $id)');
   }
 
