@@ -418,7 +418,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ...tasksInCategory.map((task) {
                         final now = DateTime.now();
                         final health = task.health(now);
-                        final isOverdue = health < 0;
+                        final isOverdue = (health * 100).round() <= 0;
 
                         return TaskCard(
                           title: task.title,

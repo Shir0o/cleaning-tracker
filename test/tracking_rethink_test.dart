@@ -85,6 +85,32 @@ void main() {
       expect(overdueTask.dueDateText(now), 'MAR 25 (-2 DAYS)');
     });
 
+    test('overdue threshold logic: rounds to 0% is overdue', () {
+      final now = DateTime.now();
+      final task = Task(
+        title: 'Test',
+        interval: '1 DAYS',
+        // 0.4% health rounds to 0%
+        lastCompleted: now.subtract(const Duration(seconds: 86100)),
+      );
+      final health = task.health(now);
+      final isOverdue = (health * 100).round() <= 0;
+      expect(isOverdue, isTrue, reason: '0.4% health rounds to 0% and should be considered overdue');
+    });
+
+    test('overdue threshold logic: rounds to 1% is NOT overdue', () {
+      final now = DateTime.now();
+      final task = Task(
+        title: 'Test',
+        interval: '1 DAYS',
+        // 0.6% health rounds to 1%
+        lastCompleted: now.subtract(const Duration(seconds: 85800)),
+      );
+      final health = task.health(now);
+      final isOverdue = (health * 100).round() <= 0;
+      expect(isOverdue, isFalse, reason: '0.6% health rounds to 1% and should NOT be considered overdue');
+    });
+
     testWidgets('TaskCard handles long titles without overflow', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(

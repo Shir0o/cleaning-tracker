@@ -75,5 +75,35 @@ void main() {
       expect(find.text('-1%'), findsOneWidget);
       expect(find.text('STATUS: 5 DAYS OVERDUE'), findsOneWidget);
     });
+
+    testWidgets('shows red color at exactly 0%', (WidgetTester tester) async {
+      TaskDetailPage.testingMode = false; // Disable to allow style/color inspection
+      addTearDown(() => TaskDetailPage.testingMode = true);
+
+      // Use a fixed time for stability in health calculation
+      final now = DateTime.now();
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF0038FF),
+              error: Color(0xFFFF0000),
+            ),
+          ),
+          home: TaskDetailPage(
+            task: Task(
+              title: 'DEADLINE TASK',
+              interval: '1 DAYS',
+              lastCompleted: now.subtract(const Duration(days: 1)),
+            ),
+          ),
+        ),
+      );
+
+      final percentageText = tester.widget<Text>(find.text('0%'));
+      // This is expected to fail initially as 0% is currently blue (primary)
+      expect(percentageText.style?.color, const Color(0xFFFF0000), 
+          reason: '0% cleanliness should be displayed in error color (red)');
+    });
   });
 }

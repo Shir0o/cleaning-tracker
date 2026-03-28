@@ -273,10 +273,9 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
 
     // Recalculate based on _currentTask
     final now = DateTime.now();
-    final isOverdue = _currentTask.health(now) < 0;
-    
     final health = _currentTask.health(now);
     final remainingPercentage = (health * 100).round();
+    final isOverdue = remainingPercentage <= 0;
 
     String getStatusText() {
       return 'STATUS: ${_currentTask.statusText(now)}';
