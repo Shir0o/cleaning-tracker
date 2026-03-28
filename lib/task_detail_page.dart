@@ -618,45 +618,30 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                   bottom: BorderSide(color: colorScheme.onSurface, width: 2),
                 ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  InkWell(
-                    onTap: _showNotesDialog,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'NOTES',
-                            style: _safeGoogleFont(
-                              () => GoogleFonts.inter(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                                color: const Color(0xFF8A8A8A),
-                              ),
+              child: InkWell(
+                onTap: _showNotesDialog,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          _currentTask.notes.isEmpty ? 'NO NOTES RECORDED' : _currentTask.notes,
+                          style: _safeGoogleFont(
+                            () => GoogleFonts.inter(
+                              fontSize: 16,
+                              height: 1.5,
+                              color: colorScheme.onSurface,
                             ),
                           ),
-                          const Icon(Icons.edit, size: 16, color: Color(0xFF8A8A8A)),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-                    child: Text(
-                      _currentTask.notes.isEmpty ? 'NO NOTES RECORDED' : _currentTask.notes,
-                      style: _safeGoogleFont(
-                        () => GoogleFonts.inter(
-                          fontSize: 16,
-                          height: 1.5,
-                          color: colorScheme.onSurface,
                         ),
                       ),
-                    ),
+                      const SizedBox(width: 8),
+                      const Icon(Icons.edit, size: 16, color: Color(0xFF8A8A8A)),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
   
@@ -682,7 +667,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                             ),
                           ),
                           child: Text(
-                            'NO LOGS RECORDED',
+                            'NO HISTORY YET',
                             style: _safeGoogleFont(
                               () => GoogleFonts.inter(
                                 fontSize: 14,
