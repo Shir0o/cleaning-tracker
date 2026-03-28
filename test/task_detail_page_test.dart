@@ -45,14 +45,14 @@ void main() {
       await tester.drag(find.byType(ListView), const Offset(0, -300));
       await tester.pump();
 
-      expect(find.text('NOTES'), findsOneWidget);
+      expect(find.text('NOTES'), findsNWidgets(2));
       expect(find.text('NO NOTES RECORDED'), findsOneWidget);
 
       // History Section
       await tester.drag(find.byType(ListView), const Offset(0, -500));
       await tester.pump();
 
-      expect(find.text('03. HISTORY'), findsOneWidget);
+      expect(find.text('HISTORY'), findsOneWidget);
       expect(find.text('NO LOGS RECORDED'), findsOneWidget);
     });
 

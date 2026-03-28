@@ -516,7 +516,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
             ),
 
             // SYSTEM DETAILS SECTION
-            _buildSectionTitle('01. System Details', context),
+            _buildSectionTitle('System Details', context),
             Container(
               decoration: BoxDecoration(
                 color: colorScheme.surface,
@@ -609,7 +609,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
             ),
   
             // NOTES SECTION
-            _buildSectionTitle('02. Notes', context),
+            _buildSectionTitle('Notes', context),
             Container(
               decoration: BoxDecoration(
                 color: colorScheme.surface,
@@ -661,7 +661,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
             ),
   
             // HISTORY SECTION
-            _buildSectionTitle('03. History', context),
+            _buildSectionTitle('History', context),
             Container(
               decoration: BoxDecoration(
                 color: colorScheme.surface,
