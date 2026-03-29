@@ -26,6 +26,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
   }
 
   bool _notificationsEnabled = false;
+  bool _appNotificationsEnabled = true;
   String _lastBackupTime = 'Never';
   GoogleSignInAccount? _currentUser;
   StreamSubscription? _authSubscription;
@@ -75,6 +76,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
     final prefs = await SharedPreferences.getInstance();
     if (mounted) {
       setState(() {
+        _appNotificationsEnabled = prefs.getBool('notifications_enabled') ?? true;
         _notifyBeforeExpiry =
             prefs.getString('notifyBeforeExpiry') ?? '2 DAYS';
         _dailyReminderTime = prefs.getString('dailyReminderTime') ?? '09:00 AM';
@@ -102,6 +104,11 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
   Future<void> _saveSetting(String key, String value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(key, value);
+  }
+
+  Future<void> _saveBoolSetting(String key, bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(key, value);
   }
 
   void _showSelectionDialog({
@@ -357,7 +364,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
         child: Column(
           children: [
             // Notification Preferences
-            _buildSectionHeader('01. Notification Preferences'),
+            _buildSectionHeader('Notification Preferences'),
             Container(
               decoration: BoxDecoration(
                 border: Border(
@@ -366,6 +373,25 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
               ),
               child: Column(
                 children: [
+                  _buildSettingRow(
+                    context: context,
+                    icon: Icons.notifications_active,
+                    title: 'Enable Notifications',
+                    subtitle: 'Toggle all reminders in-app',
+                    trailing: _buildBrutalSwitch(
+                      _appNotificationsEnabled,
+                      (val) async {
+                        setState(() => _appNotificationsEnabled = val);
+                        await _saveBoolSetting('notifications_enabled', val);
+                        if (val) {
+                          await NotificationService().rescheduleAll();
+                        } else {
+                          await NotificationService().rescheduleAll([]); // Cancel all
+                        }
+                      },
+                      context,
+                    ),
+                  ),
                   _buildSettingRow(
                     context: context,
                     onTap: _notificationsEnabled
@@ -483,7 +509,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                         },
                       );
                     },
-                    icon: Icons.notifications_active,
+                    icon: Icons.timer_outlined,
                     title: 'Daily reminder',
                     subtitle: 'Morning digest status',
                     trailing: Row(
@@ -508,12 +534,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                           ),
                         ),
                         const SizedBox(width: 16),
-                        // Custom switch for notifications
-                        _buildBrutalSwitch(
-                          _notificationsEnabled,
-                          _requestNotificationPermission,
-                          context,
-                        ),
+                        const Icon(Icons.edit, size: 20),
                       ],
                     ),
                   ),
@@ -522,7 +543,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
             ),
 
             // Global Preferences
-            _buildSectionHeader('02. Global Preferences'),
+            _buildSectionHeader('Global Preferences'),
             Container(
               decoration: BoxDecoration(
                 border: Border(
@@ -626,7 +647,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
             ),
 
             // Data Backup
-            _buildSectionHeader('03. Data & Sync'),
+            _buildSectionHeader('Data & Sync'),
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -734,7 +755,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
             ),
 
             // History Section
-            _buildSectionHeader('04. History'),
+            _buildSectionHeader('History'),
             Padding(
               padding: const EdgeInsets.only(left: 16.0, right: 16, bottom: 16),
               child: Container(
@@ -784,7 +805,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
             ),
 
             // Legal Section
-            _buildSectionHeader('05. Legal'),
+            _buildSectionHeader('Legal'),
             Padding(
               padding: const EdgeInsets.only(left: 16.0, right: 16, bottom: 32),
               child: Container(

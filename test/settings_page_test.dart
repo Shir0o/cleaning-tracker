@@ -22,14 +22,15 @@ void main() {
     // Verify headers and sections exist
     expect(find.text('SYSTEM SETTINGS'), findsOneWidget);
     expect(
-      find.text('01. Notification Preferences'.toUpperCase()),
+      find.text('Notification Preferences'.toUpperCase()),
       findsOneWidget,
     );
-    expect(find.text('02. Global Preferences'.toUpperCase()), findsOneWidget);
-    expect(find.text('03. Data & Sync'.toUpperCase()), findsOneWidget);
-    expect(find.text('04. History'.toUpperCase()), findsOneWidget);
+    expect(find.text('Global Preferences'.toUpperCase()), findsOneWidget);
+    expect(find.text('Data & Sync'.toUpperCase()), findsOneWidget);
+    expect(find.text('History'.toUpperCase()), findsOneWidget);
 
     // Verify key elements exist
+    expect(find.text('Enable Notifications'.toUpperCase()), findsOneWidget);
     expect(find.text('Notify before expiry'.toUpperCase()), findsOneWidget);
     expect(find.text('Daily reminder'.toUpperCase()), findsOneWidget);
     expect(find.text('Interface Theme'.toUpperCase()), findsOneWidget);

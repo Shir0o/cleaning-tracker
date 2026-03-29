@@ -4,7 +4,6 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
-import 'dart:convert';
 import 'main.dart' show Task;
 import 'database_service.dart';
 
@@ -13,8 +12,13 @@ class NotificationService {
   factory NotificationService() => _instance;
   NotificationService._internal();
 
-  final FlutterLocalNotificationsPlugin _notificationsPlugin =
+  FlutterLocalNotificationsPlugin _notificationsPlugin =
       FlutterLocalNotificationsPlugin();
+
+  @visibleForTesting
+  set notificationsPlugin(FlutterLocalNotificationsPlugin plugin) {
+    _notificationsPlugin = plugin;
+  }
 
   Future<void> init() async {
     // Initialize timezone
@@ -48,7 +52,15 @@ class NotificationService {
 
   Future<void> scheduleTaskNotification(Task task) async {
     final prefs = await SharedPreferences.getInstance();
-    final bool notificationsEnabled = prefs.getString('notifications_enabled') != 'false'; // Default to true if not set
+    // Support both bool and string for transition, then prefer bool
+    final dynamic notificationsEnabledPref = prefs.get('notifications_enabled');
+    bool notificationsEnabled = true;
+    if (notificationsEnabledPref is bool) {
+      notificationsEnabled = notificationsEnabledPref;
+    } else if (notificationsEnabledPref is String) {
+      notificationsEnabled = notificationsEnabledPref != 'false';
+    }
+
     if (!notificationsEnabled) return;
 
     final String notifyBeforeStr = prefs.getString('notifyBeforeExpiry') ?? '2 DAYS';
