@@ -56,6 +56,14 @@ void main() {
         )).thenAnswer((_) async => {});
 
     when(() => mockPlugin.cancelAll()).thenAnswer((_) async => {});
+
+    when(() => mockPlugin.show(
+          id: any(named: 'id'),
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          notificationDetails: any(named: 'notificationDetails'),
+          payload: any(named: 'payload'),
+        )).thenAnswer((_) async => {});
   });
 
   test('scheduleTaskNotification respects notifications_enabled setting (bool)', () async {
@@ -150,6 +158,20 @@ void main() {
           scheduledDate: any(named: 'scheduledDate'),
           notificationDetails: any(named: 'notificationDetails'),
           androidScheduleMode: any(named: 'androidScheduleMode'),
+        )).called(1);
+  });
+
+  test('showImmediateNotification triggers immediate notification', () async {
+    await notificationService.showImmediateNotification(
+      title: 'TEST TITLE',
+      body: 'TEST BODY',
+    );
+
+    verify(() => mockPlugin.show(
+          id: 999,
+          title: 'TEST TITLE',
+          body: 'TEST BODY',
+          notificationDetails: any(named: 'notificationDetails'),
         )).called(1);
   });
 }

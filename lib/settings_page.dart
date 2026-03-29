@@ -378,18 +378,49 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                     icon: Icons.notifications_active,
                     title: 'Enable Notifications',
                     subtitle: 'Toggle all reminders in-app',
-                    trailing: _buildBrutalSwitch(
-                      _appNotificationsEnabled,
-                      (val) async {
-                        setState(() => _appNotificationsEnabled = val);
-                        await _saveBoolSetting('notifications_enabled', val);
-                        if (val) {
-                          await NotificationService().rescheduleAll();
-                        } else {
-                          await NotificationService().rescheduleAll([]); // Cancel all
-                        }
-                      },
-                      context,
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (_notificationsEnabled)
+                          Padding(
+                            padding: const EdgeInsets.only(right: 12.0),
+                            child: OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(color: colorScheme.onSurface, width: 1.5),
+                                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                                padding: const EdgeInsets.symmetric(horizontal: 8),
+                                minimumSize: const Size(0, 28),
+                              ),
+                              onPressed: () async {
+                                await NotificationService().showImmediateNotification();
+                              },
+                              child: Text(
+                                'TEST',
+                                style: _safeGoogleFont(
+                                  () => GoogleFonts.spaceGrotesk(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 10,
+                                    letterSpacing: 1.0,
+                                    color: colorScheme.onSurface,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        _buildBrutalSwitch(
+                          _appNotificationsEnabled,
+                          (val) async {
+                            setState(() => _appNotificationsEnabled = val);
+                            await _saveBoolSetting('notifications_enabled', val);
+                            if (val) {
+                              await NotificationService().rescheduleAll();
+                            } else {
+                              await NotificationService().rescheduleAll([]); // Cancel all
+                            }
+                          },
+                          context,
+                        ),
+                      ],
                     ),
                   ),
                   _buildSettingRow(

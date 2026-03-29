@@ -144,4 +144,29 @@ class NotificationService {
       await scheduleTaskNotification(task);
     }
   }
+
+  Future<void> showImmediateNotification({
+    String title = 'TEST NOTIFICATION',
+    String body = 'This is a test notification from Cleaning Tracker.',
+  }) async {
+    const id = 999;
+    const notificationDetails = NotificationDetails(
+      android: AndroidNotificationDetails(
+        'test_notifications',
+        'Test Notifications',
+        channelDescription: 'Used for testing notification system',
+        importance: Importance.high,
+        priority: Priority.high,
+      ),
+      iOS: DarwinNotificationDetails(),
+    );
+
+    await _notificationsPlugin.show(
+      id: id,
+      title: title,
+      body: body,
+      notificationDetails: notificationDetails,
+    );
+    debugPrint('Immediate test notification shown (ID: $id)');
+  }
 }
