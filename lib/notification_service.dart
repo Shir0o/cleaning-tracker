@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'main.dart' show Task;
+import 'database_service.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
