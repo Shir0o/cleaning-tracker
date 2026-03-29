@@ -5,6 +5,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'log_history_page.dart';
+import 'privacy_policy_page.dart';
 import 'drive_service.dart';
 import 'notification_service.dart';
 import 'main.dart' show themeNotifier;
@@ -778,6 +779,60 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                       ),
                     ),
                   ),
+                ),
+              ),
+            ),
+
+            // Legal Section
+            _buildSectionHeader('05. Legal'),
+            Padding(
+              padding: const EdgeInsets.only(left: 16.0, right: 16, bottom: 32),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: colorScheme.surface,
+                  border: Border.all(color: colorScheme.onSurface, width: 2),
+                ),
+                child: Column(
+                  children: [
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const PrivacyPolicyPage(),
+                            ),
+                          );
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(Icons.privacy_tip_outlined, color: colorScheme.primary),
+                                  const SizedBox(width: 16),
+                                  Text(
+                                    'PRIVACY POLICY',
+                                    style: TextStyle(
+                                      fontFamily: _safeGoogleFont(
+                                        () => GoogleFonts.inter(),
+                                      ).fontFamily,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                      color: colorScheme.onSurface,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Icon(Icons.arrow_forward, color: colorScheme.onSurface),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

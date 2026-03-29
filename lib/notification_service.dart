@@ -122,11 +122,7 @@ class NotificationService {
     List<Task> tasksToSchedule = tasks ?? [];
     
     if (tasks == null) {
-      final prefs = await SharedPreferences.getInstance();
-      final taskStrings = prefs.getStringList('tasks') ?? [];
-      tasksToSchedule = taskStrings
-          .map((s) => Task.fromJson(jsonDecode(s) as Map<String, dynamic>))
-          .toList();
+      tasksToSchedule = await DatabaseService().getTasks();
     }
 
     await _notificationsPlugin.cancelAll();

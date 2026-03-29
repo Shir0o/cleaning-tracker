@@ -24,6 +24,7 @@ class Task {
   final String category;
   final String notes;
   final List<DateTime> completions;
+  final DateTime? snoozedUntil;
 
   Task({
     this.id,
@@ -33,6 +34,7 @@ class Task {
     this.category = 'GENERAL',
     this.notes = '',
     this.completions = const [],
+    this.snoozedUntil,
   });
 
   Task copyWith({
@@ -43,6 +45,7 @@ class Task {
     String? category,
     String? notes,
     List<DateTime>? completions,
+    DateTime? snoozedUntil,
   }) {
     return Task(
       id: id ?? this.id,
@@ -52,6 +55,7 @@ class Task {
       category: category ?? this.category,
       notes: notes ?? this.notes,
       completions: completions ?? this.completions,
+      snoozedUntil: snoozedUntil ?? this.snoozedUntil,
     );
   }
 
@@ -63,6 +67,7 @@ class Task {
         'category': category,
         'notes': notes,
         'completions': completions.map((e) => e.toIso8601String()).toList(),
+        if (snoozedUntil != null) 'snoozedUntil': snoozedUntil!.toIso8601String(),
       };
 
   factory Task.fromJson(Map<String, dynamic> json) => Task(
@@ -78,6 +83,9 @@ class Task {
                 ?.map((e) => DateTime.parse(e as String))
                 .toList() ??
             [],
+        snoozedUntil: json['snoozedUntil'] != null
+            ? DateTime.parse(json['snoozedUntil'] as String)
+            : null,
       );
 
   Duration get intervalDuration {
@@ -99,12 +107,25 @@ class Task {
   }
 
   double health(DateTime now) {
+    if (snoozedUntil != null && now.isBefore(snoozedUntil!)) {
+      return 1.0;
+    }
     final total = intervalDuration.inSeconds;
     final elapsed = now.difference(lastCompleted).inSeconds;
     return (total - elapsed) / total;
   }
 
+  bool isUrgent(DateTime now) {
+    if (snoozedUntil != null && now.isBefore(snoozedUntil!)) {
+      return false;
+    }
+    return health(now) < 0.25;
+  }
+
   String statusText(DateTime now) {
+    if (snoozedUntil != null && now.isBefore(snoozedUntil!)) {
+      return 'SNOOZED';
+    }
     final h = health(now);
     if (h >= 0.85) return 'OPERATIONAL';
     if (h >= 0.25) return 'DEGRADING';
@@ -117,7 +138,7 @@ class Task {
     final dueDate = lastCompleted.add(intervalDuration);
     final diff = dueDate.difference(now);
     final absoluteDate = DateFormat('MMM d').format(dueDate).toUpperCase();
-    
+
     if (diff.isNegative) {
       return '$absoluteDate (-${diff.inDays.abs()} DAYS)';
     } else {
@@ -311,6 +332,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final now = DateTime.now();
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -365,91 +387,161 @@ class _DashboardScreenState extends State<DashboardScreen> {
               padding: const EdgeInsets.all(16),
               itemBuilder: (context, index) => const ShimmerCard(),
             )
-          : _tasks.isEmpty
-              ? ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    Center(
-                      child: Text(
-                        'NO SYSTEMS TRACKED',
-                        style: _safeGoogleFont(
-                          () => GoogleFonts.spaceGrotesk(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                            letterSpacing: -0.5,
-                            color: const Color(0xFF8A8A8A),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                )
-              : () {
+          : () {
               final Map<String, List<Task>> groupedTasks = {};
+              final List<Task> urgentTasks = [];
+              double totalHealth = 0.0;
+
               for (var task in _tasks) {
-                groupedTasks.putIfAbsent(task.category, () => []).add(task);
+                final h = task.health(now);
+                totalHealth += h.clamp(0.0, 1.0);
+                if (task.isUrgent(now)) {
+                  urgentTasks.add(task);
+                } else {
+                  groupedTasks.putIfAbsent(task.category, () => []).add(task);
+                }
               }
+
+              final int overallHealth = _tasks.isEmpty
+                  ? 100 // Default to 100% if no tasks
+                  : ((totalHealth / _tasks.length) * 100).round();
+              final bool isHomeCritical = overallHealth < 50;
+
               final categories = groupedTasks.keys.toList()..sort();
 
-              return ListView.builder(
+              return ListView(
                 padding: const EdgeInsets.all(16),
-                itemCount: categories.length,
-                itemBuilder: (context, catIndex) {
-                  final category = categories[catIndex];
-                  final tasksInCategory = groupedTasks[category]!;
-
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16, bottom: 8),
-                        child: Text(
-                          category,
+                children: [
+                  // Overall Health Section
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 32),
+                    decoration: BoxDecoration(
+                      border: Border(
+                          bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          'HOME HEALTH',
                           style: _safeGoogleFont(
                             () => GoogleFonts.spaceGrotesk(
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
                               letterSpacing: 2.0,
-                              color: colorScheme.onSurface.withValues(alpha: 0.6),
+                              color: const Color(0xFF8A8A8A),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '$overallHealth%',
+                          style: _safeGoogleFont(
+                            () => GoogleFonts.chivoMono(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 64,
+                              height: 1.0,
+                              color: isHomeCritical
+                                  ? colorScheme.error
+                                  : colorScheme.primary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  if (_tasks.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 48),
+                      child: Center(
+                        child: Text(
+                          'NO SYSTEMS TRACKED',
+                          style: _safeGoogleFont(
+                            () => GoogleFonts.spaceGrotesk(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                              letterSpacing: -0.5,
+                              color: const Color(0xFF8A8A8A),
                             ),
                           ),
                         ),
                       ),
-                      ...tasksInCategory.map((task) {
-                        final now = DateTime.now();
-                        final health = task.health(now);
-                        final isOverdue = (health * 100).round() <= 0;
+                    )
+                  else ...[
+                    // Priority Section
+                    if (urgentTasks.isNotEmpty) ...[
+                      Padding(
+                        padding: const EdgeInsets.only(top: 24, bottom: 8),
+                        child: Text(
+                          'PRIORITY ACTIONS',
+                          style: _safeGoogleFont(
+                            () => GoogleFonts.spaceGrotesk(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              letterSpacing: 2.0,
+                              color: colorScheme.error,
+                            ),
+                          ),
+                        ),
+                      ),
+                      ...urgentTasks
+                          .map((task) => _buildTaskRow(task, now, context)),
+                    ],
 
-                        return TaskCard(
-                          title: task.title,
-                          interval: task.interval,
-                          dueDateText: task.dueDateText(now),
-                          progress: health,
-                          isOverdue: isOverdue,
-                          isFresh: now.difference(task.lastCompleted).inSeconds <
-                              3600, // Show fresh if completed in last hour
-                          onTap: () async {
-                            final result = await Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => TaskDetailPage(
-                                  task: task,
+                    // Categories
+                    ...categories.expand((category) {
+                      final tasksInCategory = groupedTasks[category]!;
+                      return [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 24, bottom: 8),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                category,
+                                style: _safeGoogleFont(
+                                  () => GoogleFonts.spaceGrotesk(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                    letterSpacing: 2.0,
+                                    color:
+                                        colorScheme.onSurface.withValues(alpha: 0.6),
+                                  ),
                                 ),
                               ),
-                            );
-
-                            if (result == 'delete') {
-                              await DatabaseService().deleteTask(task.id!);
-                              await _refreshTasks();
-                            } else if (result is Task) {
-                              await DatabaseService().updateTask(result);
-                              await _refreshTasks();
-                            }
-                          },
-                        );
-                      }),
-                    ],
-                  );
-                },
+                              InkWell(
+                                onTap: () =>
+                                    _showCategoryResetConfirmation(category),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                        color: colorScheme.onSurface
+                                            .withValues(alpha: 0.4)),
+                                  ),
+                                  child: Text(
+                                    'RESET CATEGORY',
+                                    style: _safeGoogleFont(
+                                      () => GoogleFonts.chivoMono(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        color: colorScheme.onSurface
+                                            .withValues(alpha: 0.6),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        ...tasksInCategory
+                            .map((task) => _buildTaskRow(task, now, context)),
+                      ];
+                    }),
+                  ],
+                ],
               );
             }(),
       floatingActionButton: Container(
@@ -481,6 +573,156 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showCategoryResetConfirmation(String category) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+          child: Container(
+            decoration: BoxDecoration(
+              color: colorScheme.surface,
+              border: Border.all(color: colorScheme.onSurface, width: 4),
+            ),
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'RESET ALL TASKS?',
+                  style: _safeGoogleFont(
+                    () => GoogleFonts.spaceGrotesk(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
+                      letterSpacing: -0.5,
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'THIS WILL MARK ALL TASKS IN "$category" AS COMPLETED TODAY.',
+                  style: _safeGoogleFont(
+                    () => GoogleFonts.inter(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 32),
+                Row(
+                  children: [
+                    Expanded(
+                      child: SizedBox(
+                        height: 48,
+                        child: OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: colorScheme.onSurface,
+                            side: BorderSide(
+                              color: colorScheme.onSurface,
+                              width: 2,
+                            ),
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.zero,
+                            ),
+                          ),
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: Text(
+                            'CANCEL',
+                            style: _safeGoogleFont(
+                              () => GoogleFonts.spaceGrotesk(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                                letterSpacing: 1.0,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: SizedBox(
+                        height: 48,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: colorScheme.primary,
+                            foregroundColor: Colors.white,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.zero,
+                            ),
+                            elevation: 0,
+                          ),
+                          onPressed: () async {
+                            await DatabaseService().resetCategory(category, DateTime.now());
+                            if (mounted) {
+                              Navigator.of(context).pop();
+                              _refreshTasks();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('All tasks in $category reset.')),
+                              );
+                            }
+                          },
+                          child: Text(
+                            'RESET ALL',
+                            style: _safeGoogleFont(
+                              () => GoogleFonts.spaceGrotesk(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                                letterSpacing: 1.0,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildTaskRow(Task task, DateTime now, BuildContext context) {
+    final health = task.health(now);
+    final isOverdue = (health * 100).round() <= 0;
+    final isFresh = now.difference(task.lastCompleted).inSeconds < 3600;
+
+    return TaskCard(
+      title: task.title,
+      interval: task.interval,
+      dueDateText: task.dueDateText(now),
+      progress: health,
+      isOverdue: isOverdue,
+      isFresh: isFresh,
+      onTap: () async {
+        final result = await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => TaskDetailPage(
+              task: task,
+            ),
+          ),
+        );
+
+        if (result == 'delete') {
+          await DatabaseService().deleteTask(task.id!);
+          await _refreshTasks();
+        } else if (result is Task) {
+          await DatabaseService().updateTask(result);
+          await _refreshTasks();
+        }
+      },
     );
   }
 }

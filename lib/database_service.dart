@@ -9,6 +9,8 @@ class DatabaseService {
   factory DatabaseService() => _instance;
   DatabaseService._internal();
 
+  static bool testingMode = false;
+
   Database? _db;
 
   Future<Database> get db async {
@@ -18,12 +20,15 @@ class DatabaseService {
   }
 
   Future<Database> _initDb() async {
+    if (testingMode) {
+      throw UnsupportedError('Database not available in testing mode');
+    }
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, 'cleaning_tracker.db');
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE tasks (
@@ -32,7 +37,8 @@ class DatabaseService {
             interval TEXT,
             lastCompleted TEXT,
             category TEXT,
-            notes TEXT
+            notes TEXT,
+            snoozedUntil TEXT
           )
         ''');
         await db.execute('''
@@ -44,10 +50,16 @@ class DatabaseService {
           )
         ''');
       },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          await db.execute('ALTER TABLE tasks ADD COLUMN snoozedUntil TEXT');
+        }
+      },
     );
   }
 
   Future<void> migrateFromSharedPreferences() async {
+    if (testingMode) return;
     final prefs = await SharedPreferences.getInstance();
     final isMigrated = prefs.getBool('migration_complete') ?? false;
     if (isMigrated) return;
@@ -63,6 +75,7 @@ class DatabaseService {
   }
 
   Future<int> insertTask(Task task) async {
+    if (testingMode) return 0;
     final database = await db;
     final id = await database.insert('tasks', {
       'title': task.title,
@@ -70,6 +83,7 @@ class DatabaseService {
       'lastCompleted': task.lastCompleted.toIso8601String(),
       'category': task.category,
       'notes': task.notes,
+      'snoozedUntil': task.snoozedUntil?.toIso8601String(),
     });
 
     for (var completion in task.completions) {
@@ -82,6 +96,7 @@ class DatabaseService {
   }
 
   Future<List<Task>> getTasks() async {
+    if (testingMode) return [];
     final database = await db;
     final List<Map<String, dynamic>> taskMaps = await database.query('tasks');
     
@@ -107,13 +122,16 @@ class DatabaseService {
         category: map['category'] as String,
         notes: map['notes'] as String,
         completions: completions,
+        snoozedUntil: map['snoozedUntil'] != null
+            ? DateTime.parse(map['snoozedUntil'] as String)
+            : null,
       ));
     }
     return tasks;
   }
 
   Future<void> updateTask(Task task) async {
-    if (task.id == null) return;
+    if (testingMode || task.id == null) return;
     final database = await db;
     await database.update(
       'tasks',
@@ -123,6 +141,7 @@ class DatabaseService {
         'lastCompleted': task.lastCompleted.toIso8601String(),
         'category': task.category,
         'notes': task.notes,
+        'snoozedUntil': task.snoozedUntil?.toIso8601String(),
       },
       where: 'id = ?',
       whereArgs: [task.id],
@@ -140,6 +159,7 @@ class DatabaseService {
   }
 
   Future<void> deleteTask(int id) async {
+    if (testingMode) return;
     final database = await db;
     await database.delete('tasks', where: 'id = ?', whereArgs: [id]);
     // completions will be deleted via ON DELETE CASCADE if supported, but let's be explicit
@@ -147,6 +167,7 @@ class DatabaseService {
   }
 
   Future<void> addCompletion(int taskId, DateTime date) async {
+    if (testingMode) return;
     final database = await db;
     await database.insert('completions', {
       'task_id': taskId,
@@ -158,5 +179,33 @@ class DatabaseService {
       where: 'id = ?',
       whereArgs: [taskId],
     );
+  }
+
+  Future<void> resetCategory(String category, DateTime date) async {
+    if (testingMode) return;
+    final database = await db;
+    
+    // Get all tasks in this category
+    final List<Map<String, dynamic>> tasks = await database.query(
+      'tasks',
+      where: 'category = ?',
+      whereArgs: [category],
+    );
+
+    await database.transaction((txn) async {
+      for (var task in tasks) {
+        final id = task['id'] as int;
+        await txn.insert('completions', {
+          'task_id': id,
+          'date': date.toIso8601String(),
+        });
+        await txn.update(
+          'tasks',
+          {'lastCompleted': date.toIso8601String()},
+          where: 'id = ?',
+          whereArgs: [id],
+        );
+      }
+    });
   }
 }

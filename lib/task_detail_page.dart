@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
@@ -287,6 +288,73 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     );
   }
 
+  void _onSnooze() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+      builder: (context) {
+        return Container(
+          color: colorScheme.surface,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Text(
+                  'SNOOZE UNTIL...',
+                  style: _safeGoogleFont(
+                    () => GoogleFonts.spaceGrotesk(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                ),
+              ),
+              _buildSnoozeOption('1 DAY', const Duration(days: 1)),
+              _buildSnoozeOption('3 DAYS', const Duration(days: 3)),
+              _buildSnoozeOption('1 WEEK', const Duration(days: 7)),
+              _buildSnoozeOption('2 WEEKS', const Duration(days: 14)),
+              const SizedBox(height: 24),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSnoozeOption(String label, Duration duration) {
+    return ListTile(
+      title: Text(
+        label,
+        textAlign: TextAlign.center,
+        style: _safeGoogleFont(
+          () => GoogleFonts.chivoMono(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+      ),
+      onTap: () async {
+        final snoozeDate = DateTime.now().add(duration);
+        final updatedTask = _currentTask.copyWith(snoozedUntil: snoozeDate);
+        await DatabaseService().updateTask(updatedTask);
+        if (mounted) {
+          setState(() {
+            _currentTask = updatedTask;
+          });
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Snoozed for $label')),
+          );
+        }
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -431,50 +499,88 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
               ),
               child: Column(
                 children: [
-                  SizedBox(
-                    height: 56,
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: colorScheme.primary,
-                        foregroundColor: Colors.white,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.zero,
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: SizedBox(
+                          height: 56,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: colorScheme.primary,
+                              foregroundColor: Colors.white,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.zero,
+                              ),
+                              elevation: 0,
+                            ),
+                            onPressed: () async {
+                              final now = DateTime.now();
+                              HapticFeedback.heavyImpact();
+                              // Clear snooze when completing
+                              final updatedTask = _currentTask.copyWith(
+                                lastCompleted: now,
+                                completions: [..._currentTask.completions, now],
+                                snoozedUntil: null,
+                              );
+                              await DatabaseService().updateTask(updatedTask);
+                              if (!context.mounted) return;
+                              setState(() {
+                                _currentTask = updatedTask;
+                              });
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('System Reset Successful')),
+                              );
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.restart_alt, size: 24),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'I JUST DID IT!',
+                                  style: _safeGoogleFont(
+                                    () => GoogleFonts.spaceGrotesk(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                      letterSpacing: 1.0,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                        elevation: 0,
                       ),
-                      onPressed: () async {
-                        final now = DateTime.now();
-                        await DatabaseService().addCompletion(_currentTask.id!, now);
-                        if (!context.mounted) return;
-                        setState(() {
-                          _currentTask = _currentTask.copyWith(
-                            lastCompleted: now,
-                            completions: [..._currentTask.completions, now],
-                          );
-                        });
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('System Reset Successful')),
-                        );
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.restart_alt, size: 24),
-                          const SizedBox(width: 8),
-                          Text(
-                            'I JUST DID IT!',
-                            style: _safeGoogleFont(
-                              () => GoogleFonts.spaceGrotesk(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                                letterSpacing: 1.0,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        flex: 1,
+                        child: SizedBox(
+                          height: 56,
+                          child: OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: colorScheme.onSurface,
+                              side: BorderSide(color: colorScheme.onSurface, width: 2),
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.zero,
+                              ),
+                              elevation: 0,
+                            ),
+                            onPressed: _onSnooze,
+                            child: Text(
+                              'SNOOZE',
+                              style: _safeGoogleFont(
+                                () => GoogleFonts.spaceGrotesk(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                  letterSpacing: 1.0,
+                                ),
                               ),
                             ),
                           ),
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                   const SizedBox(height: 16),
                   SizedBox(
