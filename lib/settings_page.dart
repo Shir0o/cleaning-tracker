@@ -349,32 +349,6 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        if (_appNotificationsEnabled)
-                          Padding(
-                            padding: const EdgeInsets.only(right: 12.0),
-                            child: OutlinedButton(
-                              style: OutlinedButton.styleFrom(
-                                side: BorderSide(color: colorScheme.onSurface, width: 1.5),
-                                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                                padding: const EdgeInsets.symmetric(horizontal: 8),
-                                minimumSize: const Size(0, 28),
-                              ),
-                              onPressed: () async {
-                                await NotificationService().showImmediateNotification();
-                              },
-                              child: Text(
-                                'TEST',
-                                style: _safeGoogleFont(
-                                  () => GoogleFonts.spaceGrotesk(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 10,
-                                    letterSpacing: 1.0,
-                                    color: colorScheme.onSurface,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
                         _buildBrutalSwitch(
                           _appNotificationsEnabled,
                           (val) async {
