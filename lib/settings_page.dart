@@ -242,38 +242,6 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
     });
   }
 
-  Future<void> _requestNotificationPermission(bool enable) async {
-    if (enable) {
-      final status = await Permission.notification.request();
-      setState(() {
-        _notificationsEnabled = status.isGranted;
-      });
-      if (status.isGranted) {
-        await NotificationService().rescheduleAll();
-      }
-      if (status.isPermanentlyDenied && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please enable notifications in system settings.'),
-          ),
-        );
-        openAppSettings();
-      }
-    } else {
-      // We can't actually disable notifications programmatically, but we can direct them to settings
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'To disable notifications, please visit system settings.',
-            ),
-          ),
-        );
-        openAppSettings();
-      }
-    }
-  }
-
   Future<void> _handleSignIn() async {
     try {
       debugPrint('Attempting Google Sign In...');
@@ -381,7 +349,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        if (_notificationsEnabled)
+                        if (_appNotificationsEnabled)
                           Padding(
                             padding: const EdgeInsets.only(right: 12.0),
                             child: OutlinedButton(
@@ -410,6 +378,25 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                         _buildBrutalSwitch(
                           _appNotificationsEnabled,
                           (val) async {
+                            if (val) {
+                              // If enabling, check and request permission if needed
+                              final status = await Permission.notification.status;
+                              if (!status.isGranted) {
+                                final result = await Permission.notification.request();
+                                if (!result.isGranted) {
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Please enable notifications in system settings.'),
+                                      ),
+                                    );
+                                  }
+                                  // Don't turn on the toggle if permission is denied
+                                  return;
+                                }
+                              }
+                            }
+                            
                             setState(() => _appNotificationsEnabled = val);
                             await _saveBoolSetting('notifications_enabled', val);
                             if (val) {
@@ -422,53 +409,6 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                         ),
                       ],
                     ),
-                  ),
-                  _buildSettingRow(
-                    context: context,
-                    onTap: _notificationsEnabled
-                        ? null
-                        : () => _requestNotificationPermission(true),
-                    icon: Icons.security,
-                    title: 'System Permission',
-                    subtitle: _notificationsEnabled
-                        ? 'Notifications are active'
-                        : 'Notifications are disabled',
-                    trailing: _notificationsEnabled
-                        ? const Icon(
-                            Icons.check_circle_outline,
-                            color: Color(0xFF0038FF),
-                            size: 24,
-                          )
-                        : Container(
-                            decoration: BoxDecoration(
-                              color: colorScheme.onSurface,
-                              border: Border.all(color: colorScheme.onSurface, width: 2),
-                            ),
-                            child: Material(
-                              color: Colors.transparent,
-                              child: InkWell(
-                                onTap: () =>
-                                    _requestNotificationPermission(true),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 4,
-                                  ),
-                                  child: Text(
-                                    'ENABLE',
-                                    style: _safeGoogleFont(
-                                      () => GoogleFonts.spaceGrotesk(
-                                        color: colorScheme.surface,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12,
-                                        letterSpacing: 1.0,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
                   ),
                   _buildSettingRow(
                     context: context,
