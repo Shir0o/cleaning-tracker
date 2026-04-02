@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
 import 'database_service.dart';
+import 'main.dart' show Task;
 
 class GoogleAuthClient extends http.BaseClient {
   final Map<String, String> _headers;
@@ -201,6 +202,91 @@ class DriveService extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       debugPrint('Sync failed: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> restoreFromBackup() async {
+    if (_driveApi == null) {
+      if (_currentUser != null) {
+        await _initDriveApi();
+      } else {
+        await signInSilently();
+        if (_currentUser != null) {
+          await _initDriveApi();
+        }
+      }
+    }
+
+    if (_driveApi == null) {
+      throw Exception('Drive API not initialized');
+    }
+
+    try {
+      debugPrint('Searching for backup on Google Drive...');
+      final fileList = await _driveApi!.files.list(
+        q: "name = 'cleaning_tracker_backup.json' and trashed = false",
+        spaces: 'drive',
+      );
+
+      if (fileList.files == null || fileList.files!.isEmpty) {
+        throw Exception('No backup file found on Google Drive');
+      }
+
+      final fileId = fileList.files!.first.id!;
+      debugPrint('Downloading backup file (ID: $fileId)...');
+      
+      final media = await _driveApi!.files.get(
+        fileId,
+        downloadOptions: drive.DownloadOptions.fullMedia,
+      ) as drive.Media;
+
+      final List<int> dataBytes = [];
+      await for (final chunk in media.stream) {
+        dataBytes.addAll(chunk);
+      }
+
+      final jsonString = utf8.decode(dataBytes);
+      final Map<String, dynamic> data = jsonDecode(jsonString);
+
+      final prefs = await SharedPreferences.getInstance();
+      
+      // Restore settings
+      for (final entry in data.entries) {
+        final key = entry.key;
+        final value = entry.value;
+
+        if (key == 'db_tasks' || key == 'tasks') continue;
+
+        if (value is bool) {
+          await prefs.setBool(key, value);
+        } else if (value is String) {
+          await prefs.setString(key, value);
+        } else if (value is int) {
+          await prefs.setInt(key, value);
+        } else if (value is double) {
+          await prefs.setDouble(key, value);
+        } else if (value is List<dynamic>) {
+          await prefs.setStringList(key, value.map((e) => e.toString()).toList());
+        }
+      }
+
+      // Restore tasks to Database
+      if (data.containsKey('db_tasks')) {
+        final List<dynamic> taskData = data['db_tasks'];
+        final databaseService = DatabaseService();
+        await databaseService.deleteAllTasks();
+        
+        for (final taskJson in taskData) {
+          final task = Task.fromJson(taskJson as Map<String, dynamic>);
+          await databaseService.insertTask(task);
+        }
+      }
+
+      debugPrint('Restore complete');
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Restore failed: $e');
       rethrow;
     }
   }

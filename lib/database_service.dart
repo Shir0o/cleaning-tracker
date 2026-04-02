@@ -208,4 +208,13 @@ class DatabaseService {
       }
     });
   }
+
+  Future<void> deleteAllTasks() async {
+    if (testingMode) return;
+    final database = await db;
+    await database.transaction((txn) async {
+      await txn.delete('completions');
+      await txn.delete('tasks');
+    });
+  }
 }

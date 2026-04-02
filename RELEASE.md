@@ -1,4 +1,14 @@
-# Release Notes - v1.1.0
+# Release Notes - v1.1.1
+
+## [1.1.1] - 2026-04-02
+
+### Added
+- **Restore from Backup:** Seamlessly restore your tasks, completion history, and settings from Google Drive.
+- **Data Persistence:** Added `deleteAllTasks` to `DatabaseService` for clean state restoration.
+
+### Improved
+- **Settings UI:** Added a dedicated "Restore from Backup" action in the Data & Sync section.
+- **Documentation:** Comprehensive new documentation suite in the `docs/` directory covering Architecture, Features, Testing, and more.
 
 ## [1.1.0] - 2026-03-29
 
