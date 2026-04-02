@@ -145,6 +145,37 @@ class Task {
       return '$absoluteDate (${diff.inDays} DAYS)';
     }
   }
+
+  String? get suggestedInterval {
+    if (completions.length < 3) return null;
+
+    // Calculate average days between completions
+    final List<DateTime> sortedCompletions = List.from(completions)..sort();
+    final List<int> deltas = [];
+
+    for (int i = 1; i < sortedCompletions.length; i++) {
+      deltas.add(sortedCompletions[i].difference(sortedCompletions[i - 1]).inDays);
+    }
+
+    if (deltas.isEmpty) return null;
+
+    final double averageDays = deltas.reduce((a, b) => a + b) / deltas.length;
+    final int roundedAverage = averageDays.round();
+
+    if (roundedAverage <= 0) return null;
+
+    final int currentDays = intervalDuration.inDays;
+    
+    // Only suggest if the difference is more than 10% AND at least 1 day
+    final double diff = (roundedAverage - currentDays).abs().toDouble();
+    final double percentDiff = diff / currentDays;
+
+    if (diff >= 1 && percentDiff > 0.1) {
+      return '$roundedAverage DAYS';
+    }
+
+    return null;
+  }
 }
 
 Future<void> main() async {

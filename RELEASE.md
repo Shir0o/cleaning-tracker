@@ -1,4 +1,10 @@
-# Release Notes - v1.1.1
+# Release Notes - v1.1.2
+
+## [1.1.2] - 2026-04-02
+
+### Added
+- **Adaptive Intervals (Smart Suggestions):** The app now analyzes your task history and suggests optimal cleaning intervals based on your actual performance.
+- **Smart Unit Tests:** New test suite for validating interval calculation logic.
 
 ## [1.1.1] - 2026-04-02
 

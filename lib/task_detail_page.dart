@@ -750,6 +750,94 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                 ),
               ),
             ),
+
+            // SMART SUGGESTION SECTION
+            if (_currentTask.suggestedInterval != null) ...[
+              _buildSectionTitle('Smart Suggestion', context),
+              Container(
+                decoration: BoxDecoration(
+                  color: colorScheme.surface,
+                  border: Border.all(color: colorScheme.primary, width: 2),
+                ),
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.auto_awesome, color: colorScheme.primary, size: 20),
+                          const SizedBox(width: 8),
+                          Text(
+                            'ADAPTIVE INTERVAL',
+                            style: _safeGoogleFont(
+                              () => GoogleFonts.spaceGrotesk(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                                letterSpacing: 1.0,
+                                color: colorScheme.primary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'BASED ON YOUR HISTORY, WE RECOMMEND UPDATING THE INTERVAL TO ${_currentTask.suggestedInterval}.',
+                        style: _safeGoogleFont(
+                          () => GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            height: 1.4,
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 40,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: colorScheme.primary,
+                            foregroundColor: Colors.white,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.zero,
+                            ),
+                            elevation: 0,
+                          ),
+                          onPressed: () async {
+                            final updatedTask = _currentTask.copyWith(
+                              interval: _currentTask.suggestedInterval!,
+                            );
+                            await DatabaseService().updateTask(updatedTask);
+                            if (mounted) {
+                              setState(() {
+                                _currentTask = updatedTask;
+                              });
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Interval updated based on history.')),
+                              );
+                            }
+                          },
+                          child: Text(
+                            'UPDATE TO ${_currentTask.suggestedInterval}',
+                            style: _safeGoogleFont(
+                              () => GoogleFonts.spaceGrotesk(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                                letterSpacing: 1.0,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
   
             // HISTORY SECTION
             _buildSectionTitle('History', context),
