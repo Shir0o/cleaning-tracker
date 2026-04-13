@@ -25,7 +25,6 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
     return fontFn();
   }
 
-  bool _notificationsEnabled = false;
   bool _appNotificationsEnabled = true;
   String _lastBackupTime = 'Never';
   GoogleSignInAccount? _currentUser;
@@ -236,10 +235,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
   }
 
   Future<void> _checkNotificationPermission() async {
-    final status = await Permission.notification.status;
-    setState(() {
-      _notificationsEnabled = status.isGranted;
-    });
+    await Permission.notification.status;
   }
 
   Future<void> _handleSignIn() async {
