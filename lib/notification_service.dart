@@ -50,21 +50,32 @@ class NotificationService {
     );
   }
 
-  Future<void> scheduleTaskNotification(Task task) async {
-    final prefs = await SharedPreferences.getInstance();
-    // Support both bool and string for transition, then prefer bool
-    final dynamic notificationsEnabledPref = prefs.get('notifications_enabled');
-    bool notificationsEnabled = true;
-    if (notificationsEnabledPref is bool) {
-      notificationsEnabled = notificationsEnabledPref;
-    } else if (notificationsEnabledPref is String) {
-      notificationsEnabled = notificationsEnabledPref != 'false';
+  Future<void> scheduleTaskNotification(
+    Task task, {
+    bool? notificationsEnabled,
+    String? notifyBeforeStr,
+    String? reminderTimeStr,
+  }) async {
+    if (notificationsEnabled == null ||
+        notifyBeforeStr == null ||
+        reminderTimeStr == null) {
+      final prefs = await SharedPreferences.getInstance();
+      if (notificationsEnabled == null) {
+        // Support both bool and string for transition, then prefer bool
+        final dynamic notificationsEnabledPref = prefs.get('notifications_enabled');
+        notificationsEnabled = true;
+        if (notificationsEnabledPref is bool) {
+          notificationsEnabled = notificationsEnabledPref;
+        } else if (notificationsEnabledPref is String) {
+          notificationsEnabled = notificationsEnabledPref != 'false';
+        }
+      }
+
+      notifyBeforeStr ??= prefs.getString('notifyBeforeExpiry') ?? '2 DAYS';
+      reminderTimeStr ??= prefs.getString('dailyReminderTime') ?? '09:00 AM';
     }
 
-    if (!notificationsEnabled) return;
-
-    final String notifyBeforeStr = prefs.getString('notifyBeforeExpiry') ?? '2 DAYS';
-    final String reminderTimeStr = prefs.getString('dailyReminderTime') ?? '09:00 AM';
+    if (!notificationsEnabled!) return;
 
     // Calculate due date
     final dueDate = task.lastCompleted.add(task.intervalDuration);
@@ -133,15 +144,37 @@ class NotificationService {
 
   Future<void> rescheduleAll([List<Task>? tasks]) async {
     List<Task> tasksToSchedule = tasks ?? [];
-    
+
     if (tasks == null) {
       tasksToSchedule = await DatabaseService().getTasks();
     }
 
+    final prefs = await SharedPreferences.getInstance();
+
+    // Support both bool and string for transition, then prefer bool
+    final dynamic notificationsEnabledPref = prefs.get('notifications_enabled');
+    bool notificationsEnabled = true;
+    if (notificationsEnabledPref is bool) {
+      notificationsEnabled = notificationsEnabledPref;
+    } else if (notificationsEnabledPref is String) {
+      notificationsEnabled = notificationsEnabledPref != 'false';
+    }
+
+    final String notifyBeforeStr =
+        prefs.getString('notifyBeforeExpiry') ?? '2 DAYS';
+    final String reminderTimeStr =
+        prefs.getString('dailyReminderTime') ?? '09:00 AM';
+
     await _notificationsPlugin.cancelAll();
-    debugPrint('Cancelled all notifications. Rescheduling ${tasksToSchedule.length} tasks...');
+    debugPrint(
+        'Cancelled all notifications. Rescheduling ${tasksToSchedule.length} tasks...');
     for (final task in tasksToSchedule) {
-      await scheduleTaskNotification(task);
+      await scheduleTaskNotification(
+        task,
+        notificationsEnabled: notificationsEnabled,
+        notifyBeforeStr: notifyBeforeStr,
+        reminderTimeStr: reminderTimeStr,
+      );
     }
   }
 }
