@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cleaning_tracker/main.dart';
 import 'package:cleaning_tracker/settings_page.dart';
 import 'package:cleaning_tracker/log_history_page.dart';
+import 'package:cleaning_tracker/privacy_policy_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -10,6 +11,7 @@ void main() {
     TestWidgetsFlutterBinding.ensureInitialized();
     SettingsPage.testingMode = true;
     LogHistoryPage.testingMode = true;
+    PrivacyPolicyPage.testingMode = true;
     DashboardScreen.testingMode = true;
     TaskCard.testingMode = true;
     SharedPreferences.setMockInitialValues({});
@@ -74,6 +76,25 @@ void main() {
 
     // Verify we are on the Log History Page
     expect(find.text('HISTORY'), findsOneWidget);
+  });
+
+  testWidgets('Settings page "PRIVACY POLICY" navigates to PrivacyPolicyPage', (
+    WidgetTester tester,
+  ) async {
+    // Build our app and trigger a frame.
+    await tester.pumpWidget(const MaterialApp(home: SettingsPage()));
+
+    // Verify the privacy policy button is present
+    expect(find.text('PRIVACY POLICY'), findsOneWidget);
+
+    // Tap the privacy policy button
+    await tester.ensureVisible(find.text('PRIVACY POLICY'));
+    await tester.tap(find.text('PRIVACY POLICY'));
+    await tester.pumpAndSettle(); // Wait for navigation animation
+
+    // Verify we are on the Privacy Policy Page
+    expect(find.byType(PrivacyPolicyPage), findsOneWidget);
+    expect(find.text('PRIVACY POLICY'), findsWidgets);
   });
 
   testWidgets('Settings page selection dialog updates value', (

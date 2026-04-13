@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class PrivacyPolicyPage extends StatelessWidget {
+  static bool testingMode = false;
+
   const PrivacyPolicyPage({super.key});
 
   TextStyle _safeGoogleFont(TextStyle Function() fontFn) {
-    // In a real app, you might have a testing mode flag here
+    if (testingMode) return const TextStyle();
     return fontFn();
   }
 
