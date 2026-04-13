@@ -7,6 +7,18 @@ import 'package:flutter/foundation.dart';
 import 'main.dart' show Task;
 import 'database_service.dart';
 
+class NotificationSettings {
+  final bool enabled;
+  final String notifyBefore;
+  final String reminderTime;
+
+  NotificationSettings({
+    required this.enabled,
+    required this.notifyBefore,
+    required this.reminderTime,
+  });
+}
+
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
   factory NotificationService() => _instance;
@@ -14,6 +26,8 @@ class NotificationService {
 
   FlutterLocalNotificationsPlugin _notificationsPlugin =
       FlutterLocalNotificationsPlugin();
+
+  SharedPreferences? _prefs;
 
   @visibleForTesting
   set notificationsPlugin(FlutterLocalNotificationsPlugin plugin) {
@@ -48,10 +62,17 @@ class NotificationService {
         // Handle notification tap
       },
     );
+
+    _prefs = await SharedPreferences.getInstance();
   }
 
-  Future<void> scheduleTaskNotification(Task task) async {
-    final prefs = await SharedPreferences.getInstance();
+  Future<SharedPreferences> _getPrefs() async {
+    _prefs ??= await SharedPreferences.getInstance();
+    return _prefs!;
+  }
+
+  Future<NotificationSettings> _getSettings() async {
+    final prefs = await _getPrefs();
     // Support both bool and string for transition, then prefer bool
     final dynamic notificationsEnabledPref = prefs.get('notifications_enabled');
     bool notificationsEnabled = true;
@@ -61,14 +82,40 @@ class NotificationService {
       notificationsEnabled = notificationsEnabledPref != 'false';
     }
 
-    if (!notificationsEnabled) return;
+    final String notifyBeforeStr =
+        prefs.getString('notifyBeforeExpiry') ?? '2 DAYS';
+    final String reminderTimeStr =
+        prefs.getString('dailyReminderTime') ?? '09:00 AM';
 
-    final String notifyBeforeStr = prefs.getString('notifyBeforeExpiry') ?? '2 DAYS';
-    final String reminderTimeStr = prefs.getString('dailyReminderTime') ?? '09:00 AM';
+    return NotificationSettings(
+      enabled: notificationsEnabled,
+      notifyBefore: notifyBeforeStr,
+      reminderTime: reminderTimeStr,
+    );
+  }
+
+  Future<void> scheduleTaskNotification(Task task) async {
+    final settings = await _getSettings();
+
+    await _scheduleTaskNotification(
+      task,
+      settings.enabled,
+      settings.notifyBefore,
+      settings.reminderTime,
+    );
+  }
+
+  Future<void> _scheduleTaskNotification(
+    Task task,
+    bool notificationsEnabled,
+    String notifyBeforeStr,
+    String reminderTimeStr,
+  ) async {
+    if (!notificationsEnabled) return;
 
     // Calculate due date
     final dueDate = task.lastCompleted.add(task.intervalDuration);
-    
+
     // Parse notifyBefore
     int daysBefore = 0;
     if (notifyBeforeStr == 'SAME DAY') {
@@ -121,8 +168,9 @@ class NotificationService {
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
     );
-    
-    debugPrint('Scheduled notification for ${task.title} at $scheduledDate (ID: $id)');
+
+    debugPrint(
+        'Scheduled notification for ${task.title} at $scheduledDate (ID: $id)');
   }
 
   Future<void> cancelTaskNotification(String title) async {
@@ -133,15 +181,23 @@ class NotificationService {
 
   Future<void> rescheduleAll([List<Task>? tasks]) async {
     List<Task> tasksToSchedule = tasks ?? [];
-    
+
     if (tasks == null) {
       tasksToSchedule = await DatabaseService().getTasks();
     }
 
+    final settings = await _getSettings();
+
     await _notificationsPlugin.cancelAll();
-    debugPrint('Cancelled all notifications. Rescheduling ${tasksToSchedule.length} tasks...');
+    debugPrint(
+        'Cancelled all notifications. Rescheduling ${tasksToSchedule.length} tasks...');
     for (final task in tasksToSchedule) {
-      await scheduleTaskNotification(task);
+      await _scheduleTaskNotification(
+        task,
+        settings.enabled,
+        settings.notifyBefore,
+        settings.reminderTime,
+      );
     }
   }
 }
