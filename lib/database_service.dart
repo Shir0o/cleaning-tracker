@@ -5,9 +5,14 @@ import 'dart:convert';
 import 'main.dart' show Task;
 
 class DatabaseService {
-  static final DatabaseService _instance = DatabaseService._internal();
+  static DatabaseService _instance = DatabaseService._internal();
   factory DatabaseService() => _instance;
   DatabaseService._internal();
+
+  @visibleForTesting
+  static set instance(DatabaseService service) {
+    _instance = service;
+  }
 
   static bool testingMode = false;
 

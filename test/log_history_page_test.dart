@@ -2,12 +2,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:cleaning_tracker/log_history_page.dart';
 import 'package:cleaning_tracker/main.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
+import 'package:cleaning_tracker/database_service.dart';
+import 'package:mocktail/mocktail.dart';
+
+class MockDatabaseService extends Mock implements DatabaseService {}
 
 void main() {
+  late MockDatabaseService mockDatabaseService;
+
   setUp(() {
     LogHistoryPage.testingMode = true;
+    DatabaseService.testingMode = true;
+    mockDatabaseService = MockDatabaseService();
+    DatabaseService.instance = mockDatabaseService;
   });
 
   testWidgets('LogHistoryPage renders correctly with header and logs', (
@@ -15,6 +22,7 @@ void main() {
   ) async {
     final now = DateTime.now();
     final task = Task(
+      id: 1,
       title: 'HVAC FILTER',
       interval: '90 DAYS',
       lastCompleted: now,
@@ -24,9 +32,7 @@ void main() {
       ],
     );
 
-    SharedPreferences.setMockInitialValues({
-      'tasks': [jsonEncode(task.toJson())],
-    });
+    when(() => mockDatabaseService.getTasks()).thenAnswer((_) async => [task]);
 
     await tester.pumpWidget(const MaterialApp(home: LogHistoryPage()));
     await tester.pump(); // No need for long pump since testingMode = true
@@ -44,7 +50,7 @@ void main() {
   testWidgets('LogHistoryPage shows empty state when no completions', (
     WidgetTester tester,
   ) async {
-    SharedPreferences.setMockInitialValues({'tasks': []});
+    when(() => mockDatabaseService.getTasks()).thenAnswer((_) async => []);
 
     await tester.pumpWidget(const MaterialApp(home: LogHistoryPage()));
     await tester.pump();
