@@ -2,9 +2,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:cleaning_tracker/log_history_page.dart';
 
+import 'package:cleaning_tracker/database_service.dart';
+
 void main() {
   setUp(() {
     LogHistoryPage.testingMode = true;
+    DatabaseService.testingMode = true;
   });
 
   group('LogHistoryPage Unit Tests', () {
@@ -12,6 +15,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(const MaterialApp(home: LogHistoryPage()));
+      await tester.pump(); // Allow initState's _loadHistory to complete
 
       final titleFinder = find.text('HISTORY');
       expect(titleFinder, findsOneWidget);
@@ -25,6 +29,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(const MaterialApp(home: LogHistoryPage()));
+      await tester.pump();
 
       // Since testingMode = true, isLoading = false immediately
       final emptyFinder = find.text('NO HISTORY AVAILABLE');

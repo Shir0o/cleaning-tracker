@@ -10,14 +10,16 @@ void main() {
   });
 
   testWidgets('TaskDetailPage Golden Test', (WidgetTester tester) async {
+    final fixedNow = DateTime(2024, 5, 20, 10, 0, 0);
     await tester.pumpWidget(
       MaterialApp(
         debugShowCheckedModeBanner: false,
         home: TaskDetailPage(
+          referenceTime: fixedNow,
           task: Task(
             title: 'HVAC FILTER',
             interval: '90 DAYS',
-            lastCompleted: DateTime.now().subtract(const Duration(hours: 13 * 24 + 12)), // 13.5 days
+            lastCompleted: fixedNow.subtract(const Duration(days: 13, hours: 12)), // 13.5 days ago
           ),
         ),
       ),

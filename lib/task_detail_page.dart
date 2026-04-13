@@ -10,10 +10,12 @@ class TaskDetailPage extends StatefulWidget {
   static bool testingMode = false;
 
   final Task task;
+  final DateTime? referenceTime;
 
   const TaskDetailPage({
     super.key,
     required this.task,
+    this.referenceTime,
   });
 
   @override
@@ -362,7 +364,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     final surfaceColor = _getSurfaceColor(theme);
 
     // Recalculate based on _currentTask
-    final now = DateTime.now();
+    final now = widget.referenceTime ?? DateTime.now();
     final health = _currentTask.health(now);
     final remainingPercentage = (health * 100).round();
     final isOverdue = remainingPercentage <= 0;

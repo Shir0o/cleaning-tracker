@@ -34,6 +34,11 @@ class NotificationService {
     _notificationsPlugin = plugin;
   }
 
+  @visibleForTesting
+  static void resetForTesting() {
+    _instance._prefs = null;
+  }
+
   Future<void> init() async {
     // Initialize timezone
     tz.initializeTimeZones();

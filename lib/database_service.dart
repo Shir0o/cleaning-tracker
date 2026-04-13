@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -203,7 +204,7 @@ class DatabaseService {
       whereArgs: [category],
     );
 
-    await database.transaction((txn) async {
+    await database.transaction<void>((txn) async {
       for (var task in tasks) {
         final id = task['id'] as int;
         await txn.insert('completions', {

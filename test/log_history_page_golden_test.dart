@@ -1,11 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:cleaning_tracker/log_history_page.dart';
+import 'package:cleaning_tracker/database_service.dart';
 
 void main() {
   setUpAll(() {
     TestWidgetsFlutterBinding.ensureInitialized();
     LogHistoryPage.testingMode = true;
+    DatabaseService.testingMode = true;
   });
 
   group('LogHistoryPage Golden Tests', () {

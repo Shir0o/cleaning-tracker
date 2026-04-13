@@ -31,6 +31,7 @@ void main() {
   setUp(() {
     TestWidgetsFlutterBinding.ensureInitialized();
     SharedPreferences.setMockInitialValues({});
+    NotificationService.resetForTesting();
     notificationService = NotificationService();
     mockPlugin = MockFlutterLocalNotificationsPlugin();
     notificationService.notificationsPlugin = mockPlugin;
