@@ -130,7 +130,7 @@ void main() {
   test('cancelTaskNotification cancels the correct notification', () async {
     await notificationService.cancelTaskNotification('Test Task');
     final id = 'Test Task'.hashCode.abs();
-    verify(() => mockPlugin.cancel(id: any(named: 'id'))).called(1);
+    verify(() => mockPlugin.cancel(id: id)).called(1);
   });
 
   test('rescheduleAll cancels all and schedules tasks', () async {
