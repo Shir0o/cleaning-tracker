@@ -10,17 +10,23 @@ class DatabaseService {
   DatabaseService._internal();
 
   static bool testingMode = false;
+  static Database? _mockDb;
+
+  static void setMockDb(Database? mockDb) {
+    _mockDb = mockDb;
+  }
 
   Database? _db;
 
   Future<Database> get db async {
+    if (_mockDb != null) return _mockDb!;
     if (_db != null) return _db!;
     _db = await _initDb();
     return _db!;
   }
 
   Future<Database> _initDb() async {
-    if (testingMode) {
+    if (testingMode && _mockDb == null) {
       throw UnsupportedError('Database not available in testing mode');
     }
     final dbPath = await getDatabasesPath();
@@ -182,7 +188,7 @@ class DatabaseService {
   }
 
   Future<void> resetCategory(String category, DateTime date) async {
-    if (testingMode) return;
+    if (testingMode && _mockDb == null) return;
     final database = await db;
     
     // Get all tasks in this category
