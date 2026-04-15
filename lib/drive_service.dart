@@ -46,12 +46,13 @@ class DriveService extends ChangeNotifier {
 
   void _listenToAuth() {
     _googleSignIn.authenticationEvents.listen((event) {
-      if (event is GoogleSignInAuthenticationEventSignIn) {
-        _currentUser = event.user;
-        _initDriveApi();
-      } else if (event is GoogleSignInAuthenticationEventSignOut) {
-        _currentUser = null;
-        _driveApi = null;
+      switch (event) {
+        case GoogleSignInAuthenticationEventSignIn():
+          _currentUser = event.user;
+          _initDriveApi();
+        case GoogleSignInAuthenticationEventSignOut():
+          _currentUser = null;
+          _driveApi = null;
       }
       notifyListeners();
     });
