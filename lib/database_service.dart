@@ -89,22 +89,29 @@ class DatabaseService {
   Future<int> insertTask(Task task) async {
     if (testingMode) return 0;
     final database = await db;
-    final id = await database.insert('tasks', {
-      'title': task.title,
-      'interval': task.interval,
-      'lastCompleted': task.lastCompleted.toIso8601String(),
-      'category': task.category,
-      'notes': task.notes,
-      'snoozedUntil': task.snoozedUntil?.toIso8601String(),
-    });
 
-    for (var completion in task.completions) {
-      await database.insert('completions', {
-        'task_id': id,
-        'date': completion.toIso8601String(),
+    return await database.transaction((txn) async {
+      final id = await txn.insert('tasks', {
+        'title': task.title,
+        'interval': task.interval,
+        'lastCompleted': task.lastCompleted.toIso8601String(),
+        'category': task.category,
+        'notes': task.notes,
+        'snoozedUntil': task.snoozedUntil?.toIso8601String(),
       });
-    }
-    return id;
+
+      if (task.completions.isNotEmpty) {
+        final batch = txn.batch();
+        for (var completion in task.completions) {
+          batch.insert('completions', {
+            'task_id': id,
+            'date': completion.toIso8601String(),
+          });
+        }
+        await batch.commit(noResult: true);
+      }
+      return id;
+    });
   }
 
   Future<List<Task>> getTasks() async {
@@ -145,29 +152,37 @@ class DatabaseService {
   Future<void> updateTask(Task task) async {
     if (testingMode || task.id == null) return;
     final database = await db;
-    await database.update(
-      'tasks',
-      {
-        'title': task.title,
-        'interval': task.interval,
-        'lastCompleted': task.lastCompleted.toIso8601String(),
-        'category': task.category,
-        'notes': task.notes,
-        'snoozedUntil': task.snoozedUntil?.toIso8601String(),
-      },
-      where: 'id = ?',
-      whereArgs: [task.id],
-    );
     
-    // For simplicity in this migration, we'll sync completions by deleting and re-inserting
-    // A better way would be to only insert new ones, but tasks usually don't have many.
-    await database.delete('completions', where: 'task_id = ?', whereArgs: [task.id]);
-    for (var completion in task.completions) {
-      await database.insert('completions', {
-        'task_id': task.id,
-        'date': completion.toIso8601String(),
-      });
-    }
+    await database.transaction((txn) async {
+      await txn.update(
+        'tasks',
+        {
+          'title': task.title,
+          'interval': task.interval,
+          'lastCompleted': task.lastCompleted.toIso8601String(),
+          'category': task.category,
+          'notes': task.notes,
+          'snoozedUntil': task.snoozedUntil?.toIso8601String(),
+        },
+        where: 'id = ?',
+        whereArgs: [task.id],
+      );
+
+      // For simplicity in this migration, we'll sync completions by deleting and re-inserting
+      // A better way would be to only insert new ones, but tasks usually don't have many.
+      await txn.delete('completions', where: 'task_id = ?', whereArgs: [task.id]);
+
+      if (task.completions.isNotEmpty) {
+        final batch = txn.batch();
+        for (var completion in task.completions) {
+          batch.insert('completions', {
+            'task_id': task.id,
+            'date': completion.toIso8601String(),
+          });
+        }
+        await batch.commit(noResult: true);
+      }
+    });
   }
 
   Future<void> deleteTask(int id) async {
