@@ -87,7 +87,7 @@ class DatabaseService {
   }
 
   Future<int> insertTask(Task task) async {
-    if (testingMode) return 0;
+    if (testingMode && _mockDb == null) return 0;
     final database = await db;
     final id = await database.insert('tasks', {
       'title': task.title,

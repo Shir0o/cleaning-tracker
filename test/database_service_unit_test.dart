@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:cleaning_tracker/database_service.dart';
+import 'package:cleaning_tracker/main.dart' show Task;
 
 class MockDatabase extends Mock implements Database {}
 class MockTransaction extends Mock implements Transaction {}
@@ -24,6 +25,65 @@ void main() {
 
   tearDown(() {
     DatabaseService.setMockDb(null);
+  });
+
+  group('DatabaseService.insertTask', () {
+    test('should insert task and return its id', () async {
+      final task = Task(
+        title: 'Test Task',
+        interval: '7 DAYS',
+        lastCompleted: DateTime(2024, 1, 1),
+        category: 'TEST',
+        notes: 'Some notes',
+      );
+
+      when(() => mockDb.insert(
+            'tasks',
+            {
+              'title': task.title,
+              'interval': task.interval,
+              'lastCompleted': task.lastCompleted.toIso8601String(),
+              'category': task.category,
+              'notes': task.notes,
+              'snoozedUntil': null,
+            },
+          )).thenAnswer((_) async => 123);
+
+      final result = await databaseService.insertTask(task);
+
+      expect(result, 123);
+      verify(() => mockDb.insert('tasks', any())).called(1);
+      verifyNever(() => mockDb.insert('completions', any()));
+    });
+
+    test('should insert task and its completions', () async {
+      final completions = [
+        DateTime(2024, 1, 1),
+        DateTime(2024, 1, 8),
+      ];
+      final task = Task(
+        title: 'Test Task',
+        interval: '7 DAYS',
+        lastCompleted: DateTime(2024, 1, 8),
+        completions: completions,
+      );
+
+      when(() => mockDb.insert('tasks', any())).thenAnswer((_) async => 456);
+      when(() => mockDb.insert('completions', any())).thenAnswer((_) async => 1);
+
+      final result = await databaseService.insertTask(task);
+
+      expect(result, 456);
+      verify(() => mockDb.insert('tasks', any())).called(1);
+      verify(() => mockDb.insert('completions', {
+            'task_id': 456,
+            'date': completions[0].toIso8601String(),
+          })).called(1);
+      verify(() => mockDb.insert('completions', {
+            'task_id': 456,
+            'date': completions[1].toIso8601String(),
+          })).called(1);
+    });
   });
 
   group('DatabaseService.resetCategory', () {
