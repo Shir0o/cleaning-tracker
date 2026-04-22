@@ -9,12 +9,14 @@ import 'package:intl/intl.dart';
 import 'add_task_page.dart';
 import 'settings_page.dart';
 import 'task_detail_page.dart';
-import 'secrets.dart';
 import 'drive_service.dart';
 import 'notification_service.dart';
 import 'database_service.dart';
 
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
+
+const String googleServerClientId =
+    String.fromEnvironment('GOOGLE_SERVER_CLIENT_ID', defaultValue: 'dummy_client_id');
 
 class Task {
   final int? id;

@@ -26,12 +26,13 @@ flutter pub run build_runner build --delete-conflicting-outputs
 - **Service-Oriented Architecture:** Logic should be kept in dedicated services (Database, Notification, Drive) and not within UI widgets.
 
 ## 4. Environment Secrets
-The app requires a `lib/secrets.dart` file to function properly for Google Sign-In and Drive Sync. This file is **excluded** from version control for security.
+The app requires a Google Server Client ID for Google Sign-In and Drive Sync. This value is provided at build time using the `--dart-define` flag:
 
-```dart
-// lib/secrets.dart
-const String googleServerClientId = 'YOUR_GOOGLE_SERVER_CLIENT_ID';
+```bash
+flutter run --dart-define=GOOGLE_SERVER_CLIENT_ID=YOUR_GOOGLE_SERVER_CLIENT_ID
 ```
+
+For development, if no flag is provided, the app defaults to `dummy_client_id` (see `lib/main.dart`).
 
 ## 5. Development Workflow
 1. **Research & Plan:** Analyze the task and design your approach.
