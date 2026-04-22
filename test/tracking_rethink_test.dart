@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:cleaning_tracker/main.dart' show Task, TaskCard;
+import 'package:cleaning_tracker/main.dart' show TaskCard;
+import 'package:cleaning_tracker/models.dart';
 
 void main() {
   group('Task Tracking Rethink Tests', () {

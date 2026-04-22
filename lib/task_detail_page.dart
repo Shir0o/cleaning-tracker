@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
-import 'main.dart' show Task;
+import 'models.dart';
 import 'database_service.dart';
 
 class TaskDetailPage extends StatefulWidget {
@@ -870,7 +870,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                               interval: _currentTask.suggestedInterval!,
                             );
                             await DatabaseService().updateTask(updatedTask);
-                            if (mounted) {
+                            if (context.mounted) {
                               setState(() {
                                 _currentTask = updatedTask;
                               });

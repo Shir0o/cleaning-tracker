@@ -4,7 +4,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
-import 'main.dart' show Task;
+import 'models.dart';
 import 'database_service.dart';
 
 class NotificationSettings {

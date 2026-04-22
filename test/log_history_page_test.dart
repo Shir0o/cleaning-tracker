@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:cleaning_tracker/log_history_page.dart';
-import 'package:cleaning_tracker/main.dart';
+import 'package:cleaning_tracker/models.dart';
 import 'package:cleaning_tracker/database_service.dart';
 import 'package:mocktail/mocktail.dart';
 

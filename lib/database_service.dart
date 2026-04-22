@@ -3,7 +3,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import 'main.dart' show Task;
+import 'models.dart';
 
 class DatabaseService {
   static DatabaseService _instance = DatabaseService._internal();
@@ -71,7 +71,7 @@ class DatabaseService {
   }
 
   Future<void> migrateFromSharedPreferences() async {
-    if (testingMode) return;
+    if (testingMode && _mockDb == null) return;
     final prefs = await SharedPreferences.getInstance();
     final isMigrated = prefs.getBool('migration_complete') ?? false;
     if (isMigrated) return;
@@ -87,9 +87,9 @@ class DatabaseService {
   }
 
   Future<int> insertTask(Task task) async {
-    if (testingMode) return 0;
+    if (testingMode && _mockDb == null) return 0;
     final database = await db;
-    return await database.transaction((txn) async {
+    return await database.transaction<int>((txn) async {
       final id = await txn.insert('tasks', {
         'title': task.title,
         'interval': task.interval,
@@ -110,7 +110,7 @@ class DatabaseService {
   }
 
   Future<void> batchInsertTasks(List<Task> tasks) async {
-    if (testingMode || tasks.isEmpty) return;
+    if ((testingMode && _mockDb == null) || tasks.isEmpty) return;
     final database = await db;
     final batch = database.batch();
 
@@ -142,7 +142,7 @@ class DatabaseService {
   }
 
   Future<List<Task>> getTasks() async {
-    if (testingMode) return [];
+    if (testingMode && _mockDb == null) return [];
     final database = await db;
     final List<Map<String, dynamic>> taskMaps = await database.query('tasks');
 
@@ -179,9 +179,9 @@ class DatabaseService {
   }
 
   Future<void> updateTask(Task task) async {
-    if (testingMode || task.id == null) return;
+    if ((testingMode && _mockDb == null) || task.id == null) return;
     final database = await db;
-    await database.transaction((txn) async {
+    await database.transaction<void>((txn) async {
       await txn.update(
         'tasks',
         {
@@ -213,7 +213,7 @@ class DatabaseService {
   }
 
   Future<void> deleteTask(int id) async {
-    if (testingMode) return;
+    if (testingMode && _mockDb == null) return;
     final database = await db;
     await database.delete('tasks', where: 'id = ?', whereArgs: [id]);
     // completions will be deleted via ON DELETE CASCADE if supported, but let's be explicit
@@ -221,7 +221,7 @@ class DatabaseService {
   }
 
   Future<void> addCompletion(int taskId, DateTime date) async {
-    if (testingMode) return;
+    if (testingMode && _mockDb == null) return;
     final database = await db;
     await database.insert('completions', {
       'task_id': taskId,
@@ -264,9 +264,9 @@ class DatabaseService {
   }
 
   Future<void> deleteAllTasks() async {
-    if (testingMode) return;
+    if (testingMode && _mockDb == null) return;
     final database = await db;
-    await database.transaction((txn) async {
+    await database.transaction<void>((txn) async {
       await txn.delete('completions');
       await txn.delete('tasks');
     });

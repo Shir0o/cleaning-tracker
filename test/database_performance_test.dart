@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:cleaning_tracker/database_service.dart';
-import 'package:cleaning_tracker/main.dart';
+import 'package:cleaning_tracker/models.dart';
 
 class MockDatabase extends Mock implements Database {}
 
@@ -34,7 +34,15 @@ void main() {
       ),
     );
 
-    when(() => mockDb.insert(any(), any())).thenAnswer((_) async => 1);
+    final mockTxn = MockTransaction();
+    when(() => mockDb.transaction<int>(any())).thenAnswer((invocation) async {
+      final action =
+          invocation.positionalArguments[0]
+              as Future<int> Function(Transaction);
+      return await action(mockTxn);
+    });
+
+    when(() => mockTxn.insert(any(), any())).thenAnswer((_) async => 1);
 
     final stopwatch = Stopwatch()..start();
     for (final task in tasks) {

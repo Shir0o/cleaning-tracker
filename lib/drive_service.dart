@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
 import 'database_service.dart';
-import 'main.dart' show Task;
+import 'models.dart';
 
 class GoogleAuthClient extends http.BaseClient {
   final Map<String, String> _headers;
@@ -101,10 +101,8 @@ class DriveService extends ChangeNotifier {
   Future<GoogleSignInAccount?> authenticate() async {
     try {
       final account = await _googleSignIn.authenticate();
-      if (account != null) {
-        _currentUser = account;
-        await _initDriveApi();
-      }
+      _currentUser = account;
+      await _initDriveApi();
       notifyListeners();
       return account;
     } catch (e) {
@@ -124,7 +122,7 @@ class DriveService extends ChangeNotifier {
     final account = _currentUser;
     if (account == null) return;
 
-    final auth = await account.authentication;
+    final auth = account.authentication;
     final idToken = auth.idToken;
     if (idToken == null) {
       debugPrint('No ID token available');

@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:cleaning_tracker/database_service.dart';
+import 'package:cleaning_tracker/models.dart';
 
 class MockDatabase extends Mock implements Database {}
 
@@ -47,12 +48,13 @@ void main() {
       // Mock the transaction
       when(() => mockDb.transaction<void>(any())).thenAnswer((
         invocation,
-      ) async {
+      ) {
         final action =
             invocation.positionalArguments[0]
                 as Future<void> Function(Transaction);
-        await action(mockTxn);
+        return action(mockTxn);
       });
+
 
       // Mock the updates and inserts within the transaction
       when(
@@ -118,12 +120,13 @@ void main() {
 
       when(() => mockDb.transaction<void>(any())).thenAnswer((
         invocation,
-      ) async {
+      ) {
         final action =
             invocation.positionalArguments[0]
                 as Future<void> Function(Transaction);
-        await action(mockTxn);
+        return action(mockTxn);
       });
+
 
       await databaseService.resetCategory(category, resetDate);
 
@@ -154,18 +157,18 @@ void main() {
         completions: [DateTime.now()],
       );
 
-      when(() => mockDb.transaction(any())).thenAnswer((invocation) async {
+      when(() => mockDb.transaction<int>(any())).thenAnswer((invocation) {
         final action =
             invocation.positionalArguments[0]
-                as Future<dynamic> Function(Transaction);
-        return await action(mockTxn);
+                as Future<int> Function(Transaction);
+        return action(mockTxn);
       });
 
       when(() => mockTxn.insert(any(), any())).thenAnswer((_) async => 1);
 
       await databaseService.insertTask(task);
 
-      verify(() => mockDb.transaction(any())).called(1);
+      verify(() => mockDb.transaction<int>(any())).called(1);
       verify(() => mockTxn.insert('tasks', any())).called(1);
       verify(() => mockTxn.insert('completions', any())).called(1);
     });
@@ -180,13 +183,14 @@ void main() {
         lastCompleted: DateTime.now(),
         completions: [DateTime.now()],
       );
-
-      when(() => mockDb.transaction(any())).thenAnswer((invocation) async {
-        final action =
-            invocation.positionalArguments[0]
-                as Future<dynamic> Function(Transaction);
-        return await action(mockTxn);
-      });
+when(() => mockDb.transaction<void>(any())).thenAnswer((
+  invocation,
+) {
+  final action =
+      invocation.positionalArguments[0]
+          as Future<void> Function(Transaction);
+  return action(mockTxn);
+});
 
       when(
         () => mockTxn.update(
@@ -207,7 +211,7 @@ void main() {
 
       await databaseService.updateTask(task);
 
-      verify(() => mockDb.transaction(any())).called(1);
+      verify(() => mockDb.transaction<void>(any())).called(1);
       verify(
         () => mockTxn.update(
           'tasks',

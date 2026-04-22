@@ -494,7 +494,7 @@ class _SettingsPageState extends State<SettingsPage>
                               final result = await Permission.notification
                                   .request();
                               if (!result.isGranted) {
-                                if (mounted) {
+                                if (context.mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                       content: Text(

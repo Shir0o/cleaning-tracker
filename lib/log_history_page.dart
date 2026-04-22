@@ -4,6 +4,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:intl/intl.dart';
 
 import 'database_service.dart';
+import 'models.dart';
 
 class LogHistoryPage extends StatefulWidget {
   static bool testingMode = false;
@@ -232,12 +233,6 @@ class _LogHistoryPageState extends State<LogHistoryPage> {
   }
 }
 
-class TaskCompletion {
-  final String taskTitle;
-  final DateTime completionDate;
-
-  TaskCompletion({required this.taskTitle, required this.completionDate});
-}
 
 class ShimmerLogRecord extends StatelessWidget {
   const ShimmerLogRecord({super.key});
