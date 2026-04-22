@@ -7,7 +7,9 @@ void main() {
     PresetsPage.testingMode = true;
   });
 
-  testWidgets('PresetsPage shows all home-related categories and items', (WidgetTester tester) async {
+  testWidgets('PresetsPage shows all home-related categories and items', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(const MaterialApp(home: PresetsPage()));
 
     // Verify Categories
@@ -25,7 +27,9 @@ void main() {
     expect(find.text('LOAD OF LAUNDRY'), findsOneWidget);
   });
 
-  testWidgets('Tapping a preset returns correct data', (WidgetTester tester) async {
+  testWidgets('Tapping a preset returns correct data', (
+    WidgetTester tester,
+  ) async {
     tester.view.physicalSize = const Size(800, 2000);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() {
@@ -34,15 +38,18 @@ void main() {
     });
 
     Map<String, dynamic>? selectedPreset;
-    
+
     await tester.pumpWidget(
       MaterialApp(
         home: Builder(
           builder: (context) => ElevatedButton(
             onPressed: () async {
-              selectedPreset = await Navigator.of(context).push<Map<String, dynamic>>(
-                MaterialPageRoute(builder: (context) => const PresetsPage()),
-              );
+              selectedPreset = await Navigator.of(context)
+                  .push<Map<String, dynamic>>(
+                    MaterialPageRoute(
+                      builder: (context) => const PresetsPage(),
+                    ),
+                  );
             },
             child: const Text('OPEN'),
           ),

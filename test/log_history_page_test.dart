@@ -26,10 +26,7 @@ void main() {
       title: 'HVAC FILTER',
       interval: '90 DAYS',
       lastCompleted: now,
-      completions: [
-        now.subtract(const Duration(days: 90)),
-        now,
-      ],
+      completions: [now.subtract(const Duration(days: 90)), now],
     );
 
     when(() => mockDatabaseService.getTasks()).thenAnswer((_) async => [task]);
@@ -46,7 +43,7 @@ void main() {
     // Verify log entries exist
     expect(find.text('HVAC FILTER'), findsNWidgets(2));
   });
-  
+
   testWidgets('LogHistoryPage shows empty state when no completions', (
     WidgetTester tester,
   ) async {

@@ -23,13 +23,13 @@ class GoogleAuthClient extends http.BaseClient {
 class DriveService extends ChangeNotifier {
   static final DriveService _instance = DriveService._internal();
   factory DriveService() => _instance;
-  
+
   DriveService._internal() {
     _listenToAuth();
   }
 
   static const String _syncEnabledKey = 'drive_sync_enabled';
-  
+
   final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
   drive.DriveApi? _driveApi;
   bool _isDriveSyncEnabled = false;
@@ -60,10 +60,10 @@ class DriveService extends ChangeNotifier {
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
     _isDriveSyncEnabled = prefs.getBool(_syncEnabledKey) ?? false;
-    
+
     // Always attempt to restore sign in status so the UI reflects the current user
     await signInSilently();
-    
+
     if (_isDriveSyncEnabled && _currentUser != null) {
       syncFiles().catchError((e) => debugPrint('Initial sync failed: $e'));
     }
@@ -79,7 +79,7 @@ class DriveService extends ChangeNotifier {
     await prefs.setBool(_syncEnabledKey, enabled);
     _isDriveSyncEnabled = enabled;
     notifyListeners();
-    
+
     if (enabled && _currentUser != null) {
       await syncFiles();
     }
@@ -161,12 +161,12 @@ class DriveService extends ChangeNotifier {
     try {
       debugPrint('Syncing files to Google Drive...');
       final prefs = await SharedPreferences.getInstance();
-      
+
       // Collect settings from SharedPreferences
       final Map<String, dynamic> data = {};
       for (final key in prefs.getKeys()) {
         // Skip large data that is now in DB or shouldn't be backed up
-        if (key == 'tasks') continue; 
+        if (key == 'tasks') continue;
         data[key] = prefs.get(key);
       }
 
@@ -181,7 +181,7 @@ class DriveService extends ChangeNotifier {
       final media = drive.Media(jsonContent, jsonBytes.length);
       final driveFile = drive.File();
       driveFile.name = 'cleaning_tracker_backup.json';
-      
+
       // Look for existing backup file
       final fileList = await _driveApi!.files.list(
         q: "name = 'cleaning_tracker_backup.json' and trashed = false",
@@ -190,15 +190,22 @@ class DriveService extends ChangeNotifier {
 
       if (fileList.files != null && fileList.files!.isNotEmpty) {
         final existingFileId = fileList.files!.first.id!;
-        await _driveApi!.files.update(driveFile, existingFileId, uploadMedia: media);
+        await _driveApi!.files.update(
+          driveFile,
+          existingFileId,
+          uploadMedia: media,
+        );
         debugPrint('Updated existing backup on Google Drive');
       } else {
         await _driveApi!.files.create(driveFile, uploadMedia: media);
         debugPrint('Created new backup on Google Drive');
       }
-      
+
       // Save last backup time
-      await prefs.setString('last_backup_time', DateTime.now().toIso8601String());
+      await prefs.setString(
+        'last_backup_time',
+        DateTime.now().toIso8601String(),
+      );
       notifyListeners();
     } catch (e) {
       debugPrint('Sync failed: $e');
@@ -235,11 +242,13 @@ class DriveService extends ChangeNotifier {
 
       final fileId = fileList.files!.first.id!;
       debugPrint('Downloading backup file (ID: $fileId)...');
-      
-      final media = await _driveApi!.files.get(
-        fileId,
-        downloadOptions: drive.DownloadOptions.fullMedia,
-      ) as drive.Media;
+
+      final media =
+          await _driveApi!.files.get(
+                fileId,
+                downloadOptions: drive.DownloadOptions.fullMedia,
+              )
+              as drive.Media;
 
       final List<int> dataBytes = [];
       await for (final chunk in media.stream) {
@@ -250,7 +259,7 @@ class DriveService extends ChangeNotifier {
       final Map<String, dynamic> data = jsonDecode(jsonString);
 
       final prefs = await SharedPreferences.getInstance();
-      
+
       // Restore settings
       for (final entry in data.entries) {
         final key = entry.key;
@@ -267,7 +276,10 @@ class DriveService extends ChangeNotifier {
         } else if (value is double) {
           await prefs.setDouble(key, value);
         } else if (value is List<dynamic>) {
-          await prefs.setStringList(key, value.map((e) => e.toString()).toList());
+          await prefs.setStringList(
+            key,
+            value.map((e) => e.toString()).toList(),
+          );
         }
       }
 
@@ -276,11 +288,11 @@ class DriveService extends ChangeNotifier {
         final List<dynamic> taskData = data['db_tasks'];
         final databaseService = DatabaseService();
         await databaseService.deleteAllTasks();
-        
-        for (final taskJson in taskData) {
-          final task = Task.fromJson(taskJson as Map<String, dynamic>);
-          await databaseService.insertTask(task);
-        }
+
+        final List<Task> tasks = taskData
+            .map((taskJson) => Task.fromJson(taskJson as Map<String, dynamic>))
+            .toList();
+        await databaseService.batchInsertTasks(tasks);
       }
 
       debugPrint('Restore complete');

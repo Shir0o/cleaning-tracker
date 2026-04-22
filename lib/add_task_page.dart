@@ -16,7 +16,9 @@ class _AddTaskPageState extends State<AddTaskPage> {
   String _selectedInterval = '7 DAYS';
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _categoryController = TextEditingController();
-  final TextEditingController _customIntervalController = TextEditingController(text: '14');
+  final TextEditingController _customIntervalController = TextEditingController(
+    text: '14',
+  );
   String _customIntervalUnit = 'DAYS';
 
   TextStyle _safeGoogleFont(TextStyle Function() fontFn) {
@@ -35,12 +37,14 @@ class _AddTaskPageState extends State<AddTaskPage> {
   void _parseAndSetInterval(String interval) {
     setState(() {
       _selectedInterval = interval;
-      
+
       // Map common intervals to our standard buttons if they match exactly
-      if (interval == '7 DAYS' || interval == '30 DAYS' || interval == '90 DAYS') {
+      if (interval == '7 DAYS' ||
+          interval == '30 DAYS' ||
+          interval == '90 DAYS') {
         return;
       }
-      
+
       // Handle special cases and parse others as CUSTOM
       if (interval == 'DAILY') {
         _customIntervalController.text = '1';
@@ -75,7 +79,11 @@ class _AddTaskPageState extends State<AddTaskPage> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    final bool isStandardInterval = ['7 DAYS', '30 DAYS', '90 DAYS'].contains(_selectedInterval);
+    final bool isStandardInterval = [
+      '7 DAYS',
+      '30 DAYS',
+      '90 DAYS',
+    ].contains(_selectedInterval);
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -107,7 +115,9 @@ class _AddTaskPageState extends State<AddTaskPage> {
             ),
           ),
         ),
-        shape: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
+        shape: Border(
+          bottom: BorderSide(color: colorScheme.onSurface, width: 2),
+        ),
         title: Text(
           'NEW SYSTEM',
           style: _safeGoogleFont(
@@ -129,146 +139,162 @@ class _AddTaskPageState extends State<AddTaskPage> {
             children: [
               const SizedBox(height: 16),
               InkWell(
-              onTap: () async {
-                final result = await Navigator.of(context).push<Map<String, String>>(
-                  MaterialPageRoute(builder: (context) => const PresetsPage()),
-                );
-                if (result != null) {
-                  setState(() {
-                    _nameController.text = result['name']!;
-                    _categoryController.text = result['category'] ?? '';
-                    _parseAndSetInterval(result['interval']!);
-                  });
-                }
-              },
-              child: Container(
-                height: 64,
-                decoration: BoxDecoration(
-                  color: colorScheme.surface,
-                  border: Border.all(color: colorScheme.onSurface, width: 2),
+                onTap: () async {
+                  final result = await Navigator.of(context)
+                      .push<Map<String, String>>(
+                        MaterialPageRoute(
+                          builder: (context) => const PresetsPage(),
+                        ),
+                      );
+                  if (result != null) {
+                    setState(() {
+                      _nameController.text = result['name']!;
+                      _categoryController.text = result['category'] ?? '';
+                      _parseAndSetInterval(result['interval']!);
+                    });
+                  }
+                },
+                child: Container(
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: colorScheme.surface,
+                    border: Border.all(color: colorScheme.onSurface, width: 2),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'CHOOSE FROM PRESETS',
+                        style: _safeGoogleFont(
+                          () => GoogleFonts.spaceGrotesk(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            letterSpacing: 1.0,
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                      ),
+                      Icon(Icons.chevron_right, color: colorScheme.onSurface),
+                    ],
+                  ),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'CHOOSE FROM PRESETS',
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(height: 1, color: colorScheme.onSurface),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Text(
+                      'OR CREATE CUSTOM',
                       style: _safeGoogleFont(
-                        () => GoogleFonts.spaceGrotesk(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          letterSpacing: 1.0,
-                          color: colorScheme.onSurface,
+                        () => GoogleFonts.chivoMono(
+                          fontSize: 10,
+                          color: const Color(0xFF8A8A8A),
                         ),
                       ),
                     ),
-                    Icon(
-                      Icons.chevron_right,
+                  ),
+                  Expanded(
+                    child: Container(height: 1, color: colorScheme.onSurface),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                height: 56,
+                child: TextField(
+                  controller: _nameController,
+                  cursorColor: colorScheme.primary,
+                  style: _safeGoogleFont(
+                    () => GoogleFonts.inter(
+                      fontSize: 16,
                       color: colorScheme.onSurface,
                     ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(child: Container(height: 1, color: colorScheme.onSurface)),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Text(
-                    'OR CREATE CUSTOM',
-                    style: _safeGoogleFont(
-                      () => GoogleFonts.chivoMono(
-                        fontSize: 10,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: 'SYSTEM NAME...',
+                    hintStyle: _safeGoogleFont(
+                      () => GoogleFonts.inter(
+                        fontSize: 16,
                         color: const Color(0xFF8A8A8A),
                       ),
                     ),
+                    filled: true,
+                    fillColor: colorScheme.surface,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: colorScheme.onSurface,
+                        width: 2,
+                      ),
+                      borderRadius: BorderRadius.zero,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: colorScheme.primary,
+                        width: 2,
+                      ),
+                      borderRadius: BorderRadius.zero,
+                    ),
                   ),
                 ),
-                Expanded(child: Container(height: 1, color: colorScheme.onSurface)),
-              ],
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              height: 56,
-              child: TextField(
-                controller: _nameController,
-                cursorColor: colorScheme.primary,
-                style: _safeGoogleFont(
-                  () => GoogleFonts.inter(fontSize: 16, color: colorScheme.onSurface),
-                ),
-                decoration: InputDecoration(
-                  hintText: 'SYSTEM NAME...',
-                  hintStyle: _safeGoogleFont(
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                height: 56,
+                child: TextField(
+                  controller: _categoryController,
+                  cursorColor: colorScheme.primary,
+                  style: _safeGoogleFont(
                     () => GoogleFonts.inter(
                       fontSize: 16,
-                      color: const Color(0xFF8A8A8A),
+                      color: colorScheme.onSurface,
                     ),
                   ),
-                  filled: true,
-                  fillColor: colorScheme.surface,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: colorScheme.onSurface, width: 2),
-                    borderRadius: BorderRadius.zero,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: colorScheme.primary,
-                      width: 2,
+                  decoration: InputDecoration(
+                    hintText: 'CATEGORY (E.G. KITCHEN)...',
+                    hintStyle: _safeGoogleFont(
+                      () => GoogleFonts.inter(
+                        fontSize: 16,
+                        color: const Color(0xFF8A8A8A),
+                      ),
                     ),
-                    borderRadius: BorderRadius.zero,
+                    filled: true,
+                    fillColor: colorScheme.surface,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: colorScheme.onSurface,
+                        width: 2,
+                      ),
+                      borderRadius: BorderRadius.zero,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: colorScheme.primary,
+                        width: 2,
+                      ),
+                      borderRadius: BorderRadius.zero,
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              height: 56,
-              child: TextField(
-                controller: _categoryController,
-                cursorColor: colorScheme.primary,
+              const SizedBox(height: 32),
+              Text(
+                'INTERVAL',
                 style: _safeGoogleFont(
-                  () => GoogleFonts.inter(fontSize: 16, color: colorScheme.onSurface),
-                ),
-                decoration: InputDecoration(
-                  hintText: 'CATEGORY (E.G. KITCHEN)...',
-                  hintStyle: _safeGoogleFont(
-                    () => GoogleFonts.inter(
-                      fontSize: 16,
-                      color: const Color(0xFF8A8A8A),
-                    ),
-                  ),
-                  filled: true,
-                  fillColor: colorScheme.surface,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: colorScheme.onSurface, width: 2),
-                    borderRadius: BorderRadius.zero,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: colorScheme.primary,
-                      width: 2,
-                    ),
-                    borderRadius: BorderRadius.zero,
+                  () => GoogleFonts.spaceGrotesk(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    letterSpacing: -0.5,
+                    color: colorScheme.onSurface,
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 32),
-            Text(
-              'INTERVAL',
-              style: _safeGoogleFont(
-                () => GoogleFonts.spaceGrotesk(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  letterSpacing: -0.5,
-                  color: colorScheme.onSurface,
-                ),
-              ),
-            ),
               const SizedBox(height: 16),
               GridView.count(
                 shrinkWrap: true,
@@ -319,13 +345,21 @@ class _AddTaskPageState extends State<AddTaskPage> {
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: colorScheme.surface,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                            ),
                             enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: colorScheme.onSurface, width: 2),
+                              borderSide: BorderSide(
+                                color: colorScheme.onSurface,
+                                width: 2,
+                              ),
                               borderRadius: BorderRadius.zero,
                             ),
                             focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                              borderSide: BorderSide(
+                                color: colorScheme.primary,
+                                width: 2,
+                              ),
                               borderRadius: BorderRadius.zero,
                             ),
                           ),
@@ -337,12 +371,20 @@ class _AddTaskPageState extends State<AddTaskPage> {
                       width: 120,
                       height: 56,
                       decoration: BoxDecoration(
-                        border: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
+                        border: Border(
+                          bottom: BorderSide(
+                            color: colorScheme.onSurface,
+                            width: 2,
+                          ),
+                        ),
                       ),
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<String>(
                           value: _customIntervalUnit,
-                          icon: Icon(Icons.expand_more, color: colorScheme.onSurface),
+                          icon: Icon(
+                            Icons.expand_more,
+                            color: colorScheme.onSurface,
+                          ),
                           isExpanded: true,
                           style: _safeGoogleFont(
                             () => GoogleFonts.spaceGrotesk(
@@ -361,11 +403,12 @@ class _AddTaskPageState extends State<AddTaskPage> {
                           },
                           items: <String>['DAYS', 'WEEKS', 'MONTHS']
                               .map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
-                            );
-                          }).toList(),
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              })
+                              .toList(),
                         ),
                       ),
                     ),
@@ -380,7 +423,9 @@ class _AddTaskPageState extends State<AddTaskPage> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: colorScheme.surface,
-          border: Border(top: BorderSide(color: colorScheme.onSurface, width: 2)),
+          border: Border(
+            top: BorderSide(color: colorScheme.onSurface, width: 2),
+          ),
         ),
         child: SizedBox(
           height: 64,
@@ -397,12 +442,15 @@ class _AddTaskPageState extends State<AddTaskPage> {
               if (_nameController.text.isNotEmpty) {
                 String interval = _selectedInterval;
                 if (_selectedInterval == 'CUSTOM') {
-                  interval = '${_customIntervalController.text} $_customIntervalUnit';
+                  interval =
+                      '${_customIntervalController.text} $_customIntervalUnit';
                 }
                 Navigator.of(context).pop({
                   'name': _nameController.text,
                   'interval': interval,
-                  'category': _categoryController.text.isEmpty ? 'GENERAL' : _categoryController.text.toUpperCase(),
+                  'category': _categoryController.text.isEmpty
+                      ? 'GENERAL'
+                      : _categoryController.text.toUpperCase(),
                 });
               }
             },
@@ -427,7 +475,8 @@ class _AddTaskPageState extends State<AddTaskPage> {
     final colorScheme = theme.colorScheme;
     bool isSelected = _selectedInterval == text;
 
-    if (text == 'CUSTOM' && !['7 DAYS', '30 DAYS', '90 DAYS'].contains(_selectedInterval)) {
+    if (text == 'CUSTOM' &&
+        !['7 DAYS', '30 DAYS', '90 DAYS'].contains(_selectedInterval)) {
       isSelected = true;
     }
 
@@ -451,7 +500,9 @@ class _AddTaskPageState extends State<AddTaskPage> {
                 () => GoogleFonts.inter(
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
-                  color: isSelected ? colorScheme.surface : colorScheme.onSurface,
+                  color: isSelected
+                      ? colorScheme.surface
+                      : colorScheme.onSurface,
                 ),
               ),
             ),

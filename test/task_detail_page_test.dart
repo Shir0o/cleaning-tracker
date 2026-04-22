@@ -17,7 +17,9 @@ void main() {
             task: Task(
               title: 'HVAC FILTER',
               interval: '90 DAYS',
-              lastCompleted: DateTime.now().subtract(const Duration(hours: 13 * 24 + 12)), // 13.5 days
+              lastCompleted: DateTime.now().subtract(
+                const Duration(hours: 13 * 24 + 12),
+              ), // 13.5 days
             ),
           ),
         ),
@@ -56,28 +58,32 @@ void main() {
       expect(find.text('NO HISTORY YET'), findsOneWidget);
     });
 
-    testWidgets('calculates negative percentage and shows appropriate status for overdue', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: TaskDetailPage(
-            task: Task(
-              title: 'SMOKE ALARMS',
-              interval: '365 DAYS',
-              lastCompleted: DateTime.now().subtract(const Duration(days: 370)),
+    testWidgets(
+      'calculates negative percentage and shows appropriate status for overdue',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: TaskDetailPage(
+              task: Task(
+                title: 'SMOKE ALARMS',
+                interval: '365 DAYS',
+                lastCompleted: DateTime.now().subtract(
+                  const Duration(days: 370),
+                ),
+              ),
             ),
           ),
-        ),
-      );
+        );
 
-      // Progress is sent as negative health. Cleanliness should show negative.
-      expect(find.text('-1%'), findsOneWidget);
-      expect(find.text('STATUS: 5 DAYS OVERDUE'), findsOneWidget);
-    });
+        // Progress is sent as negative health. Cleanliness should show negative.
+        expect(find.text('-1%'), findsOneWidget);
+        expect(find.text('STATUS: 5 DAYS OVERDUE'), findsOneWidget);
+      },
+    );
 
     testWidgets('shows red color at exactly 0%', (WidgetTester tester) async {
-      TaskDetailPage.testingMode = false; // Disable to allow style/color inspection
+      TaskDetailPage.testingMode =
+          false; // Disable to allow style/color inspection
       addTearDown(() => TaskDetailPage.testingMode = true);
 
       // Use a fixed time for stability in health calculation
@@ -102,8 +108,11 @@ void main() {
 
       final percentageText = tester.widget<Text>(find.text('0%'));
       // This is expected to fail initially as 0% is currently blue (primary)
-      expect(percentageText.style?.color, const Color(0xFFFF0000), 
-          reason: '0% cleanliness should be displayed in error color (red)');
+      expect(
+        percentageText.style?.color,
+        const Color(0xFFFF0000),
+        reason: '0% cleanliness should be displayed in error color (red)',
+      );
     });
   });
 }

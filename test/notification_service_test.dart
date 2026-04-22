@@ -10,8 +10,11 @@ import 'package:cleaning_tracker/main.dart' show Task;
 class MockFlutterLocalNotificationsPlugin extends Mock
     implements FlutterLocalNotificationsPlugin {}
 
-class FakeInitializationSettings extends Fake implements InitializationSettings {}
+class FakeInitializationSettings extends Fake
+    implements InitializationSettings {}
+
 class FakeNotificationDetails extends Fake implements NotificationDetails {}
+
 class FakeTZDateTime extends Fake implements tz.TZDateTime {}
 
 void main() {
@@ -21,7 +24,7 @@ void main() {
   setUpAll(() {
     tz.initializeTimeZones();
     tz.setLocalLocation(tz.getLocation('UTC'));
-    
+
     registerFallbackValue(FakeInitializationSettings());
     registerFallbackValue(FakeNotificationDetails());
     registerFallbackValue(AndroidScheduleMode.exactAllowWhileIdle);
@@ -35,73 +38,91 @@ void main() {
     notificationService = NotificationService();
     mockPlugin = MockFlutterLocalNotificationsPlugin();
     notificationService.notificationsPlugin = mockPlugin;
-    
+
     // Default mock behavior
-    when(() => mockPlugin.initialize(
-          settings: any(named: 'settings'),
-          onDidReceiveNotificationResponse: any(named: 'onDidReceiveNotificationResponse'),
-        )).thenAnswer((_) async => true);
+    when(
+      () => mockPlugin.initialize(
+        settings: any(named: 'settings'),
+        onDidReceiveNotificationResponse: any(
+          named: 'onDidReceiveNotificationResponse',
+        ),
+      ),
+    ).thenAnswer((_) async => true);
 
-    when(() => mockPlugin.zonedSchedule(
-          id: any(named: 'id'),
-          title: any(named: 'title'),
-          body: any(named: 'body'),
-          scheduledDate: any(named: 'scheduledDate'),
-          notificationDetails: any(named: 'notificationDetails'),
-          androidScheduleMode: any(named: 'androidScheduleMode'),
-        )).thenAnswer((_) async => {});
+    when(
+      () => mockPlugin.zonedSchedule(
+        id: any(named: 'id'),
+        title: any(named: 'title'),
+        body: any(named: 'body'),
+        scheduledDate: any(named: 'scheduledDate'),
+        notificationDetails: any(named: 'notificationDetails'),
+        androidScheduleMode: any(named: 'androidScheduleMode'),
+      ),
+    ).thenAnswer((_) async => {});
 
-    when(() => mockPlugin.cancel(
-          id: any(named: 'id'),
-          tag: any(named: 'tag'),
-        )).thenAnswer((_) async => {});
+    when(
+      () => mockPlugin.cancel(
+        id: any(named: 'id'),
+        tag: any(named: 'tag'),
+      ),
+    ).thenAnswer((_) async => {});
 
     when(() => mockPlugin.cancelAll()).thenAnswer((_) async => {});
   });
 
-  test('scheduleTaskNotification respects notifications_enabled setting (bool)', () async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('notifications_enabled', false);
+  test(
+    'scheduleTaskNotification respects notifications_enabled setting (bool)',
+    () async {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('notifications_enabled', false);
 
-    final task = Task(
-      title: 'Test Task',
-      interval: '7 DAYS',
-      lastCompleted: DateTime.now(),
-    );
+      final task = Task(
+        title: 'Test Task',
+        interval: '7 DAYS',
+        lastCompleted: DateTime.now(),
+      );
 
-    await notificationService.scheduleTaskNotification(task);
+      await notificationService.scheduleTaskNotification(task);
 
-    verifyNever(() => mockPlugin.zonedSchedule(
+      verifyNever(
+        () => mockPlugin.zonedSchedule(
           id: any(named: 'id'),
           title: any(named: 'title'),
           body: any(named: 'body'),
           scheduledDate: any(named: 'scheduledDate'),
           notificationDetails: any(named: 'notificationDetails'),
           androidScheduleMode: any(named: 'androidScheduleMode'),
-        ));
-  });
+        ),
+      );
+    },
+  );
 
-  test('scheduleTaskNotification respects notifications_enabled setting (string)', () async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('notifications_enabled', 'false');
+  test(
+    'scheduleTaskNotification respects notifications_enabled setting (string)',
+    () async {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('notifications_enabled', 'false');
 
-    final task = Task(
-      title: 'Test Task',
-      interval: '7 DAYS',
-      lastCompleted: DateTime.now(),
-    );
+      final task = Task(
+        title: 'Test Task',
+        interval: '7 DAYS',
+        lastCompleted: DateTime.now(),
+      );
 
-    await notificationService.scheduleTaskNotification(task);
+      await notificationService.scheduleTaskNotification(task);
 
-    verifyNever(() => mockPlugin.zonedSchedule(
+      verifyNever(
+        () => mockPlugin.zonedSchedule(
           id: any(named: 'id'),
           title: any(named: 'title'),
           body: any(named: 'body'),
           scheduledDate: any(named: 'scheduledDate'),
           notificationDetails: any(named: 'notificationDetails'),
           androidScheduleMode: any(named: 'androidScheduleMode'),
-        ));
-  });
+        ),
+      );
+    },
+  );
 
   test('scheduleTaskNotification schedules correctly when enabled', () async {
     final prefs = await SharedPreferences.getInstance();
@@ -118,14 +139,16 @@ void main() {
 
     await notificationService.scheduleTaskNotification(task);
 
-    verify(() => mockPlugin.zonedSchedule(
-          id: any(named: 'id'),
-          title: 'CLEANING REQUIRED',
-          body: 'Task "Enabled Task" is due soon.',
-          scheduledDate: any(named: 'scheduledDate'),
-          notificationDetails: any(named: 'notificationDetails'),
-          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        )).called(1);
+    verify(
+      () => mockPlugin.zonedSchedule(
+        id: any(named: 'id'),
+        title: 'CLEANING REQUIRED',
+        body: 'Task "Enabled Task" is due soon.',
+        scheduledDate: any(named: 'scheduledDate'),
+        notificationDetails: any(named: 'notificationDetails'),
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      ),
+    ).called(1);
   });
 
   test('cancelTaskNotification cancels the correct notification', () async {
@@ -144,13 +167,15 @@ void main() {
     await notificationService.rescheduleAll([task]);
 
     verify(() => mockPlugin.cancelAll()).called(1);
-    verify(() => mockPlugin.zonedSchedule(
-          id: any(named: 'id'),
-          title: any(named: 'title'),
-          body: any(named: 'body'),
-          scheduledDate: any(named: 'scheduledDate'),
-          notificationDetails: any(named: 'notificationDetails'),
-          androidScheduleMode: any(named: 'androidScheduleMode'),
-        )).called(1);
+    verify(
+      () => mockPlugin.zonedSchedule(
+        id: any(named: 'id'),
+        title: any(named: 'title'),
+        body: any(named: 'body'),
+        scheduledDate: any(named: 'scheduledDate'),
+        notificationDetails: any(named: 'notificationDetails'),
+        androidScheduleMode: any(named: 'androidScheduleMode'),
+      ),
+    ).called(1);
   });
 }

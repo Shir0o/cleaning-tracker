@@ -60,33 +60,34 @@ class Task {
   }
 
   Map<String, dynamic> toJson() => {
-        if (id != null) 'id': id,
-        'title': title,
-        'interval': interval,
-        'lastCompleted': lastCompleted.toIso8601String(),
-        'category': category,
-        'notes': notes,
-        'completions': completions.map((e) => e.toIso8601String()).toList(),
-        if (snoozedUntil != null) 'snoozedUntil': snoozedUntil!.toIso8601String(),
-      };
+    if (id != null) 'id': id,
+    'title': title,
+    'interval': interval,
+    'lastCompleted': lastCompleted.toIso8601String(),
+    'category': category,
+    'notes': notes,
+    'completions': completions.map((e) => e.toIso8601String()).toList(),
+    if (snoozedUntil != null) 'snoozedUntil': snoozedUntil!.toIso8601String(),
+  };
 
   factory Task.fromJson(Map<String, dynamic> json) => Task(
-        id: json['id'] as int?,
-        title: json['title'] as String,
-        interval: json['interval'] as String,
-        lastCompleted: json['lastCompleted'] != null
-            ? DateTime.parse(json['lastCompleted'] as String)
-            : DateTime.now(),
-        category: (json['category'] as String?) ?? 'GENERAL',
-        notes: (json['notes'] as String?) ?? '',
-        completions: (json['completions'] as List<dynamic>?)
-                ?.map((e) => DateTime.parse(e as String))
-                .toList() ??
-            [],
-        snoozedUntil: json['snoozedUntil'] != null
-            ? DateTime.parse(json['snoozedUntil'] as String)
-            : null,
-      );
+    id: json['id'] as int?,
+    title: json['title'] as String,
+    interval: json['interval'] as String,
+    lastCompleted: json['lastCompleted'] != null
+        ? DateTime.parse(json['lastCompleted'] as String)
+        : DateTime.now(),
+    category: (json['category'] as String?) ?? 'GENERAL',
+    notes: (json['notes'] as String?) ?? '',
+    completions:
+        (json['completions'] as List<dynamic>?)
+            ?.map((e) => DateTime.parse(e as String))
+            .toList() ??
+        [],
+    snoozedUntil: json['snoozedUntil'] != null
+        ? DateTime.parse(json['snoozedUntil'] as String)
+        : null,
+  );
 
   Duration get intervalDuration {
     final parts = interval.split(' ');
@@ -154,7 +155,9 @@ class Task {
     final List<int> deltas = [];
 
     for (int i = 1; i < sortedCompletions.length; i++) {
-      deltas.add(sortedCompletions[i].difference(sortedCompletions[i - 1]).inDays);
+      deltas.add(
+        sortedCompletions[i].difference(sortedCompletions[i - 1]).inDays,
+      );
     }
 
     if (deltas.isEmpty) return null;
@@ -165,7 +168,7 @@ class Task {
     if (roundedAverage <= 0) return null;
 
     final int currentDays = intervalDuration.inDays;
-    
+
     // Only suggest if the difference is more than 10% AND at least 1 day
     final double diff = (roundedAverage - currentDays).abs().toDouble();
     final double percentDiff = diff / currentDays;
@@ -218,7 +221,8 @@ class CleaningTrackerApp extends StatefulWidget {
   State<CleaningTrackerApp> createState() => _CleaningTrackerAppState();
 }
 
-class _CleaningTrackerAppState extends State<CleaningTrackerApp> with WidgetsBindingObserver {
+class _CleaningTrackerAppState extends State<CleaningTrackerApp>
+    with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
@@ -350,7 +354,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (DashboardScreen.testingMode) return;
 
     // Listen for changes
-    _authSubscription = GoogleSignIn.instance.authenticationEvents.listen((event) {
+    _authSubscription = GoogleSignIn.instance.authenticationEvents.listen((
+      event,
+    ) {
       if (mounted) {
         setState(() {
           // Trigger refresh if needed
@@ -371,7 +377,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         backgroundColor: colorScheme.surface,
         elevation: 0,
         scrolledUnderElevation: 0,
-        shape: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
+        shape: Border(
+          bottom: BorderSide(color: colorScheme.onSurface, width: 2),
+        ),
         title: Text(
           'STATUS',
           style: _safeGoogleFont(
@@ -448,7 +456,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 32),
                     decoration: BoxDecoration(
                       border: Border(
-                          bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
+                        bottom: BorderSide(
+                          color: colorScheme.onSurface,
+                          width: 2,
+                        ),
+                      ),
                     ),
                     child: Column(
                       children: [
@@ -515,8 +527,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ),
                         ),
                       ),
-                      ...urgentTasks
-                          .map((task) => _buildTaskRow(task, now, context)),
+                      ...urgentTasks.map(
+                        (task) => _buildTaskRow(task, now, context),
+                      ),
                     ],
 
                     // Categories
@@ -535,8 +548,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     fontWeight: FontWeight.bold,
                                     fontSize: 14,
                                     letterSpacing: 2.0,
-                                    color:
-                                        colorScheme.onSurface.withValues(alpha: 0.6),
+                                    color: colorScheme.onSurface.withValues(
+                                      alpha: 0.6,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -545,11 +559,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     _showCategoryResetConfirmation(category),
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 2),
+                                    horizontal: 8,
+                                    vertical: 2,
+                                  ),
                                   decoration: BoxDecoration(
                                     border: Border.all(
-                                        color: colorScheme.onSurface
-                                            .withValues(alpha: 0.4)),
+                                      color: colorScheme.onSurface.withValues(
+                                        alpha: 0.4,
+                                      ),
+                                    ),
                                   ),
                                   child: Text(
                                     'RESET CATEGORY',
@@ -557,8 +575,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       () => GoogleFonts.chivoMono(
                                         fontSize: 10,
                                         fontWeight: FontWeight.bold,
-                                        color: colorScheme.onSurface
-                                            .withValues(alpha: 0.6),
+                                        color: colorScheme.onSurface.withValues(
+                                          alpha: 0.6,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -567,8 +586,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ],
                           ),
                         ),
-                        ...tasksInCategory
-                            .map((task) => _buildTaskRow(task, now, context)),
+                        ...tasksInCategory.map(
+                          (task) => _buildTaskRow(task, now, context),
+                        ),
                       ];
                     }),
                   ],
@@ -586,9 +606,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
           color: Colors.transparent,
           child: InkWell(
             onTap: () async {
-              final result = await Navigator.of(context).push<Map<String, String>>(
-                MaterialPageRoute(builder: (context) => const AddTaskPage()),
-              );
+              final result = await Navigator.of(context)
+                  .push<Map<String, String>>(
+                    MaterialPageRoute(
+                      builder: (context) => const AddTaskPage(),
+                    ),
+                  );
               if (result != null && mounted) {
                 final newTask = Task(
                   title: result['name']!,
@@ -693,12 +716,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             elevation: 0,
                           ),
                           onPressed: () async {
-                            await DatabaseService().resetCategory(category, DateTime.now());
+                            await DatabaseService().resetCategory(
+                              category,
+                              DateTime.now(),
+                            );
                             if (mounted) {
                               Navigator.of(context).pop();
                               _refreshTasks();
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('All tasks in $category reset.')),
+                                SnackBar(
+                                  content: Text(
+                                    'All tasks in $category reset.',
+                                  ),
+                                ),
                               );
                             }
                           },
@@ -739,11 +769,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       isFresh: isFresh,
       onTap: () async {
         final result = await Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => TaskDetailPage(
-              task: task,
-            ),
-          ),
+          MaterialPageRoute(builder: (context) => TaskDetailPage(task: task)),
         );
 
         if (result == 'delete') {
@@ -777,24 +803,12 @@ class ShimmerCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  width: 120,
-                  height: 24,
-                  color: Colors.white,
-                ),
-                Container(
-                  width: 80,
-                  height: 16,
-                  color: Colors.white,
-                ),
+                Container(width: 120, height: 24, color: Colors.white),
+                Container(width: 80, height: 16, color: Colors.white),
               ],
             ),
             const SizedBox(height: 12),
-            Container(
-              height: 24,
-              width: double.infinity,
-              color: Colors.white,
-            ),
+            Container(height: 24, width: double.infinity, color: Colors.white),
           ],
         ),
       ),
@@ -839,7 +853,9 @@ class TaskCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
+        border: Border(
+          bottom: BorderSide(color: colorScheme.onSurface, width: 2),
+        ),
       ),
       child: Material(
         color: colorScheme.surface,
@@ -888,7 +904,9 @@ class TaskCard extends StatelessWidget {
                   height: 24,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: theme.brightness == Brightness.dark ? const Color(0xFF1A1A1A) : const Color(0xFFF4F4F4), // Surface color from Stitch
+                    color: theme.brightness == Brightness.dark
+                        ? const Color(0xFF1A1A1A)
+                        : const Color(0xFFF4F4F4), // Surface color from Stitch
                     border: Border.all(color: colorScheme.onSurface, width: 2),
                   ),
                   child: FractionallySizedBox(
@@ -898,7 +916,9 @@ class TaskCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: progressColor,
                         border:
-                            (isOverdue) || (progress <= 0.0) || (!isFresh && progress >= 1.0)
+                            (isOverdue) ||
+                                (progress <= 0.0) ||
+                                (!isFresh && progress >= 1.0)
                             ? null // Full bar has no inner border
                             : Border(
                                 right: BorderSide(
