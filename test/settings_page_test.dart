@@ -23,10 +23,7 @@ void main() {
 
     // Verify headers and sections exist
     expect(find.text('SYSTEM SETTINGS'), findsOneWidget);
-    expect(
-      find.text('Notification Preferences'.toUpperCase()),
-      findsOneWidget,
-    );
+    expect(find.text('Notification Preferences'.toUpperCase()), findsOneWidget);
     expect(find.text('Global Preferences'.toUpperCase()), findsOneWidget);
     expect(find.text('Data & Sync'.toUpperCase()), findsOneWidget);
     expect(find.text('History'.toUpperCase()), findsOneWidget);
@@ -149,7 +146,10 @@ void main() {
 
     for (final option in options) {
       if (option == '2 DAYS') {
-        expect(find.text(option), findsWidgets); // Found in list and on background page
+        expect(
+          find.text(option),
+          findsWidgets,
+        ); // Found in list and on background page
       } else {
         expect(find.text(option), findsOneWidget);
       }

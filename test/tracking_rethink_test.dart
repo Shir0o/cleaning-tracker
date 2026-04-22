@@ -6,11 +6,7 @@ void main() {
   group('Task Tracking Rethink Tests', () {
     test('health calculation: fresh task', () {
       final now = DateTime.now();
-      final task = Task(
-        title: 'Test',
-        interval: '10 DAYS',
-        lastCompleted: now,
-      );
+      final task = Task(title: 'Test', interval: '10 DAYS', lastCompleted: now);
       // Health should be 1.0 (100%)
       expect(task.health(now), 1.0);
     });
@@ -75,7 +71,7 @@ void main() {
       );
       // Due date is now + 3 days = March 30
       expect(task.dueDateText(now), 'MAR 30 (3 DAYS)');
-      
+
       final overdueTask = Task(
         title: 'Test',
         interval: '10 DAYS',
@@ -95,7 +91,11 @@ void main() {
       );
       final health = task.health(now);
       final isOverdue = (health * 100).round() <= 0;
-      expect(isOverdue, isTrue, reason: '0.4% health rounds to 0% and should be considered overdue');
+      expect(
+        isOverdue,
+        isTrue,
+        reason: '0.4% health rounds to 0% and should be considered overdue',
+      );
     });
 
     test('overdue threshold logic: rounds to 1% is NOT overdue', () {
@@ -108,15 +108,22 @@ void main() {
       );
       final health = task.health(now);
       final isOverdue = (health * 100).round() <= 0;
-      expect(isOverdue, isFalse, reason: '0.6% health rounds to 1% and should NOT be considered overdue');
+      expect(
+        isOverdue,
+        isFalse,
+        reason: '0.6% health rounds to 1% and should NOT be considered overdue',
+      );
     });
 
-    testWidgets('TaskCard handles long titles without overflow', (WidgetTester tester) async {
+    testWidgets('TaskCard handles long titles without overflow', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: TaskCard(
-              title: 'THIS IS AN EXTREMELY LONG TASK TITLE THAT SHOULD DEFINITELY OVERFLOW IF NOT HANDLED PROPERLY BY THE EXPANDED WIDGET',
+              title:
+                  'THIS IS AN EXTREMELY LONG TASK TITLE THAT SHOULD DEFINITELY OVERFLOW IF NOT HANDLED PROPERLY BY THE EXPANDED WIDGET',
               interval: '7 DAYS',
               dueDateText: 'MAR 30 (3 DAYS)',
               progress: 0.5,

@@ -89,29 +89,63 @@ class DatabaseService {
   Future<int> insertTask(Task task) async {
     if (testingMode) return 0;
     final database = await db;
-    final id = await database.insert('tasks', {
-      'title': task.title,
-      'interval': task.interval,
-      'lastCompleted': task.lastCompleted.toIso8601String(),
-      'category': task.category,
-      'notes': task.notes,
-      'snoozedUntil': task.snoozedUntil?.toIso8601String(),
-    });
+    return await database.transaction((txn) async {
+      final id = await txn.insert('tasks', {
+        'title': task.title,
+        'interval': task.interval,
+        'lastCompleted': task.lastCompleted.toIso8601String(),
+        'category': task.category,
+        'notes': task.notes,
+        'snoozedUntil': task.snoozedUntil?.toIso8601String(),
+      });
 
-    for (var completion in task.completions) {
-      await database.insert('completions', {
-        'task_id': id,
-        'date': completion.toIso8601String(),
+      for (var completion in task.completions) {
+        await txn.insert('completions', {
+          'task_id': id,
+          'date': completion.toIso8601String(),
+        });
+      }
+      return id;
+    });
+  }
+
+  Future<void> batchInsertTasks(List<Task> tasks) async {
+    if (testingMode || tasks.isEmpty) return;
+    final database = await db;
+    final batch = database.batch();
+
+    for (var task in tasks) {
+      batch.insert('tasks', {
+        'title': task.title,
+        'interval': task.interval,
+        'lastCompleted': task.lastCompleted.toIso8601String(),
+        'category': task.category,
+        'notes': task.notes,
+        'snoozedUntil': task.snoozedUntil?.toIso8601String(),
       });
     }
-    return id;
+
+    final results = await batch.commit();
+
+    // Now handle completions for each task using the returned IDs
+    final completionBatch = database.batch();
+    for (int i = 0; i < tasks.length; i++) {
+      final taskId = results[i] as int;
+      for (var completion in tasks[i].completions) {
+        completionBatch.insert('completions', {
+          'task_id': taskId,
+          'date': completion.toIso8601String(),
+        });
+      }
+    }
+    await completionBatch.commit(noResult: true);
   }
 
   Future<List<Task>> getTasks() async {
     if (testingMode) return [];
     final database = await db;
     final List<Map<String, dynamic>> taskMaps = await database.query('tasks');
-    
+
     final List<Task> tasks = [];
     for (var map in taskMaps) {
       final taskId = map['id'] as int;
@@ -121,23 +155,25 @@ class DatabaseService {
         whereArgs: [taskId],
         orderBy: 'date ASC',
       );
-      
+
       final completions = completionMaps
           .map((m) => DateTime.parse(m['date'] as String))
           .toList();
-          
-      tasks.add(Task(
-        id: taskId,
-        title: map['title'] as String,
-        interval: map['interval'] as String,
-        lastCompleted: DateTime.parse(map['lastCompleted'] as String),
-        category: map['category'] as String,
-        notes: map['notes'] as String,
-        completions: completions,
-        snoozedUntil: map['snoozedUntil'] != null
-            ? DateTime.parse(map['snoozedUntil'] as String)
-            : null,
-      ));
+
+      tasks.add(
+        Task(
+          id: taskId,
+          title: map['title'] as String,
+          interval: map['interval'] as String,
+          lastCompleted: DateTime.parse(map['lastCompleted'] as String),
+          category: map['category'] as String,
+          notes: map['notes'] as String,
+          completions: completions,
+          snoozedUntil: map['snoozedUntil'] != null
+              ? DateTime.parse(map['snoozedUntil'] as String)
+              : null,
+        ),
+      );
     }
     return tasks;
   }
@@ -145,29 +181,35 @@ class DatabaseService {
   Future<void> updateTask(Task task) async {
     if (testingMode || task.id == null) return;
     final database = await db;
-    await database.update(
-      'tasks',
-      {
-        'title': task.title,
-        'interval': task.interval,
-        'lastCompleted': task.lastCompleted.toIso8601String(),
-        'category': task.category,
-        'notes': task.notes,
-        'snoozedUntil': task.snoozedUntil?.toIso8601String(),
-      },
-      where: 'id = ?',
-      whereArgs: [task.id],
-    );
-    
-    // For simplicity in this migration, we'll sync completions by deleting and re-inserting
-    // A better way would be to only insert new ones, but tasks usually don't have many.
-    await database.delete('completions', where: 'task_id = ?', whereArgs: [task.id]);
-    for (var completion in task.completions) {
-      await database.insert('completions', {
-        'task_id': task.id,
-        'date': completion.toIso8601String(),
-      });
-    }
+    await database.transaction((txn) async {
+      await txn.update(
+        'tasks',
+        {
+          'title': task.title,
+          'interval': task.interval,
+          'lastCompleted': task.lastCompleted.toIso8601String(),
+          'category': task.category,
+          'notes': task.notes,
+          'snoozedUntil': task.snoozedUntil?.toIso8601String(),
+        },
+        where: 'id = ?',
+        whereArgs: [task.id],
+      );
+
+      // For simplicity in this migration, we'll sync completions by deleting and re-inserting
+      // A better way would be to only insert new ones, but tasks usually don't have many.
+      await txn.delete(
+        'completions',
+        where: 'task_id = ?',
+        whereArgs: [task.id],
+      );
+      for (var completion in task.completions) {
+        await txn.insert('completions', {
+          'task_id': task.id,
+          'date': completion.toIso8601String(),
+        });
+      }
+    });
   }
 
   Future<void> deleteTask(int id) async {
@@ -196,7 +238,7 @@ class DatabaseService {
   Future<void> resetCategory(String category, DateTime date) async {
     if (testingMode && _mockDb == null) return;
     final database = await db;
-    
+
     // Get all tasks in this category
     final List<Map<String, dynamic>> tasks = await database.query(
       'tasks',

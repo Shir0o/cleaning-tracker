@@ -42,7 +42,9 @@ class PrivacyPolicyPage extends StatelessWidget {
             ),
           ),
         ),
-        shape: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
+        shape: Border(
+          bottom: BorderSide(color: colorScheme.onSurface, width: 2),
+        ),
         title: Text(
           'PRIVACY POLICY',
           style: _safeGoogleFont(

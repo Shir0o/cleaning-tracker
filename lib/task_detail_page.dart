@@ -12,11 +12,7 @@ class TaskDetailPage extends StatefulWidget {
   final Task task;
   final DateTime? referenceTime;
 
-  const TaskDetailPage({
-    super.key,
-    required this.task,
-    this.referenceTime,
-  });
+  const TaskDetailPage({super.key, required this.task, this.referenceTime});
 
   @override
   State<TaskDetailPage> createState() => _TaskDetailPageState();
@@ -68,11 +64,16 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                     padding: const EdgeInsets.all(16),
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      border: Border(bottom: BorderSide(color: colorScheme.onSurface)),
+                      border: Border(
+                        bottom: BorderSide(color: colorScheme.onSurface),
+                      ),
                     ),
                     child: Text(
                       option,
-                      style: _safeGoogleFont(() => GoogleFonts.chivoMono(fontWeight: FontWeight.bold)),
+                      style: _safeGoogleFont(
+                        () =>
+                            GoogleFonts.chivoMono(fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ),
                 );
@@ -91,45 +92,55 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
       context: context,
       builder: (context) {
         final colorScheme = Theme.of(context).colorScheme;
-        return StatefulBuilder(builder: (context, setDialogState) {
-          return Dialog(
-            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-            child: Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: colorScheme.surface,
-                border: Border.all(color: colorScheme.onSurface, width: 4),
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return Dialog(
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.zero,
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: controller,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(hintText: 'VALUE...'),
-                  ),
-                  DropdownButton<String>(
-                    value: unit,
-                    items: ['DAYS', 'WEEKS', 'MONTHS'].map((u) => DropdownMenuItem(value: u, child: Text(u))).toList(),
-                    onChanged: (val) => setDialogState(() => unit = val!),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      if (controller.text.isNotEmpty) {
-                        setState(() {
-                          _currentTask = _currentTask.copyWith(interval: '${controller.text} $unit');
-                        });
-                        Navigator.pop(context);
-                      }
-                    },
-                    child: const Text('SET INTERVAL'),
-                  )
-                ],
+              child: Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: colorScheme.surface,
+                  border: Border.all(color: colorScheme.onSurface, width: 4),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: controller,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(hintText: 'VALUE...'),
+                    ),
+                    DropdownButton<String>(
+                      value: unit,
+                      items: ['DAYS', 'WEEKS', 'MONTHS']
+                          .map(
+                            (u) => DropdownMenuItem(value: u, child: Text(u)),
+                          )
+                          .toList(),
+                      onChanged: (val) => setDialogState(() => unit = val!),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (controller.text.isNotEmpty) {
+                          setState(() {
+                            _currentTask = _currentTask.copyWith(
+                              interval: '${controller.text} $unit',
+                            );
+                          });
+                          Navigator.pop(context);
+                        }
+                      },
+                      child: const Text('SET INTERVAL'),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
-        });
+            );
+          },
+        );
       },
     );
   }
@@ -179,17 +190,21 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: colorScheme.onSurface,
                       foregroundColor: colorScheme.surface,
-                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.zero,
+                      ),
                     ),
                     onPressed: () {
                       setState(() {
-                        _currentTask = _currentTask.copyWith(notes: controller.text);
+                        _currentTask = _currentTask.copyWith(
+                          notes: controller.text,
+                        );
                       });
                       Navigator.pop(context);
                     },
                     child: const Text('SAVE NOTES'),
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -253,14 +268,16 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                     onPressed: () {
                       if (controller.text.isNotEmpty) {
                         setState(() {
-                          _currentTask = _currentTask.copyWith(category: controller.text.toUpperCase());
+                          _currentTask = _currentTask.copyWith(
+                            category: controller.text.toUpperCase(),
+                          );
                         });
                         Navigator.pop(context);
                       }
                     },
                     child: const Text('SAVE'),
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -270,7 +287,9 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
   }
 
   Color _getSurfaceColor(ThemeData theme) {
-    return theme.brightness == Brightness.dark ? const Color(0xFF1A1A1A) : const Color(0xFFF4F4F4);
+    return theme.brightness == Brightness.dark
+        ? const Color(0xFF1A1A1A)
+        : const Color(0xFFF4F4F4);
   }
 
   Widget _buildSectionTitle(String title, BuildContext context) {
@@ -334,10 +353,8 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
         label,
         textAlign: TextAlign.center,
         style: _safeGoogleFont(
-          () => GoogleFonts.chivoMono(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-          ),
+          () =>
+              GoogleFonts.chivoMono(fontWeight: FontWeight.bold, fontSize: 16),
         ),
       ),
       onTap: () async {
@@ -349,9 +366,9 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
             _currentTask = updatedTask;
           });
           Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Snoozed for $label')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Snoozed for $label')));
         }
       },
     );
@@ -414,7 +431,9 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
               ),
             ),
           ),
-          shape: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
+          shape: Border(
+            bottom: BorderSide(color: colorScheme.onSurface, width: 2),
+          ),
           title: Text(
             _currentTask.title,
             style: _safeGoogleFont(
@@ -436,7 +455,9 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
               padding: const EdgeInsets.symmetric(vertical: 40),
               decoration: BoxDecoration(
                 color: surfaceColor,
-                border: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
+                border: Border(
+                  bottom: BorderSide(color: colorScheme.onSurface, width: 2),
+                ),
               ),
               child: Column(
                 children: [
@@ -460,7 +481,9 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                         fontSize: 80,
                         height: 1.0,
                         letterSpacing: -2.0,
-                        color: isOverdue ? colorScheme.error : colorScheme.primary,
+                        color: isOverdue
+                            ? colorScheme.error
+                            : colorScheme.primary,
                       ),
                     ),
                   ),
@@ -472,7 +495,9 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
                         letterSpacing: 1.0,
-                        color: isOverdue ? colorScheme.error : colorScheme.onSurface,
+                        color: isOverdue
+                            ? colorScheme.error
+                            : colorScheme.onSurface,
                       ),
                     ),
                   ),
@@ -484,20 +509,24 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
                         letterSpacing: 1.0,
-                        color: isOverdue ? colorScheme.error : colorScheme.onSurface,
+                        color: isOverdue
+                            ? colorScheme.error
+                            : colorScheme.onSurface,
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-  
+
             // Reset Action
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: colorScheme.surface,
-                border: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
+                border: Border(
+                  bottom: BorderSide(color: colorScheme.onSurface, width: 2),
+                ),
               ),
               child: Column(
                 children: [
@@ -531,7 +560,9 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                                 _currentTask = updatedTask;
                               });
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('System Reset Successful')),
+                                const SnackBar(
+                                  content: Text('System Reset Successful'),
+                                ),
                               );
                             },
                             child: Row(
@@ -562,7 +593,10 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                           child: OutlinedButton(
                             style: OutlinedButton.styleFrom(
                               foregroundColor: colorScheme.onSurface,
-                              side: BorderSide(color: colorScheme.onSurface, width: 2),
+                              side: BorderSide(
+                                color: colorScheme.onSurface,
+                                width: 2,
+                              ),
                               shape: const RoundedRectangleBorder(
                                 borderRadius: BorderRadius.zero,
                               ),
@@ -666,14 +700,22 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              const Icon(Icons.edit, size: 16, color: Color(0xFF8A8A8A)),
+                              const Icon(
+                                Icons.edit,
+                                size: 16,
+                                color: Color(0xFF8A8A8A),
+                              ),
                             ],
                           ),
                         ],
                       ),
                     ),
                   ),
-                  Divider(color: colorScheme.onSurface, thickness: 1, height: 0),
+                  Divider(
+                    color: colorScheme.onSurface,
+                    thickness: 1,
+                    height: 0,
+                  ),
                   // Interval Row
                   InkWell(
                     onTap: _showIntervalDialog,
@@ -705,7 +747,11 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              const Icon(Icons.edit, size: 16, color: Color(0xFF8A8A8A)),
+                              const Icon(
+                                Icons.edit,
+                                size: 16,
+                                color: Color(0xFF8A8A8A),
+                              ),
                             ],
                           ),
                         ],
@@ -715,7 +761,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                 ],
               ),
             ),
-  
+
             // NOTES SECTION
             _buildSectionTitle('Notes', context),
             Container(
@@ -735,7 +781,9 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                     children: [
                       Expanded(
                         child: Text(
-                          _currentTask.notes.isEmpty ? 'NO NOTES RECORDED' : _currentTask.notes,
+                          _currentTask.notes.isEmpty
+                              ? 'NO NOTES RECORDED'
+                              : _currentTask.notes,
                           style: _safeGoogleFont(
                             () => GoogleFonts.inter(
                               fontSize: 16,
@@ -746,7 +794,11 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      const Icon(Icons.edit, size: 16, color: Color(0xFF8A8A8A)),
+                      const Icon(
+                        Icons.edit,
+                        size: 16,
+                        color: Color(0xFF8A8A8A),
+                      ),
                     ],
                   ),
                 ),
@@ -769,7 +821,11 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.auto_awesome, color: colorScheme.primary, size: 20),
+                          Icon(
+                            Icons.auto_awesome,
+                            color: colorScheme.primary,
+                            size: 20,
+                          ),
                           const SizedBox(width: 8),
                           Text(
                             'ADAPTIVE INTERVAL',
@@ -819,7 +875,11 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                                 _currentTask = updatedTask;
                               });
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Interval updated based on history.')),
+                                const SnackBar(
+                                  content: Text(
+                                    'Interval updated based on history.',
+                                  ),
+                                ),
                               );
                             }
                           },
@@ -840,7 +900,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                 ),
               ),
             ],
-  
+
             // HISTORY SECTION
             _buildSectionTitle('History', context),
             Container(
@@ -859,7 +919,10 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                           width: double.infinity,
                           decoration: BoxDecoration(
                             border: Border(
-                              bottom: BorderSide(color: colorScheme.onSurface, width: 1),
+                              bottom: BorderSide(
+                                color: colorScheme.onSurface,
+                                width: 1,
+                              ),
                             ),
                           ),
                           child: Text(
@@ -875,7 +938,10 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                       : Column(
                           children: _currentTask.completions.reversed
                               .take(5)
-                              .map((completion) => _buildHistoryRow(completion, context))
+                              .map(
+                                (completion) =>
+                                    _buildHistoryRow(completion, context),
+                              )
                               .toList(),
                         ),
                 ],
@@ -1028,7 +1094,9 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                           ),
                           onPressed: () {
                             Navigator.of(context).pop(); // Close dialog
-                            Navigator.of(context).pop('delete'); // Pop detail page with 'delete' result
+                            Navigator.of(context).pop(
+                              'delete',
+                            ); // Pop detail page with 'delete' result
                           },
                           child: Text(
                             'DELETE',

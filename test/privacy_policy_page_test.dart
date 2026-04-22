@@ -7,7 +7,9 @@ void main() {
     PrivacyPolicyPage.testingMode = true;
   });
 
-  testWidgets('PrivacyPolicyPage renders correctly', (WidgetTester tester) async {
+  testWidgets('PrivacyPolicyPage renders correctly', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(const MaterialApp(home: PrivacyPolicyPage()));
 
     // Verify Title
@@ -20,27 +22,38 @@ void main() {
     expect(find.text('04. YOUR RIGHTS'), findsOneWidget);
 
     // Verify presence of some body text
-    expect(find.textContaining('Cleaning Tracker is designed with a "Local First" philosophy.'), findsOneWidget);
+    expect(
+      find.textContaining(
+        'Cleaning Tracker is designed with a "Local First" philosophy.',
+      ),
+      findsOneWidget,
+    );
 
     // Verify footer
     expect(find.text('VERSION 1.0.0 - MARCH 2026'), findsOneWidget);
   });
 
-  testWidgets('PrivacyPolicyPage back button works', (WidgetTester tester) async {
+  testWidgets('PrivacyPolicyPage back button works', (
+    WidgetTester tester,
+  ) async {
     final navKey = GlobalKey<NavigatorState>();
-    await tester.pumpWidget(MaterialApp(
-      navigatorKey: navKey,
-      home: Scaffold(
-        body: Builder(
-          builder: (context) => ElevatedButton(
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const PrivacyPolicyPage()),
+    await tester.pumpWidget(
+      MaterialApp(
+        navigatorKey: navKey,
+        home: Scaffold(
+          body: Builder(
+            builder: (context) => ElevatedButton(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const PrivacyPolicyPage(),
+                ),
+              ),
+              child: const Text('Go to Privacy Policy'),
             ),
-            child: const Text('Go to Privacy Policy'),
           ),
         ),
       ),
-    ));
+    );
 
     // Navigate to PrivacyPolicyPage
     await tester.tap(find.text('Go to Privacy Policy'));

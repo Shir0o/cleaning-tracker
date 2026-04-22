@@ -31,18 +31,17 @@ class _LogHistoryPageState extends State<LogHistoryPage> {
 
   Future<void> _loadHistory() async {
     final tasks = await DatabaseService().getTasks();
-    
+
     final List<TaskCompletion> allCompletions = [];
-    
+
     for (var task in tasks) {
       for (var completionDate in task.completions) {
-        allCompletions.add(TaskCompletion(
-          taskTitle: task.title,
-          completionDate: completionDate,
-        ));
+        allCompletions.add(
+          TaskCompletion(taskTitle: task.title, completionDate: completionDate),
+        );
       }
     }
-    
+
     // Sort by date descending
     allCompletions.sort((a, b) => b.completionDate.compareTo(a.completionDate));
 
@@ -58,7 +57,7 @@ class _LogHistoryPageState extends State<LogHistoryPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: AppBar(
@@ -87,7 +86,9 @@ class _LogHistoryPageState extends State<LogHistoryPage> {
             ),
           ),
         ),
-        shape: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
+        shape: Border(
+          bottom: BorderSide(color: colorScheme.onSurface, width: 2),
+        ),
         title: Text(
           'HISTORY',
           style: _safeGoogleFont(
@@ -107,35 +108,40 @@ class _LogHistoryPageState extends State<LogHistoryPage> {
               itemBuilder: (context, index) => const ShimmerLogRecord(),
             )
           : _completions.isEmpty
-              ? Center(
-                  child: Text(
-                    'NO HISTORY AVAILABLE',
-                    style: _safeGoogleFont(
-                      () => GoogleFonts.spaceGrotesk(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                        letterSpacing: -0.5,
-                        color: const Color(0xFF8A8A8A),
-                      ),
-                    ),
+          ? Center(
+              child: Text(
+                'NO HISTORY AVAILABLE',
+                style: _safeGoogleFont(
+                  () => GoogleFonts.spaceGrotesk(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    letterSpacing: -0.5,
+                    color: const Color(0xFF8A8A8A),
                   ),
-                )
-              : ListView.builder(
-                  itemCount: _completions.length,
-                  itemBuilder: (context, index) {
-                    final completion = _completions[index];
-                    final showYear = index == 0 || 
-                      completion.completionDate.year != _completions[index - 1].completionDate.year;
-                    
-                    return Column(
-                      children: [
-                        if (showYear) 
-                          _buildYearDivider(completion.completionDate.year.toString(), context),
-                        _buildLogRecord(completion, context),
-                      ],
-                    );
-                  },
                 ),
+              ),
+            )
+          : ListView.builder(
+              itemCount: _completions.length,
+              itemBuilder: (context, index) {
+                final completion = _completions[index];
+                final showYear =
+                    index == 0 ||
+                    completion.completionDate.year !=
+                        _completions[index - 1].completionDate.year;
+
+                return Column(
+                  children: [
+                    if (showYear)
+                      _buildYearDivider(
+                        completion.completionDate.year.toString(),
+                        context,
+                      ),
+                    _buildLogRecord(completion, context),
+                  ],
+                );
+              },
+            ),
     );
   }
 
@@ -147,7 +153,9 @@ class _LogHistoryPageState extends State<LogHistoryPage> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        border: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
+        border: Border(
+          bottom: BorderSide(color: colorScheme.onSurface, width: 2),
+        ),
       ),
       child: Text(
         year,
@@ -172,7 +180,9 @@ class _LogHistoryPageState extends State<LogHistoryPage> {
       height: 56,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 1)),
+        border: Border(
+          bottom: BorderSide(color: colorScheme.onSurface, width: 1),
+        ),
       ),
       child: Row(
         children: [
@@ -182,9 +192,10 @@ class _LogHistoryPageState extends State<LogHistoryPage> {
               dateStr,
               style: _safeGoogleFont(
                 () => GoogleFonts.chivoMono(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.onSurface),
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.onSurface,
+                ),
               ),
             ),
           ),
@@ -210,7 +221,7 @@ class _LogHistoryPageState extends State<LogHistoryPage> {
             'RESET',
             style: _safeGoogleFont(
               () => GoogleFonts.chivoMono(
-                fontSize: 14, 
+                fontSize: 14,
                 color: const Color(0xFF8A8A8A),
               ),
             ),
@@ -241,31 +252,20 @@ class ShimmerLogRecord extends StatelessWidget {
       height: 56,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 1)),
+        border: Border(
+          bottom: BorderSide(color: colorScheme.onSurface, width: 1),
+        ),
       ),
       child: Shimmer.fromColors(
         baseColor: isDark ? Colors.grey[800]! : Colors.grey[300]!,
         highlightColor: isDark ? Colors.grey[700]! : Colors.grey[100]!,
         child: Row(
           children: [
-            Container(
-              width: 48,
-              height: 14,
-              color: Colors.white,
-            ),
+            Container(width: 48, height: 14, color: Colors.white),
             const SizedBox(width: 16),
-            Expanded(
-              child: Container(
-                height: 16,
-                color: Colors.white,
-              ),
-            ),
+            Expanded(child: Container(height: 16, color: Colors.white)),
             const SizedBox(width: 16),
-            Container(
-              width: 48,
-              height: 14,
-              color: Colors.white,
-            ),
+            Container(width: 48, height: 14, color: Colors.white),
           ],
         ),
       ),

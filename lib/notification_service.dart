@@ -51,15 +51,16 @@ class NotificationService {
 
     const DarwinInitializationSettings initializationSettingsDarwin =
         DarwinInitializationSettings(
-      requestAlertPermission: false,
-      requestBadgePermission: false,
-      requestSoundPermission: false,
-    );
+          requestAlertPermission: false,
+          requestBadgePermission: false,
+          requestSoundPermission: false,
+        );
 
-    const InitializationSettings initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid,
-      iOS: initializationSettingsDarwin,
-    );
+    const InitializationSettings initializationSettings =
+        InitializationSettings(
+          android: initializationSettingsAndroid,
+          iOS: initializationSettingsDarwin,
+        );
 
     await _notificationsPlugin.initialize(
       settings: initializationSettings,
@@ -175,7 +176,8 @@ class NotificationService {
     );
 
     debugPrint(
-        'Scheduled notification for ${task.title} at $scheduledDate (ID: $id)');
+      'Scheduled notification for ${task.title} at $scheduledDate (ID: $id)',
+    );
   }
 
   Future<void> cancelTaskNotification(String title) async {
@@ -195,7 +197,8 @@ class NotificationService {
 
     await _notificationsPlugin.cancelAll();
     debugPrint(
-        'Cancelled all notifications. Rescheduling ${tasksToSchedule.length} tasks...');
+      'Cancelled all notifications. Rescheduling ${tasksToSchedule.length} tasks...',
+    );
     for (final task in tasksToSchedule) {
       await _scheduleTaskNotification(
         task,

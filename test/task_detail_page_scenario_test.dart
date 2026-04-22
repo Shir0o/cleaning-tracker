@@ -27,7 +27,9 @@ void main() {
                           task: Task(
                             title: 'HVAC FILTER',
                             interval: '90 DAYS',
-                            lastCompleted: DateTime.now().subtract(const Duration(days: 13)),
+                            lastCompleted: DateTime.now().subtract(
+                              const Duration(days: 13),
+                            ),
                           ),
                         ),
                       ),

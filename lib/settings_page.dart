@@ -19,7 +19,8 @@ class SettingsPage extends StatefulWidget {
   State<SettingsPage> createState() => _SettingsPageState();
 }
 
-class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver {
+class _SettingsPageState extends State<SettingsPage>
+    with WidgetsBindingObserver {
   TextStyle _safeGoogleFont(TextStyle Function() fontFn) {
     if (SettingsPage.testingMode) return const TextStyle();
     return fontFn();
@@ -63,7 +64,6 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
     super.dispose();
   }
 
-
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
@@ -75,13 +75,13 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
     final prefs = await SharedPreferences.getInstance();
     if (mounted) {
       setState(() {
-        _appNotificationsEnabled = prefs.getBool('notifications_enabled') ?? true;
-        _notifyBeforeExpiry =
-            prefs.getString('notifyBeforeExpiry') ?? '2 DAYS';
+        _appNotificationsEnabled =
+            prefs.getBool('notifications_enabled') ?? true;
+        _notifyBeforeExpiry = prefs.getString('notifyBeforeExpiry') ?? '2 DAYS';
         _dailyReminderTime = prefs.getString('dailyReminderTime') ?? '09:00 AM';
         _interfaceTheme = prefs.getString('interfaceTheme') ?? 'LIGHT';
         _startOfWeek = prefs.getString('startOfWeek') ?? 'MONDAY';
-        
+
         final lastBackup = prefs.getString('last_backup_time');
         if (lastBackup != null) {
           final dt = DateTime.parse(lastBackup);
@@ -165,7 +165,9 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                             vertical: 16,
                           ),
                           decoration: BoxDecoration(
-                            color: isSelected ? colorScheme.onSurface : colorScheme.surface,
+                            color: isSelected
+                                ? colorScheme.onSurface
+                                : colorScheme.surface,
                             border: Border(
                               bottom: BorderSide(color: colorScheme.onSurface),
                             ),
@@ -208,7 +210,10 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                     child: OutlinedButton(
                       style: OutlinedButton.styleFrom(
                         foregroundColor: colorScheme.onSurface,
-                        side: BorderSide(color: colorScheme.onSurface, width: 2),
+                        side: BorderSide(
+                          color: colorScheme.onSurface,
+                          width: 2,
+                        ),
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.zero,
                         ),
@@ -260,17 +265,15 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
       await DriveService().syncFiles();
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Backup successful!'),
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Backup successful!')));
       }
     } catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Backup failed: $error')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Backup failed: $error')));
       }
     }
   }
@@ -322,7 +325,10 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                       child: OutlinedButton(
                         style: OutlinedButton.styleFrom(
                           foregroundColor: colorScheme.onSurface,
-                          side: BorderSide(color: colorScheme.onSurface, width: 2),
+                          side: BorderSide(
+                            color: colorScheme.onSurface,
+                            width: 2,
+                          ),
                           shape: const RoundedRectangleBorder(
                             borderRadius: BorderRadius.zero,
                           ),
@@ -380,26 +386,27 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
           showDialog(
             context: context,
             barrierDismissible: false,
-            builder: (context) => const Center(child: CircularProgressIndicator()),
+            builder: (context) =>
+                const Center(child: CircularProgressIndicator()),
           );
         }
 
         await DriveService().restoreFromBackup();
-        
+
         if (mounted) {
           Navigator.pop(context); // Pop loading
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Restore successful!')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Restore successful!')));
           _loadSettings(); // Reload local state
           await NotificationService().rescheduleAll();
         }
       } catch (error) {
         if (mounted) {
           Navigator.pop(context); // Pop loading
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Restore failed: $error')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Restore failed: $error')));
         }
       }
     }
@@ -438,7 +445,9 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
             ),
           ),
         ),
-        shape: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
+        shape: Border(
+          bottom: BorderSide(color: colorScheme.onSurface, width: 2),
+        ),
         title: Text(
           'SYSTEM SETTINGS',
           style: _safeGoogleFont(
@@ -475,38 +484,41 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        _buildBrutalSwitch(
-                          _appNotificationsEnabled,
-                          (val) async {
-                            if (val) {
-                              // If enabling, check and request permission if needed
-                              final status = await Permission.notification.status;
-                              if (!status.isGranted) {
-                                final result = await Permission.notification.request();
-                                if (!result.isGranted) {
-                                  if (mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Please enable notifications in system settings.'),
+                        _buildBrutalSwitch(_appNotificationsEnabled, (
+                          val,
+                        ) async {
+                          if (val) {
+                            // If enabling, check and request permission if needed
+                            final status = await Permission.notification.status;
+                            if (!status.isGranted) {
+                              final result = await Permission.notification
+                                  .request();
+                              if (!result.isGranted) {
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Please enable notifications in system settings.',
                                       ),
-                                    );
-                                  }
-                                  // Don't turn on the toggle if permission is denied
-                                  return;
+                                    ),
+                                  );
                                 }
+                                // Don't turn on the toggle if permission is denied
+                                return;
                               }
                             }
-                            
-                            setState(() => _appNotificationsEnabled = val);
-                            await _saveBoolSetting('notifications_enabled', val);
-                            if (val) {
-                              await NotificationService().rescheduleAll();
-                            } else {
-                              await NotificationService().rescheduleAll([]); // Cancel all
-                            }
-                          },
-                          context,
-                        ),
+                          }
+
+                          setState(() => _appNotificationsEnabled = val);
+                          await _saveBoolSetting('notifications_enabled', val);
+                          if (val) {
+                            await NotificationService().rescheduleAll();
+                          } else {
+                            await NotificationService().rescheduleAll(
+                              [],
+                            ); // Cancel all
+                          }
+                        }, context),
                       ],
                     ),
                   ),
@@ -542,7 +554,10 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                         Container(
                           decoration: BoxDecoration(
                             border: Border(
-                              bottom: BorderSide(color: colorScheme.onSurface, width: 2),
+                              bottom: BorderSide(
+                                color: colorScheme.onSurface,
+                                width: 2,
+                              ),
                             ),
                           ),
                           padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -589,7 +604,10 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                         Container(
                           decoration: BoxDecoration(
                             border: Border(
-                              bottom: BorderSide(color: colorScheme.onSurface, width: 2),
+                              bottom: BorderSide(
+                                color: colorScheme.onSurface,
+                                width: 2,
+                              ),
                             ),
                           ),
                           padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -652,7 +670,10 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                         Container(
                           decoration: BoxDecoration(
                             border: Border(
-                              bottom: BorderSide(color: colorScheme.onSurface, width: 2),
+                              bottom: BorderSide(
+                                color: colorScheme.onSurface,
+                                width: 2,
+                              ),
                             ),
                           ),
                           padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -668,7 +689,11 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                           ),
                         ),
                         const SizedBox(width: 8),
-                        Icon(Icons.expand_more, size: 20, color: colorScheme.onSurface),
+                        Icon(
+                          Icons.expand_more,
+                          size: 20,
+                          color: colorScheme.onSurface,
+                        ),
                       ],
                     ),
                   ),
@@ -693,7 +718,10 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                         Container(
                           decoration: BoxDecoration(
                             border: Border(
-                              bottom: BorderSide(color: colorScheme.onSurface, width: 2),
+                              bottom: BorderSide(
+                                color: colorScheme.onSurface,
+                                width: 2,
+                              ),
                             ),
                           ),
                           padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -709,7 +737,11 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                           ),
                         ),
                         const SizedBox(width: 8),
-                        Icon(Icons.expand_more, size: 20, color: colorScheme.onSurface),
+                        Icon(
+                          Icons.expand_more,
+                          size: 20,
+                          color: colorScheme.onSurface,
+                        ),
                       ],
                     ),
                   ),
@@ -729,7 +761,9 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: theme.brightness == Brightness.dark ? const Color(0xFF1A1A1A) : const Color(0xFFF8FAFC),
+                  color: theme.brightness == Brightness.dark
+                      ? const Color(0xFF1A1A1A)
+                      : const Color(0xFFF8FAFC),
                   border: Border.all(color: colorScheme.onSurface, width: 2),
                 ),
                 child: Column(
@@ -742,7 +776,10 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                           height: 40,
                           decoration: BoxDecoration(
                             color: colorScheme.surface,
-                            border: Border.all(color: colorScheme.onSurface, width: 2),
+                            border: Border.all(
+                              color: colorScheme.onSurface,
+                              width: 2,
+                            ),
                           ),
                           child: Icon(
                             Icons.cloud_upload,
@@ -787,9 +824,15 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                       width: double.infinity,
                       decoration: BoxDecoration(
                         color: colorScheme.onSurface,
-                        border: Border.all(color: colorScheme.onSurface, width: 2),
+                        border: Border.all(
+                          color: colorScheme.onSurface,
+                          width: 2,
+                        ),
                         boxShadow: [
-                          BoxShadow(color: colorScheme.onSurface, offset: const Offset(4, 4)),
+                          BoxShadow(
+                            color: colorScheme.onSurface,
+                            offset: const Offset(4, 4),
+                          ),
                         ],
                       ),
                       child: Material(
@@ -826,9 +869,15 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                         width: double.infinity,
                         decoration: BoxDecoration(
                           color: colorScheme.surface,
-                          border: Border.all(color: colorScheme.onSurface, width: 2),
+                          border: Border.all(
+                            color: colorScheme.onSurface,
+                            width: 2,
+                          ),
                           boxShadow: [
-                            BoxShadow(color: colorScheme.onSurface, offset: const Offset(4, 4)),
+                            BoxShadow(
+                              color: colorScheme.onSurface,
+                              offset: const Offset(4, 4),
+                            ),
                           ],
                         ),
                         child: Material(
@@ -836,7 +885,9 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                           child: InkWell(
                             onTap: _handleRestore,
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 12.0),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 12.0,
+                              ),
                               child: Center(
                                 child: Text(
                                   'RESTORE FROM BACKUP',
@@ -902,7 +953,10 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                               ),
                             ],
                           ),
-                          Icon(Icons.arrow_forward, color: colorScheme.onSurface),
+                          Icon(
+                            Icons.arrow_forward,
+                            color: colorScheme.onSurface,
+                          ),
                         ],
                       ),
                     ),
@@ -939,7 +993,10 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                             children: [
                               Row(
                                 children: [
-                                  Icon(Icons.privacy_tip_outlined, color: colorScheme.primary),
+                                  Icon(
+                                    Icons.privacy_tip_outlined,
+                                    color: colorScheme.primary,
+                                  ),
                                   const SizedBox(width: 16),
                                   Text(
                                     'PRIVACY POLICY',
@@ -954,7 +1011,10 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                                   ),
                                 ],
                               ),
-                              Icon(Icons.arrow_forward, color: colorScheme.onSurface),
+                              Icon(
+                                Icons.arrow_forward,
+                                color: colorScheme.onSurface,
+                              ),
                             ],
                           ),
                         ),
@@ -999,7 +1059,9 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(color: colorScheme.onSurface, width: 2)),
+          border: Border(
+            bottom: BorderSide(color: colorScheme.onSurface, width: 2),
+          ),
         ),
         padding: const EdgeInsets.all(16),
         child: Row(
@@ -1046,7 +1108,11 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
     );
   }
 
-  Widget _buildBrutalSwitch(bool value, Function(bool) onChanged, BuildContext context) {
+  Widget _buildBrutalSwitch(
+    bool value,
+    Function(bool) onChanged,
+    BuildContext context,
+  ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -1056,7 +1122,9 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
         width: 44,
         height: 24,
         decoration: BoxDecoration(
-          color: theme.brightness == Brightness.dark ? Colors.black : Colors.grey[200],
+          color: theme.brightness == Brightness.dark
+              ? Colors.black
+              : Colors.grey[200],
           border: Border.all(color: colorScheme.onSurface, width: 2),
         ),
         child: Stack(
