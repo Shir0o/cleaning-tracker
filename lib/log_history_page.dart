@@ -233,7 +233,6 @@ class _LogHistoryPageState extends State<LogHistoryPage> {
   }
 }
 
-
 class ShimmerLogRecord extends StatelessWidget {
   const ShimmerLogRecord({super.key});
 
