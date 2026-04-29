@@ -15,9 +15,10 @@ import 'models.dart';
 
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 
-const String googleServerClientId =
-    String.fromEnvironment('GOOGLE_SERVER_CLIENT_ID', defaultValue: 'dummy_client_id');
-
+const String googleServerClientId = String.fromEnvironment(
+  'GOOGLE_SERVER_CLIENT_ID',
+  defaultValue: 'dummy_client_id',
+);
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

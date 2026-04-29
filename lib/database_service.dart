@@ -146,36 +146,37 @@ class DatabaseService {
     final database = await db;
     final List<Map<String, dynamic>> taskMaps = await database.query('tasks');
 
-    final List<Task> tasks = [];
-    for (var map in taskMaps) {
-      final taskId = map['id'] as int;
-      final List<Map<String, dynamic>> completionMaps = await database.query(
-        'completions',
-        where: 'task_id = ?',
-        whereArgs: [taskId],
-        orderBy: 'date ASC',
-      );
+    if (taskMaps.isEmpty) return [];
 
-      final completions = completionMaps
-          .map((m) => DateTime.parse(m['date'] as String))
-          .toList();
+    // Optimize N+1 query by fetching all completions at once
+    final List<Map<String, dynamic>> allCompletionMaps = await database.query(
+      'completions',
+      orderBy: 'date ASC',
+    );
 
-      tasks.add(
-        Task(
-          id: taskId,
-          title: map['title'] as String,
-          interval: map['interval'] as String,
-          lastCompleted: DateTime.parse(map['lastCompleted'] as String),
-          category: map['category'] as String,
-          notes: map['notes'] as String,
-          completions: completions,
-          snoozedUntil: map['snoozedUntil'] != null
-              ? DateTime.parse(map['snoozedUntil'] as String)
-              : null,
-        ),
-      );
+    // Group completions by task_id
+    final Map<int, List<DateTime>> completionsByTaskId = {};
+    for (var map in allCompletionMaps) {
+      final taskId = map['task_id'] as int;
+      final date = DateTime.parse(map['date'] as String);
+      completionsByTaskId.putIfAbsent(taskId, () => []).add(date);
     }
-    return tasks;
+
+    return taskMaps.map((map) {
+      final taskId = map['id'] as int;
+      return Task(
+        id: taskId,
+        title: map['title'] as String,
+        interval: map['interval'] as String,
+        lastCompleted: DateTime.parse(map['lastCompleted'] as String),
+        category: map['category'] as String,
+        notes: map['notes'] as String,
+        completions: completionsByTaskId[taskId] ?? [],
+        snoozedUntil: map['snoozedUntil'] != null
+            ? DateTime.parse(map['snoozedUntil'] as String)
+            : null,
+      );
+    }).toList();
   }
 
   Future<void> updateTask(Task task) async {
