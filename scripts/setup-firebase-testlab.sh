@@ -41,10 +41,12 @@ gcloud iam service-accounts create "${SA_NAME}" \
   --display-name="GitHub Actions — Firebase Test Lab" \
   --project="${PROJECT_ID}" 2>/dev/null || echo "    already exists"
 
-echo "==> Granting roles/firebase.testAdmin to ${SA_EMAIL}"
+echo "==> Granting roles/firebase.qualityAdmin to ${SA_EMAIL}"
+# Firebase Test Lab is under the "Quality" product family; the role
+# formerly known as roles/firebase.testAdmin is now qualityAdmin.
 gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
   --member="serviceAccount:${SA_EMAIL}" \
-  --role="roles/firebase.testAdmin" \
+  --role="roles/firebase.qualityAdmin" \
   --condition=None >/dev/null
 
 echo "==> Creating Workload Identity Pool '${POOL_ID}' (skip if exists)"
