@@ -83,15 +83,19 @@ jobs:
           path: test/failures/
           if-no-files-found: ignore
 
-  # Job 3: Integration Tests (Android Emulator on Linux)
-  # Cost: Low (1x) - Significantly cheaper than macOS
-  # ONLY runs on PRs and ONLY if previous checks pass.
+  # Job 3: Integration Tests (Firebase Test Lab)
+  # Runs the integration tests on a real-ish Android device hosted by
+  # Firebase Test Lab instead of a self-hosted emulator. Auth uses
+  # Workload Identity Federation — no long-lived service-account keys.
   integration-tests:
-    name: "Integration Tests (Android)"
+    name: "Integration Tests (Firebase Test Lab)"
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    needs: validation # Fail-fast: ensure builds and tests pass first
-    timeout-minutes: 20
+    needs: validation
+    timeout-minutes: 30
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     steps:
       - uses: actions/checkout@v4
 
@@ -107,13 +111,40 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Run Integration Tests
-        uses: reactivecircus/android-emulator-runner@v2
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Bootstrap Android project (generates gradlew)
+        run: flutter build apk --debug
+
+      - name: Build app APK with integration tests bundled
+        run: |
+          pushd android
+          ./gradlew app:assembleDebug \
+            -Ptarget=$(pwd)/../integration_test/all_tests.dart
+          popd
+
+      - name: Build instrumentation test APK
+        run: |
+          pushd android
+          ./gradlew app:assembleAndroidTest
+          popd
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
         with:
-          api-level: 29
-          arch: x86_64
-          target: google_apis
-          # The script runs inside the emulator environment
-          script: |
-            flutter test integration_test/app_test.dart || exit 1
-            flutter test integration_test/task_detail_page_integration_test.dart || exit 1
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Run on Firebase Test Lab
+        run: |
+          gcloud firebase test android run \
+            --type instrumentation \
+            --app build/app/outputs/flutter-apk/app-debug.apk \
+            --test build/app/outputs/apk/androidTest/debug/app-debug-androidTest.apk \
+            --device model=MediumPhone.arm,version=33,locale=en,orientation=portrait \
+            --timeout 10m \
+            --results-dir=integration-tests/${{ github.run_id }}
