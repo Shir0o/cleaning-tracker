@@ -50,13 +50,40 @@ jobs:
         run: |
           find test -name "*_test.dart" ! -name "*_golden_test.dart" | xargs flutter test --fail-fast
 
-      - name: Run Golden Tests
-        run: flutter test test/*_golden_test.dart --fail-fast
-
       - name: Build debug APK
         run: flutter build apk --debug
 
-  # Job 2: Integration Tests (Android Emulator on Linux)
+  # Job 2: Golden Tests (macOS)
+  # Goldens are committed from macOS dev environments. Skia renders text
+  # differently across platforms, so we run them on macOS to avoid
+  # spurious sub-pixel diffs from Linux font rendering.
+  golden-tests:
+    name: "Golden Tests (macOS)"
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run Golden Tests
+        run: flutter test test/*_golden_test.dart --fail-fast
+
+      - name: Upload golden failures
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: golden-failures
+          path: test/failures/
+          if-no-files-found: ignore
+
+  # Job 3: Integration Tests (Android Emulator on Linux)
   # Cost: Low (1x) - Significantly cheaper than macOS
   # ONLY runs on PRs and ONLY if previous checks pass.
   integration-tests:
