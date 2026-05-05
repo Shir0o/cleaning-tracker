@@ -96,14 +96,13 @@ class _CleaningTrackerAppState extends State<CleaningTrackerApp>
           theme: ThemeData(
             colorScheme: const ColorScheme(
               brightness: Brightness.light,
-              primary: Color(0xFF0038FF), // Primary blue from Stitch
+              primary: Color(0xFF0038FF),
               onPrimary: Colors.white,
               secondary: Color(0xFF0038FF),
               onSecondary: Colors.white,
-              error: Color(0xFFFF0000), // Accent red from Stitch
+              error: Color(0xFFFF0000),
               onError: Colors.white,
-              surface: Colors
-                  .white, // Background light from Stitch (using surface instead of background)
+              surface: Colors.white,
               onSurface: Colors.black,
             ),
             scaffoldBackgroundColor: Colors.white,
@@ -114,13 +113,13 @@ class _CleaningTrackerAppState extends State<CleaningTrackerApp>
           darkTheme: ThemeData(
             colorScheme: const ColorScheme(
               brightness: Brightness.dark,
-              primary: Color(0xFF0038FF), // Primary blue from Stitch
+              primary: Color(0xFF0038FF),
               onPrimary: Colors.white,
               secondary: Color(0xFF0038FF),
               onSecondary: Colors.white,
-              error: Color(0xFFFF0000), // Accent red from Stitch
+              error: Color(0xFFFF0000),
               onError: Colors.white,
-              surface: Colors.black, // Background dark from Stitch
+              surface: Colors.black,
               onSurface: Colors.white,
             ),
             scaffoldBackgroundColor: Colors.black,
@@ -745,7 +744,7 @@ class TaskCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: theme.brightness == Brightness.dark
                         ? const Color(0xFF1A1A1A)
-                        : const Color(0xFFF4F4F4), // Surface color from Stitch
+                        : const Color(0xFFF4F4F4),
                     border: Border.all(color: colorScheme.onSurface, width: 2),
                   ),
                   child: FractionallySizedBox(

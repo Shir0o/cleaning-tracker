@@ -1,6 +1,8 @@
-name: PR Build
+name: CI
 
 on:
+  push:
+    branches: [ "main", "master" ]
   pull_request:
     branches: [ "main", "master" ]
     paths:
@@ -10,6 +12,7 @@ on:
       - 'pubspec.yaml'
       - 'pubspec.lock'
       - 'analysis_options.yaml'
+      - '.github/workflows/**'
 
 # Use concurrency to cancel outdated builds automatically
 concurrency:
