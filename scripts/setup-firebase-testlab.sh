@@ -49,26 +49,41 @@ gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
   --role="roles/firebase.qualityAdmin" \
   --condition=None >/dev/null
 
-echo "==> Creating Workload Identity Pool '${POOL_ID}' (skip if exists)"
-gcloud iam workload-identity-pools create "${POOL_ID}" \
-  --location="global" \
-  --display-name="GitHub Actions Pool" \
-  --project="${PROJECT_ID}" 2>/dev/null || echo "    already exists"
+REPO_OWNER="${REPO%%/*}"
+
+echo "==> Ensuring Workload Identity Pool '${POOL_ID}' exists"
+if ! gcloud iam workload-identity-pools describe "${POOL_ID}" \
+  --location="global" --project="${PROJECT_ID}" >/dev/null 2>&1; then
+  gcloud iam workload-identity-pools create "${POOL_ID}" \
+    --location="global" \
+    --display-name="GitHub Actions Pool" \
+    --project="${PROJECT_ID}"
+else
+  echo "    already exists"
+fi
 
 POOL_NAME=$(gcloud iam workload-identity-pools describe "${POOL_ID}" \
   --location="global" \
   --project="${PROJECT_ID}" \
   --format="value(name)")
 
-echo "==> Creating OIDC provider '${PROVIDER_ID}' on the pool (skip if exists)"
-gcloud iam workload-identity-pools providers create-oidc "${PROVIDER_ID}" \
-  --location="global" \
-  --workload-identity-pool="${POOL_ID}" \
-  --display-name="GitHub OIDC" \
-  --issuer-uri="https://token.actions.githubusercontent.com" \
-  --attribute-mapping="google.subject=assertion.sub,attribute.repository=assertion.repository,attribute.actor=assertion.actor" \
-  --attribute-condition="assertion.repository=='${REPO}'" \
-  --project="${PROJECT_ID}" 2>/dev/null || echo "    already exists"
+echo "==> Ensuring OIDC provider '${PROVIDER_ID}' exists on the pool"
+# Google requires GitHub providers to bind to a specific repository_owner
+# (Jan 2025 security hardening) to prevent same-name impersonation.
+if ! gcloud iam workload-identity-pools providers describe "${PROVIDER_ID}" \
+  --location="global" --workload-identity-pool="${POOL_ID}" \
+  --project="${PROJECT_ID}" >/dev/null 2>&1; then
+  gcloud iam workload-identity-pools providers create-oidc "${PROVIDER_ID}" \
+    --location="global" \
+    --workload-identity-pool="${POOL_ID}" \
+    --display-name="GitHub OIDC" \
+    --issuer-uri="https://token.actions.githubusercontent.com" \
+    --attribute-mapping="google.subject=assertion.sub,attribute.repository=assertion.repository,attribute.repository_owner=assertion.repository_owner,attribute.actor=assertion.actor" \
+    --attribute-condition="assertion.repository_owner=='${REPO_OWNER}' && assertion.repository=='${REPO}'" \
+    --project="${PROJECT_ID}"
+else
+  echo "    already exists"
+fi
 
 PROVIDER_NAME=$(gcloud iam workload-identity-pools providers describe "${PROVIDER_ID}" \
   --location="global" \
