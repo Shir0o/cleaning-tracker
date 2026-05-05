@@ -46,15 +46,12 @@ void main() {
       ).thenAnswer((_) async => tasks);
 
       // Mock the transaction
-      when(() => mockDb.transaction<void>(any())).thenAnswer((
-        invocation,
-      ) {
+      when(() => mockDb.transaction<void>(any())).thenAnswer((invocation) {
         final action =
             invocation.positionalArguments[0]
                 as Future<void> Function(Transaction);
         return action(mockTxn);
       });
-
 
       // Mock the updates and inserts within the transaction
       when(
@@ -118,15 +115,12 @@ void main() {
       // });
       // Yes, it calls transaction.
 
-      when(() => mockDb.transaction<void>(any())).thenAnswer((
-        invocation,
-      ) {
+      when(() => mockDb.transaction<void>(any())).thenAnswer((invocation) {
         final action =
             invocation.positionalArguments[0]
                 as Future<void> Function(Transaction);
         return action(mockTxn);
       });
-
 
       await databaseService.resetCategory(category, resetDate);
 
@@ -183,14 +177,12 @@ void main() {
         lastCompleted: DateTime.now(),
         completions: [DateTime.now()],
       );
-when(() => mockDb.transaction<void>(any())).thenAnswer((
-  invocation,
-) {
-  final action =
-      invocation.positionalArguments[0]
-          as Future<void> Function(Transaction);
-  return action(mockTxn);
-});
+      when(() => mockDb.transaction<void>(any())).thenAnswer((invocation) {
+        final action =
+            invocation.positionalArguments[0]
+                as Future<void> Function(Transaction);
+        return action(mockTxn);
+      });
 
       when(
         () => mockTxn.update(

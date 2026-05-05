@@ -40,12 +40,21 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Verify formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Analyze project
+        run: flutter analyze
+
       - name: Run unit and widget tests
         run: |
           find test -name "*_test.dart" ! -name "*_golden_test.dart" | xargs flutter test --fail-fast
 
       - name: Run Golden Tests
         run: flutter test test/*_golden_test.dart --fail-fast
+
+      - name: Build debug APK
+        run: flutter build apk --debug
 
   # Job 2: Integration Tests (Android Emulator on Linux)
   # Cost: Low (1x) - Significantly cheaper than macOS

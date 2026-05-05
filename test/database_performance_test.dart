@@ -50,6 +50,7 @@ void main() {
     }
     stopwatch.stop();
 
+    // ignore: avoid_print
     print('BENCHMARK_RESULT_SEQUENTIAL: ${stopwatch.elapsedMicroseconds} us');
   });
 
@@ -78,6 +79,7 @@ void main() {
     await databaseService.batchInsertTasks(tasks);
     stopwatch.stop();
 
+    // ignore: avoid_print
     print('BENCHMARK_RESULT_BATCH: ${stopwatch.elapsedMicroseconds} us');
   });
 }
