@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 # One-shot setup for Firebase Test Lab + Workload Identity Federation
-# auth from this repo's GitHub Actions.
+# auth from a GitHub Actions workflow.
+#
+# Usage:
+#   PROJECT_ID=your-gcp-project-id REPO=owner/repo ./scripts/setup-firebase-testlab.sh
+#
+# Defaults if unset:
+#   REPO=Shir0o/cleaning-tracker
 #
 # Prerequisites (one-time, on your machine):
 #   1. gcloud CLI installed and authenticated:  gcloud auth login
@@ -12,8 +18,8 @@
 
 set -euo pipefail
 
-PROJECT_ID="cleaning-tracker-489919"
-REPO="Shir0o/cleaning-tracker"
+PROJECT_ID="${PROJECT_ID:?Set PROJECT_ID to your GCP project ID, e.g. PROJECT_ID=cleaning-tracker-489919}"
+REPO="${REPO:-Shir0o/cleaning-tracker}"
 SA_NAME="gh-actions"
 SA_EMAIL="${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 POOL_ID="github-pool"
