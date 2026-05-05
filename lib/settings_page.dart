@@ -627,6 +627,24 @@ class _SettingsPageState extends State<SettingsPage>
                       ],
                     ),
                   ),
+                  _buildSettingRow(
+                    context: context,
+                    icon: Icons.send,
+                    title: 'Send test notification',
+                    subtitle: 'Verify delivery on this device',
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () async {
+                      await NotificationService().showTestNotification();
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Test notification sent. Check the notification shade.',
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ],
               ),
             ),

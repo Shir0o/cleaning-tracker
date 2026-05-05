@@ -1,9 +1,12 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show PlatformException;
 import 'models.dart';
 import 'database_service.dart';
 
@@ -18,6 +21,10 @@ class NotificationSettings {
     required this.reminderTime,
   });
 }
+
+const String _channelId = 'cleaning_reminders';
+const String _channelName = 'Cleaning Reminders';
+const String _channelDescription = 'Notifications for cleaning tasks';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -51,9 +58,9 @@ class NotificationService {
 
     const DarwinInitializationSettings initializationSettingsDarwin =
         DarwinInitializationSettings(
-          requestAlertPermission: false,
-          requestBadgePermission: false,
-          requestSoundPermission: false,
+          requestAlertPermission: true,
+          requestBadgePermission: true,
+          requestSoundPermission: true,
         );
 
     const InitializationSettings initializationSettings =
@@ -68,6 +75,24 @@ class NotificationService {
         // Handle notification tap
       },
     );
+
+    if (!kIsWeb && Platform.isAndroid) {
+      final androidPlugin = _notificationsPlugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
+      final granted = await androidPlugin?.requestNotificationsPermission();
+      debugPrint('Android POST_NOTIFICATIONS granted: $granted');
+
+      await androidPlugin?.createNotificationChannel(
+        const AndroidNotificationChannel(
+          _channelId,
+          _channelName,
+          description: _channelDescription,
+          importance: Importance.high,
+        ),
+      );
+    }
 
     _prefs = await SharedPreferences.getInstance();
   }
@@ -156,28 +181,94 @@ class NotificationService {
     }
 
     final id = task.title.hashCode.abs();
+    final scheduleMode = await _resolveAndroidScheduleMode();
 
-    await _notificationsPlugin.zonedSchedule(
-      id: id,
-      title: 'CLEANING REQUIRED',
-      body: 'Task "${task.title}" is due soon.',
-      scheduledDate: tz.TZDateTime.from(scheduledDate, tz.local),
+    try {
+      await _notificationsPlugin.zonedSchedule(
+        id: id,
+        title: 'CLEANING REQUIRED',
+        body: 'Task "${task.title}" is due soon.',
+        scheduledDate: tz.TZDateTime.from(scheduledDate, tz.local),
+        notificationDetails: const NotificationDetails(
+          android: AndroidNotificationDetails(
+            _channelId,
+            _channelName,
+            channelDescription: _channelDescription,
+            importance: Importance.high,
+            priority: Priority.high,
+          ),
+          iOS: DarwinNotificationDetails(),
+        ),
+        androidScheduleMode: scheduleMode,
+      );
+      debugPrint(
+        'Scheduled notification for ${task.title} at $scheduledDate '
+        '(ID: $id, mode: $scheduleMode)',
+      );
+    } on PlatformException catch (e) {
+      // exact_alarms_not_permitted can occur if the user revokes the
+      // SCHEDULE_EXACT_ALARM permission between the capability check and
+      // the schedule call. Retry once with an inexact mode.
+      if (e.code == 'exact_alarms_not_permitted' &&
+          scheduleMode == AndroidScheduleMode.exactAllowWhileIdle) {
+        debugPrint(
+          'Exact alarms not permitted, falling back to inexact for ${task.title}',
+        );
+        await _notificationsPlugin.zonedSchedule(
+          id: id,
+          title: 'CLEANING REQUIRED',
+          body: 'Task "${task.title}" is due soon.',
+          scheduledDate: tz.TZDateTime.from(scheduledDate, tz.local),
+          notificationDetails: const NotificationDetails(
+            android: AndroidNotificationDetails(
+              _channelId,
+              _channelName,
+              channelDescription: _channelDescription,
+              importance: Importance.high,
+              priority: Priority.high,
+            ),
+            iOS: DarwinNotificationDetails(),
+          ),
+          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        );
+      } else {
+        rethrow;
+      }
+    }
+  }
+
+  Future<AndroidScheduleMode> _resolveAndroidScheduleMode() async {
+    if (kIsWeb || !Platform.isAndroid) {
+      return AndroidScheduleMode.exactAllowWhileIdle;
+    }
+    final androidPlugin = _notificationsPlugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+    final canExact =
+        await androidPlugin?.canScheduleExactNotifications() ?? false;
+    return canExact
+        ? AndroidScheduleMode.exactAllowWhileIdle
+        : AndroidScheduleMode.inexactAllowWhileIdle;
+  }
+
+  Future<void> showTestNotification() async {
+    await _notificationsPlugin.show(
+      id: 999999,
+      title: 'TEST NOTIFICATION',
+      body: 'If you see this, notifications are working.',
       notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
-          'cleaning_reminders',
-          'Cleaning Reminders',
-          channelDescription: 'Notifications for cleaning tasks',
+          _channelId,
+          _channelName,
+          channelDescription: _channelDescription,
           importance: Importance.high,
           priority: Priority.high,
         ),
         iOS: DarwinNotificationDetails(),
       ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
     );
-
-    debugPrint(
-      'Scheduled notification for ${task.title} at $scheduledDate (ID: $id)',
-    );
+    debugPrint('Showed test notification');
   }
 
   Future<void> cancelTaskNotification(String title) async {
@@ -206,6 +297,14 @@ class NotificationService {
         settings.notifyBefore,
         settings.reminderTime,
       );
+    }
+
+    if (kDebugMode) {
+      final pending = await _notificationsPlugin.pendingNotificationRequests();
+      debugPrint('Pending notifications after reschedule: ${pending.length}');
+      for (final p in pending) {
+        debugPrint('  id=${p.id} title=${p.title} body=${p.body}');
+      }
     }
   }
 }
