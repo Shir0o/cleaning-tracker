@@ -20,30 +20,45 @@ Cleaning Tracker helps you keep up with household systems and chores such as HVA
 - Unit, widget, integration, and golden tests
 
 ## Getting Started
-Prerequisites:
-- Flutter SDK compatible with the version in `pubspec.yaml`
-- Android Studio and/or Xcode for mobile builds
-- A Google Cloud project if you want to test Drive sync
 
-Install dependencies and run the app:
+### Prerequisites
+- **Flutter SDK** `>=3.11.0 <4.0.0` (matches the constraint in `pubspec.yaml`). Verify with `flutter doctor`.
+- **JDK 17** for Android builds.
+- **Android Studio** (with an Android SDK + emulator) and/or **Xcode 15+** for iOS builds.
+- A **Google Cloud project** *only* if you want to exercise Drive sync. The app runs fully offline without it.
 
+### Install and run
 ```bash
+git clone <repo-url>
+cd cleaning-tracker
 flutter pub get
+
+# Generate test mocks (only required if you'll run the test suite)
+dart run build_runner build --delete-conflicting-outputs
+
+# Run on an attached device or emulator (Drive sync disabled)
 flutter run
 ```
 
-Run with Google Drive sync enabled:
+Without `GOOGLE_SERVER_CLIENT_ID`, the app falls back to a placeholder client ID (see [`lib/main.dart`](lib/main.dart)). All local features — tasks, completions, reminders, theming — work; only Google Sign-In and Drive backup are inert.
+
+### Run with Drive sync
+1. Follow the Google Cloud setup in [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md#4-google-cloud--drive-sync-setup) to create OAuth credentials.
+2. Pass the **Web** OAuth client ID at run/build time:
 
 ```bash
-flutter run --dart-define=GOOGLE_SERVER_CLIENT_ID=YOUR_GOOGLE_SERVER_CLIENT_ID
+flutter run --dart-define=GOOGLE_SERVER_CLIENT_ID=YOUR_WEB_CLIENT_ID
 ```
 
-Run checks:
+The same `--dart-define` flag works with `flutter build apk`, `flutter build appbundle`, and `flutter build ios`.
 
+### Quality checks
 ```bash
 dart format --output=none --set-exit-if-changed .
 flutter analyze
-flutter test
+flutter test                                  # unit, widget, golden, scenario
+flutter test integration_test                 # requires a connected device/emulator
+flutter test --update-goldens                 # only when intentional UI changes
 ```
 
 ## Documentation Index

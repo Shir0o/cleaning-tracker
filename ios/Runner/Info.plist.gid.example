@@ -1,0 +1,16 @@
+Add the keys below to ios/Runner/Info.plist (inside the top-level <dict>) when you
+build the iOS target with Drive sync enabled. See docs/DEVELOPMENT.md §4 for how
+to obtain the iOS OAuth client ID. Keep your real client ID out of source control.
+
+  <key>GIDClientID</key>
+  <string>YOUR_IOS_CLIENT_ID.apps.googleusercontent.com</string>
+  <key>CFBundleURLTypes</key>
+  <array>
+    <dict>
+      <key>CFBundleURLSchemes</key>
+      <array>
+        <!-- Reversed iOS client ID, e.g. com.googleusercontent.apps.123456789-abcd... -->
+        <string>com.googleusercontent.apps.YOUR_IOS_CLIENT_ID_REVERSED</string>
+      </array>
+    </dict>
+  </array>

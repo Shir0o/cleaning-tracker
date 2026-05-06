@@ -21,10 +21,10 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        // If you fork this project, change applicationId to a unique ID you control
+        // and register it (with the SHA-1 of your signing key) in Google Cloud Console
+        // for Drive sync. See docs/DEVELOPMENT.md §4.
         applicationId = "com.cleaningtracker.app"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion // Desugaring works better with explicit minSdk >= 21
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -33,8 +33,9 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
+            // Release builds currently sign with the debug keystore so `flutter build apk
+            // --release` works out of the box for contributors. Replace this with a real
+            // signing config before publishing — see RELEASE.md.
             signingConfig = signingConfigs.getByName("debug")
         }
     }
