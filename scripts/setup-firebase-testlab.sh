@@ -24,6 +24,8 @@ SA_NAME="gh-actions"
 SA_EMAIL="${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 POOL_ID="github-pool"
 PROVIDER_ID="github-provider"
+RESULTS_BUCKET="${RESULTS_BUCKET:-cleaning-tracker-testlab-results}"
+BUCKET_LOCATION="${BUCKET_LOCATION:-us-central1}"
 
 echo "==> Setting active project to ${PROJECT_ID}"
 gcloud config set project "${PROJECT_ID}" >/dev/null
@@ -107,6 +109,25 @@ gcloud iam service-accounts add-iam-policy-binding "${SA_EMAIL}" \
   --role="roles/iam.workloadIdentityUser" \
   --member="principalSet://iam.googleapis.com/${POOL_NAME}/attribute.repository/${REPO}" \
   --project="${PROJECT_ID}" >/dev/null
+
+echo "==> Ensuring Test Lab results bucket gs://${RESULTS_BUCKET} exists"
+# Test Lab's auto-provisioned bucket lives in a Google-owned project we
+# can't grant IAM on, so we use a results bucket we control instead.
+if ! gcloud storage buckets describe "gs://${RESULTS_BUCKET}" \
+  --project="${PROJECT_ID}" >/dev/null 2>&1; then
+  gcloud storage buckets create "gs://${RESULTS_BUCKET}" \
+    --project="${PROJECT_ID}" \
+    --location="${BUCKET_LOCATION}" \
+    --uniform-bucket-level-access
+else
+  echo "    already exists"
+fi
+
+echo "==> Granting ${SA_EMAIL} write access to the results bucket"
+gcloud storage buckets add-iam-policy-binding \
+  "gs://${RESULTS_BUCKET}" \
+  --member="serviceAccount:${SA_EMAIL}" \
+  --role="roles/storage.objectAdmin" >/dev/null
 
 echo "==> Pushing secrets to GitHub repo ${REPO}"
 gh secret set WIF_PROVIDER --body "${PROVIDER_NAME}" --repo "${REPO}"
