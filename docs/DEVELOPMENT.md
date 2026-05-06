@@ -6,7 +6,7 @@ This guide covers setting up the Cleaning Tracker development environment, confi
 - **Flutter SDK:** `>=3.11.0 <4.0.0` (see `pubspec.yaml`). Run `flutter doctor` to verify a clean toolchain.
 - **JDK 17** for Android builds (Gradle and the Android plugin require it).
 - **Android Studio** with the Android SDK + an emulator or physical device.
-- **Xcode 15+** and CocoaPods (`sudo gem install cocoapods`) for iOS builds (macOS only).
+- **Xcode** (14.3+ recommended) and CocoaPods (`sudo gem install cocoapods`) for iOS builds (macOS only). The iOS deployment target is **13.0**.
 - **Google Cloud Console** access — only required if you plan to test Drive sync.
 
 ## 2. Initial Setup

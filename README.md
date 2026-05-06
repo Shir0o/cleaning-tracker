@@ -24,7 +24,7 @@ Cleaning Tracker helps you keep up with household systems and chores such as HVA
 ### Prerequisites
 - **Flutter SDK** `>=3.11.0 <4.0.0` (matches the constraint in `pubspec.yaml`). Verify with `flutter doctor`.
 - **JDK 17** for Android builds.
-- **Android Studio** (with an Android SDK + emulator) and/or **Xcode 15+** for iOS builds.
+- **Android Studio** (with an Android SDK + emulator) and/or **Xcode 14.3+** for iOS builds (deployment target iOS 13.0).
 - A **Google Cloud project** *only* if you want to exercise Drive sync. The app runs fully offline without it.
 
 ### Install and run

@@ -21,9 +21,10 @@ android {
     }
 
     defaultConfig {
-        // If you fork this project, change applicationId to a unique ID you control
-        // and register it (with the SHA-1 of your signing key) in Google Cloud Console
-        // for Drive sync. See docs/DEVELOPMENT.md §4.
+        // If you fork this project, change applicationId to a unique ID you control,
+        // then create a *new* Android OAuth client in your own Google Cloud project
+        // (the existing client is bound to com.cleaningtracker.app + this repo's signing
+        // keys and will reject your build). See docs/DEVELOPMENT.md §4.2.
         applicationId = "com.cleaningtracker.app"
         minSdk = flutter.minSdkVersion // Desugaring works better with explicit minSdk >= 21
         targetSdk = flutter.targetSdkVersion
