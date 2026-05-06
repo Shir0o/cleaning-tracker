@@ -52,5 +52,20 @@ flutter test --update-goldens
 ## 4. Continuous Integration (CI)
 The project uses GitHub Actions for automated testing.
 - **Workflow:** `.github/workflows/pr_build.yml`
-- **Triggers:** Every Pull Request and push to `main`.
-- **Actions:** Runs `flutter analyze` and `flutter test`.
+- **Triggers:** Every Pull Request.
+- **Jobs:**
+  - **Validation & Builds (Linux):** `flutter analyze`, formatting check, unit/widget tests, debug APK build.
+  - **Golden Tests (macOS):** Runs `*_golden_test.dart` on macOS so font rendering matches the environment goldens were generated in.
+  - **Integration Tests (Firebase Test Lab):** Builds app + instrumentation APKs from `integration_test/all_tests.dart` and runs them on a Test Lab device. Auth uses Workload Identity Federation.
+
+### Firebase Test Lab — one-time setup
+Run the helper script once per GCP project to provision the service account, Workload Identity pool, and GitHub secrets:
+
+```bash
+gcloud auth login            # one-time browser OAuth
+gh auth login                # one-time CLI auth
+
+PROJECT_ID=your-gcp-project-id ./scripts/setup-firebase-testlab.sh
+```
+
+The script is idempotent. It pushes `WIF_PROVIDER` and `WIF_SERVICE_ACCOUNT` into the repo's Actions secrets via `gh secret set`, so no manual UI clicks are needed.

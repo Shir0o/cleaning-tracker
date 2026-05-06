@@ -30,6 +30,7 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -42,8 +43,26 @@ android {
     }
 }
 
+configurations.all {
+    resolutionStrategy {
+        // Pin AndroidX test versions so the integration_test plugin and our
+        // androidTest dependencies agree (otherwise Gradle picks newer
+        // transitive versions and the FlutterTestRunner fails to load).
+        force("androidx.test:runner:1.5.2")
+        force("androidx.test:rules:1.5.0")
+        force("androidx.test:core:1.5.0")
+        force("androidx.test:monitor:1.6.1")
+        force("androidx.test.ext:junit:1.1.5")
+        force("androidx.test.espresso:espresso-core:3.5.1")
+    }
+}
+
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+    androidTestImplementation("androidx.test:runner:1.5.2")
+    androidTestImplementation("androidx.test:rules:1.5.0")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }
 
 flutter {

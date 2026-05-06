@@ -68,6 +68,10 @@ void main() {
     ).thenAnswer((_) async => {});
 
     when(() => mockPlugin.cancelAll()).thenAnswer((_) async => {});
+
+    when(
+      () => mockPlugin.pendingNotificationRequests(),
+    ).thenAnswer((_) async => <PendingNotificationRequest>[]);
   });
 
   test(
