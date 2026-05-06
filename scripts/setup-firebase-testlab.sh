@@ -41,13 +41,18 @@ gcloud iam service-accounts create "${SA_NAME}" \
   --display-name="GitHub Actions — Firebase Test Lab" \
   --project="${PROJECT_ID}" 2>/dev/null || echo "    already exists"
 
-echo "==> Granting roles/firebase.qualityAdmin to ${SA_EMAIL}"
+echo "==> Granting roles to ${SA_EMAIL}"
 # Firebase Test Lab is under the "Quality" product family; the role
 # formerly known as roles/firebase.testAdmin is now qualityAdmin.
-gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
-  --member="serviceAccount:${SA_EMAIL}" \
-  --role="roles/firebase.qualityAdmin" \
-  --condition=None >/dev/null
+# serviceUsageConsumer is required so the SA can consume the project's
+# API quota when calling Cloud Testing — without it Test Lab returns
+# "Not authorized for project".
+for role in roles/firebase.qualityAdmin roles/serviceusage.serviceUsageConsumer; do
+  gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+    --member="serviceAccount:${SA_EMAIL}" \
+    --role="${role}" \
+    --condition=None >/dev/null
+done
 
 REPO_OWNER="${REPO%%/*}"
 
