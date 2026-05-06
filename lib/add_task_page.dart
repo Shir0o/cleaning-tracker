@@ -207,6 +207,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
               SizedBox(
                 height: 56,
                 child: TextField(
+                  key: const ValueKey('add_task_name_field'),
                   controller: _nameController,
                   cursorColor: colorScheme.primary,
                   style: _safeGoogleFont(

@@ -40,9 +40,11 @@ class NotificationService {
   @visibleForTesting
   set notificationsPlugin(FlutterLocalNotificationsPlugin plugin) {
     _notificationsPlugin = plugin;
-    // Tests inject a mocked plugin in lieu of calling init(), so flip the
-    // initialized flag here so rescheduleAll() doesn't short-circuit.
-    _initialized = true;
+  }
+
+  @visibleForTesting
+  void setInitializedForTesting(bool initialized) {
+    _initialized = initialized;
   }
 
   @visibleForTesting

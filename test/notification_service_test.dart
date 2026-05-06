@@ -38,6 +38,7 @@ void main() {
     notificationService = NotificationService();
     mockPlugin = MockFlutterLocalNotificationsPlugin();
     notificationService.notificationsPlugin = mockPlugin;
+    notificationService.setInitializedForTesting(true);
 
     // Default mock behavior
     when(
