@@ -8,7 +8,7 @@ This document describes the high-level architecture of the Cleaning Tracker appl
 - **Local Storage:** [SharedPreferences](https://pub.dev/packages/shared_preferences) (for settings and flags)
 - **Cloud Backup:** [Google Drive API](https://developers.google.com/drive) via `googleapis`
 - **Notifications:** [Flutter Local Notifications](https://pub.dev/packages/flutter_local_notifications)
-- **Design System:** Custom "Neobrutalist" aesthetic inspired by the Stitch design language.
+- **Design System:** Custom neobrutalist aesthetic with high-contrast colors, bold borders, and simple geometric surfaces.
 
 ## Core Services
 
