@@ -22,8 +22,12 @@ void main() {
     await tester.tap(find.byIcon(Icons.add));
     await tester.pumpAndSettle();
 
-    // Type name
-    await tester.enterText(find.byType(TextField), 'HVAC FILTER');
+    // Type name. AddTaskPage has multiple TextFields, so target the name
+    // field by its ValueKey.
+    await tester.enterText(
+      find.byKey(const ValueKey('add_task_name_field')),
+      'HVAC FILTER',
+    );
     await tester.pumpAndSettle();
 
     // Initialize tracker

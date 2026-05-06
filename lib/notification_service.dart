@@ -35,6 +35,7 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   SharedPreferences? _prefs;
+  bool _initialized = false;
 
   @visibleForTesting
   set notificationsPlugin(FlutterLocalNotificationsPlugin plugin) {
@@ -42,8 +43,14 @@ class NotificationService {
   }
 
   @visibleForTesting
+  void setInitializedForTesting(bool initialized) {
+    _initialized = initialized;
+  }
+
+  @visibleForTesting
   static void resetForTesting() {
     _instance._prefs = null;
+    _instance._initialized = false;
   }
 
   Future<void> init() async {
@@ -95,6 +102,7 @@ class NotificationService {
     }
 
     _prefs = await SharedPreferences.getInstance();
+    _initialized = true;
   }
 
   Future<SharedPreferences> _getPrefs() async {
@@ -278,6 +286,11 @@ class NotificationService {
   }
 
   Future<void> rescheduleAll([List<Task>? tasks]) async {
+    if (!_initialized) {
+      // init() was skipped (e.g. testingMode). Avoid touching tz.local /
+      // platform channels — there's nothing to schedule against anyway.
+      return;
+    }
     List<Task> tasksToSchedule = tasks ?? [];
 
     if (tasks == null) {
