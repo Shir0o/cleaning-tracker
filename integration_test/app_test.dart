@@ -18,12 +18,14 @@ void main() {
     // Verify we start on the dashboard (STATUS)
     expect(find.text('STATUS'), findsOneWidget);
 
-    // Tap settings icon
+    // Tap settings icon. The Icon sits inside an InkWell that absorbs the
+    // pointer, so target the InkWell ancestor for a clean hit-test.
     await tester.tap(
-      find.byType(Icon).first,
-    ); // Settings icon is the first action icon usually, let's target by it or tooltip. The app doesn't have an IconData strictly addressable here by text. Let's find something more direct.
-    // Wait for that to fail if it isn't specifically Icons.settings, we know Dashboard has settings icon setup.
-    await tester.tap(find.byIcon(Icons.settings));
+      find.ancestor(
+        of: find.byIcon(Icons.settings),
+        matching: find.byType(InkWell),
+      ),
+    );
     await tester.pumpAndSettle();
 
     // Verify we are on settings page

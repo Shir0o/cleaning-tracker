@@ -143,10 +143,6 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
 
       - name: Run on Firebase Test Lab
-        # Non-blocking until the failing integration test in
-        # integration_test/all_tests.dart is fixed (tracked separately).
-        # Remove this once integration tests are green so regressions block merge.
-        continue-on-error: true
         run: |
           gcloud firebase test android run \
             --type instrumentation \
