@@ -6,7 +6,11 @@ Out of the box, Android release builds in this repository are signed with the **
 
 Before shipping a real release:
 
-1. Generate an upload keystore (`keytool -genkey -v -keystore ~/upload-keystore.jks ...`).
+1. Generate an upload keystore:
+   ```bash
+   keytool -genkey -v -keystore ~/upload-keystore.jks \
+       -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+   ```
 2. Add a `key.properties` file (gitignored) and a `signingConfigs { release { ... } }` block in `android/app/build.gradle.kts`, then point `buildTypes.release.signingConfig` at it. See the [Flutter signing guide](https://docs.flutter.dev/deployment/android#signing-the-app).
 3. Register the SHA-1 of your release key as an additional Android OAuth client in Google Cloud Console (see [docs/DEVELOPMENT.md §4.2](docs/DEVELOPMENT.md#42-create-oauth-client-ids)) so Drive sync continues to work in release builds.
 4. Pass `--dart-define=GOOGLE_SERVER_CLIENT_ID=...` (or `--dart-define-from-file=...`) on the build command.

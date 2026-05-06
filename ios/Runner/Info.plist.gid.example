@@ -9,8 +9,10 @@ to obtain the iOS OAuth client ID. Keep your real client ID out of source contro
     <dict>
       <key>CFBundleURLSchemes</key>
       <array>
-        <!-- Reversed iOS client ID, e.g. com.googleusercontent.apps.123456789-abcd... -->
-        <string>com.googleusercontent.apps.YOUR_IOS_CLIENT_ID_REVERSED</string>
+        <!-- Paste the "iOS URL scheme" exactly as shown in Google Cloud Console.
+             It already starts with "com.googleusercontent.apps." — do not add
+             the prefix yourself. Example: com.googleusercontent.apps.123456789-abcd -->
+        <string>YOUR_REVERSED_CLIENT_ID</string>
       </array>
     </dict>
   </array>

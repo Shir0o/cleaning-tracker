@@ -71,8 +71,13 @@ You need **two** OAuth 2.0 client IDs from **APIs & Services → Credentials →
 - Package name: `com.cleaningtracker.app` (see [`android/app/build.gradle.kts`](../android/app/build.gradle.kts)).
 - SHA-1 fingerprint of the signing certificate. For local debug builds:
   ```bash
+  # macOS / Linux
   keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey \
       -storepass android -keypass android | grep SHA1
+
+  # Windows (PowerShell or cmd.exe)
+  keytool -list -v -keystore %USERPROFILE%\.android\debug.keystore -alias androiddebugkey ^
+      -storepass android -keypass android | findstr SHA1
   ```
   Add additional SHA-1s for any release keystore you use.
 
@@ -105,19 +110,22 @@ The committed [`ios/Runner/Info.plist`](../ios/Runner/Info.plist) does **not** y
 
 ```xml
 <key>GIDClientID</key>
-<string>YOUR_IOS_CLIENT_ID</string>
+<string>YOUR_IOS_CLIENT_ID.apps.googleusercontent.com</string>
 <key>CFBundleURLTypes</key>
 <array>
   <dict>
     <key>CFBundleURLSchemes</key>
     <array>
-      <string>com.googleusercontent.apps.YOUR_IOS_CLIENT_ID_REVERSED</string>
+      <!-- Paste the "iOS URL scheme" / reversed client ID exactly as
+           shown in Google Cloud Console — it already starts with
+           "com.googleusercontent.apps." Do not add the prefix again. -->
+      <string>YOUR_REVERSED_CLIENT_ID</string>
     </array>
   </dict>
 </array>
 ```
 
-Both values come from the iOS OAuth client you created in §4.2. Keep these edits local — do not commit personal client IDs.
+Both values come from the iOS OAuth client you created in §4.2 — Google Cloud shows them as **iOS client ID** and **iOS URL scheme**. Keep these edits local; do not commit personal client IDs.
 
 ## 5. Architecture & Standards
 - **Coding style:** standard Dart/Flutter lints, configured in [`analysis_options.yaml`](../analysis_options.yaml).
@@ -148,4 +156,4 @@ flutter test --update-goldens             # regenerate after intentional UI chan
 - **`PlatformException(sign_in_failed, ...)`** — usually a missing or wrong Android SHA-1, missing test user on the OAuth consent screen, or a mismatched `GOOGLE_SERVER_CLIENT_ID`. Re-check §4.
 - **Mocks won't compile after editing a service** — re-run `dart run build_runner build --delete-conflicting-outputs`.
 - **Goldens fail in CI but pass locally** — make sure you ran `flutter test --update-goldens` from a clean checkout and committed the regenerated PNGs.
-- **iOS build fails with "Sandbox: rsync deny"** — run `cd ios && pod install` after changing native dependencies.
+- **iOS build fails with "Sandbox: rsync deny"** — Xcode 15+ enables `ENABLE_USER_SCRIPT_SANDBOXING` by default, which breaks Flutter's build phase scripts. In Xcode open `Runner.xcworkspace`, select the **Runner** target → **Build Settings**, search for `User Script Sandboxing`, and set it to **No**. Then re-run `cd ios && pod install` if you also changed native dependencies.
