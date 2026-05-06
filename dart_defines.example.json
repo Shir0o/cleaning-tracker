@@ -1,0 +1,4 @@
+{
+  "_comment": "Copy this file to dart_defines.json (gitignored) and fill in your values. Then run: flutter run --dart-define-from-file=dart_defines.json",
+  "GOOGLE_SERVER_CLIENT_ID": "REPLACE_WITH_YOUR_WEB_OAUTH_CLIENT_ID.apps.googleusercontent.com"
+}

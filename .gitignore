@@ -48,6 +48,8 @@ app.*.map.json
 # Secrets
 lib/secrets.dart
 .env
+dart_defines.json
+dart_defines.local.json
 
 # Test failure artifacts
 test/failures/
