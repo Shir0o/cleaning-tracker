@@ -27,10 +27,10 @@ dart run build_runner build --delete-conflicting-outputs
 flutter run
 ```
 
-Drive sync requires a Google server client ID:
+Drive sync is optional. Without it, the app runs locally with all non-cloud features enabled. To exercise sign-in and Drive backup, follow the Google Cloud setup in [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md#4-google-cloud--drive-sync-setup) and pass your Web OAuth client ID at run time:
 
 ```bash
-flutter run --dart-define=GOOGLE_SERVER_CLIENT_ID=YOUR_GOOGLE_SERVER_CLIENT_ID
+flutter run --dart-define=GOOGLE_SERVER_CLIENT_ID=YOUR_WEB_CLIENT_ID
 ```
 
 ## Quality Checks
