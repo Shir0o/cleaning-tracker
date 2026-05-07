@@ -241,13 +241,20 @@ void main() {
       ];
       final mockBatch = MockBatch();
 
-      when(() => mockDb.batch()).thenReturn(mockBatch);
+      when(() => mockDb.transaction<void>(any())).thenAnswer((invocation) {
+        final action =
+            invocation.positionalArguments[0]
+                as Future<void> Function(Transaction);
+        return action(mockTxn);
+      });
+      when(() => mockTxn.batch()).thenReturn(mockBatch);
       when(() => mockBatch.commit()).thenAnswer((_) async => [1, 2]);
       when(() => mockBatch.commit(noResult: true)).thenAnswer((_) async => []);
 
       await databaseService.batchInsertTasks(tasks);
 
-      verify(() => mockDb.batch()).called(2);
+      verify(() => mockDb.transaction<void>(any())).called(1);
+      verify(() => mockTxn.batch()).called(2);
       verify(() => mockBatch.insert('tasks', any())).called(2);
       verify(
         () => mockBatch.insert('completions', any()),

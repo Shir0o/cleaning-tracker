@@ -137,6 +137,7 @@ void main() {
 
     final now = DateTime.now();
     final task = Task(
+      id: 42,
       title: 'Enabled Task',
       interval: '7 DAYS',
       lastCompleted: now.subtract(const Duration(days: 1)), // Due in 6 days
@@ -146,7 +147,7 @@ void main() {
 
     verify(
       () => mockPlugin.zonedSchedule(
-        id: any(named: 'id'),
+        id: 42,
         title: 'CLEANING REQUIRED',
         body: 'Task "Enabled Task" is due soon.',
         scheduledDate: any(named: 'scheduledDate'),
@@ -157,9 +158,16 @@ void main() {
   });
 
   test('cancelTaskNotification cancels the correct notification', () async {
-    await notificationService.cancelTaskNotification('Test Task');
-    final id = 'Test Task'.hashCode.abs();
-    verify(() => mockPlugin.cancel(id: id)).called(1);
+    final task = Task(
+      id: 42,
+      title: 'Test Task',
+      interval: '7 DAYS',
+      lastCompleted: DateTime.now(),
+    );
+
+    await notificationService.cancelTaskNotification(task);
+
+    verify(() => mockPlugin.cancel(id: 42)).called(1);
   });
 
   test('rescheduleAll cancels all and schedules tasks', () async {

@@ -112,33 +112,34 @@ class DatabaseService {
   Future<void> batchInsertTasks(List<Task> tasks) async {
     if ((testingMode && _mockDb == null) || tasks.isEmpty) return;
     final database = await db;
-    final batch = database.batch();
+    await database.transaction<void>((txn) async {
+      final taskBatch = txn.batch();
 
-    for (var task in tasks) {
-      batch.insert('tasks', {
-        'title': task.title,
-        'interval': task.interval,
-        'lastCompleted': task.lastCompleted.toIso8601String(),
-        'category': task.category,
-        'notes': task.notes,
-        'snoozedUntil': task.snoozedUntil?.toIso8601String(),
-      });
-    }
-
-    final results = await batch.commit();
-
-    // Now handle completions for each task using the returned IDs
-    final completionBatch = database.batch();
-    for (int i = 0; i < tasks.length; i++) {
-      final taskId = results[i] as int;
-      for (var completion in tasks[i].completions) {
-        completionBatch.insert('completions', {
-          'task_id': taskId,
-          'date': completion.toIso8601String(),
+      for (var task in tasks) {
+        taskBatch.insert('tasks', {
+          'title': task.title,
+          'interval': task.interval,
+          'lastCompleted': task.lastCompleted.toIso8601String(),
+          'category': task.category,
+          'notes': task.notes,
+          'snoozedUntil': task.snoozedUntil?.toIso8601String(),
         });
       }
-    }
-    await completionBatch.commit(noResult: true);
+
+      final results = await taskBatch.commit();
+
+      final completionBatch = txn.batch();
+      for (int i = 0; i < tasks.length; i++) {
+        final taskId = results[i] as int;
+        for (var completion in tasks[i].completions) {
+          completionBatch.insert('completions', {
+            'task_id': taskId,
+            'date': completion.toIso8601String(),
+          });
+        }
+      }
+      await completionBatch.commit(noResult: true);
+    });
   }
 
   Future<List<Task>> getTasks() async {
