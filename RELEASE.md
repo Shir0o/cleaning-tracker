@@ -19,6 +19,19 @@ iOS releases additionally require the `GIDClientID` / URL-scheme entries describ
 
 ---
 
+## [1.1.3] - 2026-05-07
+
+### Fixed
+- **Notification Permissions:** Request notification permissions before scheduling reminders.
+- **Notification Scheduling:** Improved reminder scheduling reliability and diagnostics.
+- **Build Stability:** Resolved compilation errors and test regressions after recent feature work.
+
+### Changed
+- **Open Source Readiness:** Added license, security, contribution, and development documentation.
+- **Application ID:** Updated the Android application ID to `com.cleaningtracker.app`.
+- **Launcher Icons:** Refreshed generated app launcher icons.
+- **Drive Restore Performance:** Optimized backup restore inserts with batched database writes.
+
 ## [1.1.2] - 2026-04-02
 
 ### Added
