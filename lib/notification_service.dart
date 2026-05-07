@@ -188,7 +188,7 @@ class NotificationService {
       return;
     }
 
-    final id = task.title.hashCode.abs();
+    final id = _notificationIdForTask(task);
     final scheduleMode = await _resolveAndroidScheduleMode();
 
     try {
@@ -279,10 +279,14 @@ class NotificationService {
     debugPrint('Showed test notification');
   }
 
-  Future<void> cancelTaskNotification(String title) async {
-    final id = title.hashCode.abs();
+  int _notificationIdForTask(Task task) {
+    return task.id ?? task.title.hashCode.abs();
+  }
+
+  Future<void> cancelTaskNotification(Task task) async {
+    final id = _notificationIdForTask(task);
     await _notificationsPlugin.cancel(id: id);
-    debugPrint('Cancelled notification for $title (ID: $id)');
+    debugPrint('Cancelled notification for ${task.title} (ID: $id)');
   }
 
   Future<void> rescheduleAll([List<Task>? tasks]) async {

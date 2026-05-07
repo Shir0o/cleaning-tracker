@@ -68,8 +68,15 @@ void main() {
       ),
     );
 
+    final mockTxn = MockTransaction();
     final mockBatch = MockBatch();
-    when(() => mockDb.batch()).thenReturn(mockBatch);
+    when(() => mockDb.transaction<void>(any())).thenAnswer((invocation) async {
+      final action =
+          invocation.positionalArguments[0]
+              as Future<void> Function(Transaction);
+      await action(mockTxn);
+    });
+    when(() => mockTxn.batch()).thenReturn(mockBatch);
     when(
       () => mockBatch.commit(),
     ).thenAnswer((_) async => List.generate(50, (i) => i + 1));

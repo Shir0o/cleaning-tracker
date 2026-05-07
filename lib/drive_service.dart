@@ -48,7 +48,7 @@ class DriveService extends ChangeNotifier {
     _googleSignIn.authenticationEvents.listen((event) {
       if (event is GoogleSignInAuthenticationEventSignIn) {
         _currentUser = event.user;
-        _initDriveApi();
+        _initDriveApi(promptIfNecessary: true);
       } else if (event is GoogleSignInAuthenticationEventSignOut) {
         _currentUser = null;
         _driveApi = null;
@@ -81,7 +81,7 @@ class DriveService extends ChangeNotifier {
     notifyListeners();
 
     if (enabled && _currentUser != null) {
-      await syncFiles();
+      await syncFiles(promptIfNecessary: true);
     }
   }
 
@@ -102,7 +102,7 @@ class DriveService extends ChangeNotifier {
     try {
       final account = await _googleSignIn.authenticate();
       _currentUser = account;
-      await _initDriveApi();
+      await _initDriveApi(promptIfNecessary: true);
       notifyListeners();
       return account;
     } catch (e) {
@@ -118,35 +118,32 @@ class DriveService extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _initDriveApi() async {
+  Future<void> _initDriveApi({bool promptIfNecessary = false}) async {
     final account = _currentUser;
     if (account == null) return;
 
-    final auth = account.authentication;
-    final idToken = auth.idToken;
-    if (idToken == null) {
-      debugPrint('No ID token available');
+    final headers = await account.authorizationClient.authorizationHeaders([
+      drive.DriveApi.driveFileScope,
+    ], promptIfNecessary: promptIfNecessary);
+    if (headers == null) {
+      debugPrint('No Drive authorization headers available');
       return;
     }
 
-    final Map<String, String> headers = {
-      'Authorization': 'Bearer $idToken',
-      'X-Goog-AuthUser': '0',
-    };
     final authenticateClient = GoogleAuthClient(headers);
     _driveApi = drive.DriveApi(authenticateClient);
   }
 
-  Future<void> syncFiles() async {
+  Future<void> syncFiles({bool promptIfNecessary = false}) async {
     if (!_isDriveSyncEnabled) return;
 
     if (_driveApi == null) {
       if (_currentUser != null) {
-        await _initDriveApi();
+        await _initDriveApi(promptIfNecessary: promptIfNecessary);
       } else {
         await signInSilently();
         if (_currentUser != null) {
-          await _initDriveApi();
+          await _initDriveApi(promptIfNecessary: promptIfNecessary);
         }
       }
     }
@@ -214,11 +211,11 @@ class DriveService extends ChangeNotifier {
   Future<void> restoreFromBackup() async {
     if (_driveApi == null) {
       if (_currentUser != null) {
-        await _initDriveApi();
+        await _initDriveApi(promptIfNecessary: true);
       } else {
         await signInSilently();
         if (_currentUser != null) {
-          await _initDriveApi();
+          await _initDriveApi(promptIfNecessary: true);
         }
       }
     }
