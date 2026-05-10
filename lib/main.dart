@@ -168,6 +168,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _tasks = tasks;
         _isLoading = false;
       });
+      // Re-arm alarms on every cold start. Android's AlarmManager loses all
+      // pending alarms on reboot, app force-stop, and some OEM background
+      // kills — without this, scheduled reminders silently disappear until
+      // the user happens to add or edit a task.
+      if (!DashboardScreen.testingMode) {
+        await NotificationService().rescheduleAll(tasks);
+      }
     }
   }
 
