@@ -204,7 +204,9 @@ class NotificationService {
           iOS: DarwinNotificationDetails(),
         ),
       );
-      debugPrint('Showed immediate due notification for ${task.title} (ID: $id)');
+      debugPrint(
+        'Showed immediate due notification for ${task.title} (ID: $id)',
+      );
       return;
     }
 

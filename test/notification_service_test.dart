@@ -167,40 +167,43 @@ void main() {
     ).called(1);
   });
 
-  test('scheduleTaskNotification fires immediately for overdue tasks', () async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('notifications_enabled', true);
-    await prefs.setString('notifyBeforeExpiry', 'SAME DAY');
-    await prefs.setString('dailyReminderTime', '09:00 AM');
+  test(
+    'scheduleTaskNotification fires immediately for overdue tasks',
+    () async {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('notifications_enabled', true);
+      await prefs.setString('notifyBeforeExpiry', 'SAME DAY');
+      await prefs.setString('dailyReminderTime', '09:00 AM');
 
-    final task = Task(
-      id: 7,
-      title: 'Overdue Task',
-      interval: '7 DAYS',
-      lastCompleted: DateTime.now().subtract(const Duration(days: 30)),
-    );
-
-    await notificationService.scheduleTaskNotification(task);
-
-    verify(
-      () => mockPlugin.show(
+      final task = Task(
         id: 7,
-        title: 'CLEANING REQUIRED',
-        body: 'Task "Overdue Task" is due.',
-        notificationDetails: any(named: 'notificationDetails'),
-      ),
-    ).called(1);
-    verifyNever(
-      () => mockPlugin.zonedSchedule(
-        id: any(named: 'id'),
-        title: any(named: 'title'),
-        body: any(named: 'body'),
-        scheduledDate: any(named: 'scheduledDate'),
-        notificationDetails: any(named: 'notificationDetails'),
-        androidScheduleMode: any(named: 'androidScheduleMode'),
-      ),
-    );
-  });
+        title: 'Overdue Task',
+        interval: '7 DAYS',
+        lastCompleted: DateTime.now().subtract(const Duration(days: 30)),
+      );
+
+      await notificationService.scheduleTaskNotification(task);
+
+      verify(
+        () => mockPlugin.show(
+          id: 7,
+          title: 'CLEANING REQUIRED',
+          body: 'Task "Overdue Task" is due.',
+          notificationDetails: any(named: 'notificationDetails'),
+        ),
+      ).called(1);
+      verifyNever(
+        () => mockPlugin.zonedSchedule(
+          id: any(named: 'id'),
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          notificationDetails: any(named: 'notificationDetails'),
+          androidScheduleMode: any(named: 'androidScheduleMode'),
+        ),
+      );
+    },
+  );
 
   test('cancelTaskNotification cancels the correct notification', () async {
     final task = Task(
