@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,16 +16,24 @@ import 'models.dart';
 
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 
-const String googleServerClientId = String.fromEnvironment(
-  'GOOGLE_SERVER_CLIENT_ID',
-  defaultValue: 'dummy_client_id',
-);
+/// Resolves the Google OAuth Web Client ID for [GoogleSignIn].
+///
+/// Precedence: `--dart-define=GOOGLE_SERVER_CLIENT_ID=...` (compile-time)
+/// overrides the value loaded from the bundled `.env` asset at runtime.
+String get googleServerClientId {
+  const fromDefine = String.fromEnvironment('GOOGLE_SERVER_CLIENT_ID');
+  if (fromDefine.isNotEmpty) return fromDefine;
+  final fromEnv = dotenv.maybeGet('GOOGLE_SERVER_CLIENT_ID');
+  if (fromEnv != null && fromEnv.isNotEmpty) return fromEnv;
+  return 'dummy_client_id';
+}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   if (!DashboardScreen.testingMode) {
     try {
+      await dotenv.load(fileName: '.env', isOptional: true);
       // Initialize Google Sign In globally
       await GoogleSignIn.instance.initialize(
         serverClientId: googleServerClientId,

@@ -40,6 +40,9 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Bootstrap .env from template
+        run: cp .env.example .env
+
       - name: Install dependencies
         run: flutter pub get
 
@@ -71,6 +74,9 @@ jobs:
         with:
           channel: 'stable'
           cache: true
+
+      - name: Bootstrap .env from template
+        run: cp .env.example .env
 
       - name: Install dependencies
         run: flutter pub get
@@ -113,6 +119,9 @@ jobs:
         with:
           channel: 'stable'
           cache: true
+
+      - name: Bootstrap .env from template
+        run: cp .env.example .env
 
       - name: Install dependencies
         run: flutter pub get

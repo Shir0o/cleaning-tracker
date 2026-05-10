@@ -33,6 +33,9 @@ git clone <repo-url>
 cd cleaning-tracker
 flutter pub get
 
+# Copy the env template (required — `.env` is bundled as an asset)
+cp .env.example .env
+
 # Generate test mocks (only required if you'll run the test suite)
 dart run build_runner build --delete-conflicting-outputs
 
@@ -40,17 +43,24 @@ dart run build_runner build --delete-conflicting-outputs
 flutter run
 ```
 
-Without `GOOGLE_SERVER_CLIENT_ID`, the app falls back to a placeholder client ID (see [`lib/main.dart`](lib/main.dart)). All local features — tasks, completions, reminders, theming — work; only Google Sign-In and Drive backup are inert.
+With an empty `GOOGLE_SERVER_CLIENT_ID` in `.env`, the app falls back to a placeholder client ID (see [`lib/main.dart`](lib/main.dart)). All local features — tasks, completions, reminders, theming — work; only Google Sign-In and Drive backup are inert.
 
 ### Run with Drive sync
 1. Follow the Google Cloud setup in [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md#4-google-cloud--drive-sync-setup) to create OAuth credentials.
-2. Pass the **Web** OAuth client ID at run/build time:
+2. Set the **Web** OAuth client ID in your local `.env`:
 
 ```bash
-flutter run --dart-define=GOOGLE_SERVER_CLIENT_ID=YOUR_WEB_CLIENT_ID
+# .env (gitignored)
+GOOGLE_SERVER_CLIENT_ID=YOUR_WEB_CLIENT_ID
 ```
 
-The same `--dart-define` flag works with `flutter build apk`, `flutter build appbundle`, and `flutter build ios`.
+3. Run normally:
+
+```bash
+flutter run
+```
+
+`.env` is loaded at runtime via `flutter_dotenv`. For CI or release builds you can still override at compile time with `--dart-define=GOOGLE_SERVER_CLIENT_ID=...`, which takes precedence over `.env`. The same flag works with `flutter build apk`, `flutter build appbundle`, and `flutter build ios`.
 
 ### Quality checks
 ```bash

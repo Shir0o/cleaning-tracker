@@ -1,3 +1,6 @@
+# Local environment configuration (see .env.example for the template)
+.env
+
 # Miscellaneous
 *.class
 *.log
