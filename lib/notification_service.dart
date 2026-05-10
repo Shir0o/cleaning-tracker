@@ -61,7 +61,7 @@ class NotificationService {
     tz.setLocalLocation(tz.getLocation(timeZoneName));
 
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings('ic_stat_notify');
 
     const DarwinInitializationSettings initializationSettingsDarwin =
         DarwinInitializationSettings(
