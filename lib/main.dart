@@ -23,7 +23,9 @@ final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 String get googleServerClientId {
   const fromDefine = String.fromEnvironment('GOOGLE_SERVER_CLIENT_ID');
   if (fromDefine.isNotEmpty) return fromDefine;
-  return dotenv.maybeGet('GOOGLE_SERVER_CLIENT_ID') ?? 'dummy_client_id';
+  final fromEnv = dotenv.maybeGet('GOOGLE_SERVER_CLIENT_ID');
+  if (fromEnv != null && fromEnv.isNotEmpty) return fromEnv;
+  return 'dummy_client_id';
 }
 
 Future<void> main() async {
