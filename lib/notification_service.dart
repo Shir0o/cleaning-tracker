@@ -183,12 +183,31 @@ class NotificationService {
       minute,
     ).subtract(Duration(days: daysBefore));
 
+    final id = _notificationIdForTask(task);
+
     if (scheduledDate.isBefore(DateTime.now())) {
-      // If it's already past the reminder time for the due date, don't schedule
+      // The reminder time is already past — either the task is overdue or the
+      // notify-before window has elapsed. Fire an immediate "due now" notice
+      // instead of silently dropping the reminder.
+      await _notificationsPlugin.show(
+        id: id,
+        title: 'CLEANING REQUIRED',
+        body: 'Task "${task.title}" is due.',
+        notificationDetails: const NotificationDetails(
+          android: AndroidNotificationDetails(
+            _channelId,
+            _channelName,
+            channelDescription: _channelDescription,
+            importance: Importance.high,
+            priority: Priority.high,
+          ),
+          iOS: DarwinNotificationDetails(),
+        ),
+      );
+      debugPrint('Showed immediate due notification for ${task.title} (ID: $id)');
       return;
     }
 
-    final id = _notificationIdForTask(task);
     final scheduleMode = await _resolveAndroidScheduleMode();
 
     try {
