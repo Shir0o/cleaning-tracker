@@ -1,8 +1,9 @@
 name: cleaning_tracker
 description: "A Flutter app for tracking recurring household cleaning and maintenance tasks."
-# The following line prevents the package from being accidentally published to
-# pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+homepage: https://github.com/Shir0o/cleaning-tracker
+repository: https://github.com/Shir0o/cleaning-tracker
+issue_tracker: https://github.com/Shir0o/cleaning-tracker/issues
+publish_to: 'none'
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -55,6 +56,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  _discoveryapis_commons: ^1.0.7
   build_runner: ^2.4.14
 
   # The "flutter_lints" package below contains a set of recommended lints to

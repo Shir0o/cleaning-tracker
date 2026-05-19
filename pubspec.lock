@@ -2,7 +2,7 @@
 # See https://dart.dev/tools/pub/glossary#lockfile
 packages:
   _discoveryapis_commons:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: _discoveryapis_commons
       sha256: "113c4100b90a5b70a983541782431b82168b3cae166ab130649c36eb3559d498"

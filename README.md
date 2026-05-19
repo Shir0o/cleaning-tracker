@@ -29,7 +29,7 @@ Cleaning Tracker helps you keep up with household systems and chores such as HVA
 
 ### Install and run
 ```bash
-git clone <repo-url>
+git clone https://github.com/Shir0o/cleaning-tracker.git
 cd cleaning-tracker
 flutter pub get
 

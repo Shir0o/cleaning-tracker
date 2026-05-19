@@ -15,6 +15,7 @@
 .swiftpm/
 migrate_working_dir/
 .claude/
+gemini.md
 
 # IntelliJ related
 *.iml

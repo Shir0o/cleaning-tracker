@@ -11,7 +11,7 @@ This guide covers setting up the Cleaning Tracker development environment, confi
 
 ## 2. Initial Setup
 ```bash
-git clone <repo-url>
+git clone https://github.com/Shir0o/cleaning-tracker.git
 cd cleaning-tracker
 
 # Fetch Flutter/Dart dependencies
