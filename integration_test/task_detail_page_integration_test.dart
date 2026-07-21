@@ -16,33 +16,23 @@ void main() {
     // Verify we are on Dashboard
     expect(find.text('Due'), findsWidgets);
 
-    // Tap add button
+    // Tap add button (FAB)
     await tester.tap(find.byIcon(Icons.add));
     await tester.pumpAndSettle();
 
-    // Scroll down to find the Create Custom Task button if off-screen
-    final customButton = find.text('Create Custom Task');
-    await tester.ensureVisible(customButton);
-    await tester.pumpAndSettle();
-    await tester.tap(customButton);
+    // Tap + icon on first preset card
+    final addPresetButton = find.byIcon(Icons.add).at(1);
+    await tester.tap(addPresetButton);
     await tester.pumpAndSettle();
 
-    // Type name in custom task name field
-    await tester.enterText(find.byType(TextField), 'HVAC FILTER');
-    await tester.pumpAndSettle();
+    // Verify preset task (WASH DISHES) exists on Dashboard
+    expect(find.text('WASH DISHES'), findsOneWidget);
 
-    // Save task
-    await tester.tap(find.text('Save Task'));
-    await tester.pumpAndSettle();
+    // Find and tap the TaskCard (WASH DISHES)
+    final taskCard = find.text('WASH DISHES');
+    expect(taskCard, findsOneWidget);
 
-    // Verify back on Dashboard and task exists
-    expect(find.text('HVAC FILTER'), findsOneWidget);
-
-    // Find and tap the TaskCard (HVAC FILTER)
-    final hvacFilterCard = find.text('HVAC FILTER');
-    expect(hvacFilterCard, findsOneWidget);
-
-    await tester.tap(hvacFilterCard);
+    await tester.tap(taskCard);
     await tester.pumpAndSettle();
 
     // Verify we are on the Task Detail view

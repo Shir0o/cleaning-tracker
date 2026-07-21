@@ -33,5 +33,16 @@ void main() {
     // Verify we reach the History
     expect(find.text('HISTORY'), findsOneWidget);
     expect(find.text('NO HISTORY AVAILABLE'), findsOneWidget);
+
+    // Pop LogHistoryPage back to Settings
+    await tester.tap(find.byIcon(Icons.arrow_back));
+    await tester.pumpAndSettle();
+
+    // Pop SettingsPage back to Dashboard
+    await tester.tap(find.byIcon(Icons.arrow_back));
+    await tester.pumpAndSettle();
+
+    // Verify back on Dashboard
+    expect(find.text('Due'), findsWidgets);
   });
 }
