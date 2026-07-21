@@ -20,8 +20,11 @@ void main() {
     await tester.tap(find.byIcon(Icons.add));
     await tester.pumpAndSettle();
 
-    // Tap Create Custom Task button
-    await tester.tap(find.text('Create Custom Task'));
+    // Scroll down to find the Create Custom Task button if off-screen
+    final customButton = find.text('Create Custom Task');
+    await tester.ensureVisible(customButton);
+    await tester.pumpAndSettle();
+    await tester.tap(customButton);
     await tester.pumpAndSettle();
 
     // Type name in custom task name field
