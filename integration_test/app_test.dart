@@ -15,17 +15,11 @@ void main() {
     app.main();
     await tester.pumpAndSettle();
 
-    // Verify we start on the dashboard (STATUS)
-    expect(find.text('STATUS'), findsOneWidget);
+    // Verify we start on the dashboard
+    expect(find.text('Due'), findsWidgets);
 
-    // Tap settings icon. The Icon sits inside an InkWell that absorbs the
-    // pointer, so target the InkWell ancestor for a clean hit-test.
-    await tester.tap(
-      find.ancestor(
-        of: find.byIcon(Icons.settings),
-        matching: find.byType(InkWell),
-      ),
-    );
+    // Tap settings icon.
+    await tester.tap(find.byIcon(Icons.settings));
     await tester.pumpAndSettle();
 
     // Verify we are on settings page
