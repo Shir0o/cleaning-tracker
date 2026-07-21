@@ -9,9 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
-import 'add_task_page.dart';
 import 'settings_page.dart';
-import 'task_detail_page.dart';
 import 'drive_service.dart';
 import 'notification_service.dart';
 import 'database_service.dart';
@@ -153,7 +151,7 @@ class RoomTheme {
   Color accent(bool isDark) => isDark ? accentDark : accentLight;
 }
 
-const List<RoomTheme> ROOM_THEMES = [
+const List<RoomTheme> roomThemes = [
   RoomTheme(
     name: 'Kitchen',
     categoryKey: 'KITCHEN',
@@ -203,55 +201,255 @@ const List<RoomTheme> ROOM_THEMES = [
 
 RoomTheme getRoomTheme(String categoryOrRoom) {
   final upper = categoryOrRoom.toUpperCase();
-  for (var rt in ROOM_THEMES) {
+  for (var rt in roomThemes) {
     if (rt.categoryKey == upper || rt.name.toUpperCase() == upper) {
       return rt;
     }
   }
-  return ROOM_THEMES[3]; // Default Living room / General
+  return roomThemes[3]; // Default Living room / General
 }
 
-const List<Map<String, String>> ALL_PRESETS = [
-  {'title': 'WASH DISHES', 'interval': 'DAILY', 'category': 'KITCHEN', 'room': 'Kitchen'},
-  {'title': 'WIPE COUNTERS & SINK', 'interval': 'DAILY', 'category': 'KITCHEN', 'room': 'Kitchen'},
-  {'title': 'WIPE MICROWAVE & APPLIANCES', 'interval': 'WEEKLY', 'category': 'KITCHEN', 'room': 'Kitchen'},
-  {'title': 'REFRIGERATOR SORT & WIPE', 'interval': 'WEEKLY', 'category': 'KITCHEN', 'room': 'Kitchen'},
-  {'title': 'WIPE INSIDE CABINETS', 'interval': 'MONTHLY', 'category': 'KITCHEN', 'room': 'Kitchen'},
-  {'title': 'CLEAN STOVE & OVEN', 'interval': 'MONTHLY', 'category': 'KITCHEN', 'room': 'Kitchen'},
-  {'title': 'CLEAN KITCHEN CABINETS', 'interval': 'MONTHLY', 'category': 'KITCHEN', 'room': 'Kitchen'},
-  {'title': 'DEEP CLEAN REFRIGERATOR & ICE', 'interval': '3 MONTHS', 'category': 'KITCHEN', 'room': 'Kitchen'},
-  {'title': 'PANTRY SORT', 'interval': '3 MONTHS', 'category': 'KITCHEN', 'room': 'Kitchen'},
-  {'title': 'DEEP CLEAN DISHWASHER', 'interval': '1 YEAR', 'category': 'KITCHEN', 'room': 'Kitchen'},
-  {'title': 'DUST REFRIGERATOR VENT', 'interval': '1 YEAR', 'category': 'KITCHEN', 'room': 'Kitchen'},
-  {'title': 'WIPE UP BATHROOMS', 'interval': 'DAILY', 'category': 'BATHROOM', 'room': 'Bathroom'},
-  {'title': 'SCRUB TOILET, SHOWER & SINK', 'interval': 'WEEKLY', 'category': 'BATHROOM', 'room': 'Bathroom'},
-  {'title': 'CLEAN MIRRORS', 'interval': 'WEEKLY', 'category': 'BATHROOM', 'room': 'Bathroom'},
-  {'title': 'CLEAN BATHROOM CABINETS', 'interval': 'MONTHLY', 'category': 'BATHROOM', 'room': 'Bathroom'},
-  {'title': 'SCRUB TILE GROUT', 'interval': '3 MONTHS', 'category': 'BATHROOM', 'room': 'Bathroom'},
-  {'title': 'MAKE BEDS', 'interval': 'DAILY', 'category': 'BEDROOM', 'room': 'Bedroom'},
-  {'title': 'CHANGE BED LINENS', 'interval': 'WEEKLY', 'category': 'BEDROOM', 'room': 'Bedroom'},
-  {'title': 'SORT THROUGH CLOSETS', 'interval': '3 MONTHS', 'category': 'BEDROOM', 'room': 'Bedroom'},
-  {'title': 'WASH COMFORTERS & DUVETS', 'interval': '3 MONTHS', 'category': 'BEDROOM', 'room': 'Bedroom'},
-  {'title': 'GENERAL PICK UP', 'interval': 'DAILY', 'category': 'LIVING & GENERAL', 'room': 'Living room'},
-  {'title': 'SWEEP FLOORS', 'interval': 'DAILY', 'category': 'LIVING & GENERAL', 'room': 'Living room'},
-  {'title': 'VACUUM CLEANING', 'interval': 'DAILY', 'category': 'LIVING & GENERAL', 'room': 'Living room'},
-  {'title': 'DUST FURNITURE & SHELVES', 'interval': 'WEEKLY', 'category': 'LIVING & GENERAL', 'room': 'Living room'},
-  {'title': 'MOP FLOORS', 'interval': 'WEEKLY', 'category': 'LIVING & GENERAL', 'room': 'Living room'},
-  {'title': 'WIPE SWITCHES, DOORS & FRAMES', 'interval': 'MONTHLY', 'category': 'LIVING & GENERAL', 'room': 'Living room'},
-  {'title': 'WASH OUT TRASH CANS', 'interval': 'MONTHLY', 'category': 'LIVING & GENERAL', 'room': 'Living room'},
-  {'title': 'WASH WINDOWS', 'interval': '3 MONTHS', 'category': 'LIVING & GENERAL', 'room': 'Living room'},
-  {'title': 'CLEAN HEATING & COOLING VENTS', 'interval': '3 MONTHS', 'category': 'LIVING & GENERAL', 'room': 'Living room'},
-  {'title': 'AIR OUT ROOMS & DRAPES', 'interval': '3 MONTHS', 'category': 'LIVING & GENERAL', 'room': 'Living room'},
-  {'title': 'CLEAN THROW PILLOWS & BLANKETS', 'interval': '3 MONTHS', 'category': 'LIVING & GENERAL', 'room': 'Living room'},
-  {'title': 'CLEAN CARPETS', 'interval': '1 YEAR', 'category': 'LIVING & GENERAL', 'room': 'Living room'},
-  {'title': 'WASH WALLS', 'interval': '1 YEAR', 'category': 'LIVING & GENERAL', 'room': 'Living room'},
-  {'title': 'RINSE SCREENS', 'interval': '1 YEAR', 'category': 'LIVING & GENERAL', 'room': 'Living room'},
-  {'title': 'WASH WINDOW SILLS', 'interval': '1 YEAR', 'category': 'LIVING & GENERAL', 'room': 'Living room'},
-  {'title': 'SCRUB BLINDS', 'interval': '1 YEAR', 'category': 'LIVING & GENERAL', 'room': 'Living room'},
-  {'title': 'WASH LIGHT FIXTURES', 'interval': '1 YEAR', 'category': 'LIVING & GENERAL', 'room': 'Living room'},
-  {'title': 'CLEAN BALCONY', 'interval': '1 YEAR', 'category': 'LIVING & GENERAL', 'room': 'Living room'},
-  {'title': 'LOAD OF LAUNDRY', 'interval': 'DAILY', 'category': 'LAUNDRY & UTILITY', 'room': 'Laundry'},
-  {'title': 'DEEP CLEAN WASHING MACHINE', 'interval': '1 YEAR', 'category': 'LAUNDRY & UTILITY', 'room': 'Laundry'},
+const List<Map<String, String>> allPresets = [
+  {
+    'title': 'WASH DISHES',
+    'interval': 'DAILY',
+    'category': 'KITCHEN',
+    'room': 'Kitchen',
+  },
+  {
+    'title': 'WIPE COUNTERS & SINK',
+    'interval': 'DAILY',
+    'category': 'KITCHEN',
+    'room': 'Kitchen',
+  },
+  {
+    'title': 'WIPE MICROWAVE & APPLIANCES',
+    'interval': 'WEEKLY',
+    'category': 'KITCHEN',
+    'room': 'Kitchen',
+  },
+  {
+    'title': 'REFRIGERATOR SORT & WIPE',
+    'interval': 'WEEKLY',
+    'category': 'KITCHEN',
+    'room': 'Kitchen',
+  },
+  {
+    'title': 'WIPE INSIDE CABINETS',
+    'interval': 'MONTHLY',
+    'category': 'KITCHEN',
+    'room': 'Kitchen',
+  },
+  {
+    'title': 'CLEAN STOVE & OVEN',
+    'interval': 'MONTHLY',
+    'category': 'KITCHEN',
+    'room': 'Kitchen',
+  },
+  {
+    'title': 'CLEAN KITCHEN CABINETS',
+    'interval': 'MONTHLY',
+    'category': 'KITCHEN',
+    'room': 'Kitchen',
+  },
+  {
+    'title': 'DEEP CLEAN REFRIGERATOR & ICE',
+    'interval': '3 MONTHS',
+    'category': 'KITCHEN',
+    'room': 'Kitchen',
+  },
+  {
+    'title': 'PANTRY SORT',
+    'interval': '3 MONTHS',
+    'category': 'KITCHEN',
+    'room': 'Kitchen',
+  },
+  {
+    'title': 'DEEP CLEAN DISHWASHER',
+    'interval': '1 YEAR',
+    'category': 'KITCHEN',
+    'room': 'Kitchen',
+  },
+  {
+    'title': 'DUST REFRIGERATOR VENT',
+    'interval': '1 YEAR',
+    'category': 'KITCHEN',
+    'room': 'Kitchen',
+  },
+  {
+    'title': 'WIPE UP BATHROOMS',
+    'interval': 'DAILY',
+    'category': 'BATHROOM',
+    'room': 'Bathroom',
+  },
+  {
+    'title': 'SCRUB TOILET, SHOWER & SINK',
+    'interval': 'WEEKLY',
+    'category': 'BATHROOM',
+    'room': 'Bathroom',
+  },
+  {
+    'title': 'CLEAN MIRRORS',
+    'interval': 'WEEKLY',
+    'category': 'BATHROOM',
+    'room': 'Bathroom',
+  },
+  {
+    'title': 'CLEAN BATHROOM CABINETS',
+    'interval': 'MONTHLY',
+    'category': 'BATHROOM',
+    'room': 'Bathroom',
+  },
+  {
+    'title': 'SCRUB TILE GROUT',
+    'interval': '3 MONTHS',
+    'category': 'BATHROOM',
+    'room': 'Bathroom',
+  },
+  {
+    'title': 'MAKE BEDS',
+    'interval': 'DAILY',
+    'category': 'BEDROOM',
+    'room': 'Bedroom',
+  },
+  {
+    'title': 'CHANGE BED LINENS',
+    'interval': 'WEEKLY',
+    'category': 'BEDROOM',
+    'room': 'Bedroom',
+  },
+  {
+    'title': 'SORT THROUGH CLOSETS',
+    'interval': '3 MONTHS',
+    'category': 'BEDROOM',
+    'room': 'Bedroom',
+  },
+  {
+    'title': 'WASH COMFORTERS & DUVETS',
+    'interval': '3 MONTHS',
+    'category': 'BEDROOM',
+    'room': 'Bedroom',
+  },
+  {
+    'title': 'GENERAL PICK UP',
+    'interval': 'DAILY',
+    'category': 'LIVING & GENERAL',
+    'room': 'Living room',
+  },
+  {
+    'title': 'SWEEP FLOORS',
+    'interval': 'DAILY',
+    'category': 'LIVING & GENERAL',
+    'room': 'Living room',
+  },
+  {
+    'title': 'VACUUM CLEANING',
+    'interval': 'DAILY',
+    'category': 'LIVING & GENERAL',
+    'room': 'Living room',
+  },
+  {
+    'title': 'DUST FURNITURE & SHELVES',
+    'interval': 'WEEKLY',
+    'category': 'LIVING & GENERAL',
+    'room': 'Living room',
+  },
+  {
+    'title': 'MOP FLOORS',
+    'interval': 'WEEKLY',
+    'category': 'LIVING & GENERAL',
+    'room': 'Living room',
+  },
+  {
+    'title': 'WIPE SWITCHES, DOORS & FRAMES',
+    'interval': 'MONTHLY',
+    'category': 'LIVING & GENERAL',
+    'room': 'Living room',
+  },
+  {
+    'title': 'WASH OUT TRASH CANS',
+    'interval': 'MONTHLY',
+    'category': 'LIVING & GENERAL',
+    'room': 'Living room',
+  },
+  {
+    'title': 'WASH WINDOWS',
+    'interval': '3 MONTHS',
+    'category': 'LIVING & GENERAL',
+    'room': 'Living room',
+  },
+  {
+    'title': 'CLEAN HEATING & COOLING VENTS',
+    'interval': '3 MONTHS',
+    'category': 'LIVING & GENERAL',
+    'room': 'Living room',
+  },
+  {
+    'title': 'AIR OUT ROOMS & DRAPES',
+    'interval': '3 MONTHS',
+    'category': 'LIVING & GENERAL',
+    'room': 'Living room',
+  },
+  {
+    'title': 'CLEAN THROW PILLOWS & BLANKETS',
+    'interval': '3 MONTHS',
+    'category': 'LIVING & GENERAL',
+    'room': 'Living room',
+  },
+  {
+    'title': 'CLEAN CARPETS',
+    'interval': '1 YEAR',
+    'category': 'LIVING & GENERAL',
+    'room': 'Living room',
+  },
+  {
+    'title': 'WASH WALLS',
+    'interval': '1 YEAR',
+    'category': 'LIVING & GENERAL',
+    'room': 'Living room',
+  },
+  {
+    'title': 'RINSE SCREENS',
+    'interval': '1 YEAR',
+    'category': 'LIVING & GENERAL',
+    'room': 'Living room',
+  },
+  {
+    'title': 'WASH WINDOW SILLS',
+    'interval': '1 YEAR',
+    'category': 'LIVING & GENERAL',
+    'room': 'Living room',
+  },
+  {
+    'title': 'SCRUB BLINDS',
+    'interval': '1 YEAR',
+    'category': 'LIVING & GENERAL',
+    'room': 'Living room',
+  },
+  {
+    'title': 'WASH LIGHT FIXTURES',
+    'interval': '1 YEAR',
+    'category': 'LIVING & GENERAL',
+    'room': 'Living room',
+  },
+  {
+    'title': 'CLEAN BALCONY',
+    'interval': '1 YEAR',
+    'category': 'LIVING & GENERAL',
+    'room': 'Living room',
+  },
+  {
+    'title': 'LOAD OF LAUNDRY',
+    'interval': 'DAILY',
+    'category': 'LAUNDRY & UTILITY',
+    'room': 'Laundry',
+  },
+  {
+    'title': 'DEEP CLEAN WASHING MACHINE',
+    'interval': '1 YEAR',
+    'category': 'LAUNDRY & UTILITY',
+    'room': 'Laundry',
+  },
 ];
 
 class DashboardScreen extends StatefulWidget {
@@ -335,7 +533,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void _listenToAuthEvents() {
     if (DashboardScreen.testingMode) return;
-    _authSubscription = GoogleSignIn.instance.authenticationEvents.listen((event) {
+    _authSubscription = GoogleSignIn.instance.authenticationEvents.listen((
+      event,
+    ) {
       if (mounted) {
         setState(() {});
       }
@@ -465,7 +665,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final now = DateTime.now();
 
     final bgColor = isDark ? const Color(0xFF12140F) : const Color(0xFFE9EFE5);
-    final textColor = isDark ? const Color(0xFFEEF2E9) : const Color(0xFF26301F);
+    final textColor = isDark
+        ? const Color(0xFFEEF2E9)
+        : const Color(0xFF26301F);
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -505,7 +707,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildHeader(BuildContext context, bool isDark, Color textColor, DateTime now) {
+  Widget _buildHeader(
+    BuildContext context,
+    bool isDark,
+    Color textColor,
+    DateTime now,
+  ) {
     final dateStr = DateFormat('EEEE, MMMM d').format(now);
     final titles = ['Due', 'Rooms', 'Stats', 'Reminders & Settings'];
     final title = titles[_selectedIndex];
@@ -526,7 +733,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     fontSize: 11,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 1.2,
-                    color: isDark ? const Color(0xFF9AA48F) : const Color(0xFF6B7563),
+                    color: isDark
+                        ? const Color(0xFF9AA48F)
+                        : const Color(0xFF6B7563),
                   ),
                 ),
               ),
@@ -555,7 +764,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   final nextTheme = isDark ? ThemeMode.light : ThemeMode.dark;
                   themeNotifier.value = nextTheme;
                   SharedPreferences.getInstance().then((prefs) {
-                    prefs.setString('interfaceTheme', isDark ? 'LIGHT' : 'DARK');
+                    prefs.setString(
+                      'interfaceTheme',
+                      isDark ? 'LIGHT' : 'DARK',
+                    );
                   });
                 },
               ),
@@ -563,7 +775,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 icon: Icon(Icons.settings, color: textColor, size: 22),
                 onPressed: () {
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const SettingsPage()),
+                    MaterialPageRoute(
+                      builder: (context) => const SettingsPage(),
+                    ),
                   );
                 },
               ),
@@ -576,19 +790,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildDueTab(BuildContext context, bool isDark, DateTime now) {
     final cardBg = isDark ? const Color(0xFF1E211A) : Colors.white;
-    final textColor = isDark ? const Color(0xFFEEF2E9) : const Color(0xFF26301F);
-    final mutedText = isDark ? const Color(0xFF9AA48F) : const Color(0xFF6B7563);
+    final textColor = isDark
+        ? const Color(0xFFEEF2E9)
+        : const Color(0xFF26301F);
+    final mutedText = isDark
+        ? const Color(0xFF9AA48F)
+        : const Color(0xFF6B7563);
 
     final sortedTasks = List<Task>.from(_tasks)
-      ..sort((a, b) => _getDaysRemaining(a, now).compareTo(_getDaysRemaining(b, now)));
+      ..sort(
+        (a, b) =>
+            _getDaysRemaining(a, now).compareTo(_getDaysRemaining(b, now)),
+      );
 
-    final overdue = sortedTasks.where((t) => _getDaysRemaining(t, now) < 0).toList();
-    final dueToday = sortedTasks.where((t) => _getDaysRemaining(t, now) == 0).toList();
+    final overdue = sortedTasks
+        .where((t) => _getDaysRemaining(t, now) < 0)
+        .toList();
+    final dueToday = sortedTasks
+        .where((t) => _getDaysRemaining(t, now) == 0)
+        .toList();
     final soon = sortedTasks.where((t) {
       final d = _getDaysRemaining(t, now);
       return d > 0 && d <= 2;
     }).toList();
-    final upcoming = sortedTasks.where((t) => _getDaysRemaining(t, now) > 2).toList();
+    final upcoming = sortedTasks
+        .where((t) => _getDaysRemaining(t, now) > 2)
+        .toList();
 
     final needing = overdue.length + dueToday.length + soon.length;
     final headline = needing == 0
@@ -603,7 +830,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           const Text('STATUS', style: TextStyle(fontSize: 1)),
           const Text('HOME HEALTH', style: TextStyle(fontSize: 1)),
           const Text('100%', style: TextStyle(fontSize: 1)),
-          if (_tasks.isEmpty) const Text('NO SYSTEMS TRACKED', style: TextStyle(fontSize: 1)),
+          if (_tasks.isEmpty)
+            const Text('NO SYSTEMS TRACKED', style: TextStyle(fontSize: 1)),
         ],
 
         Text(
@@ -621,22 +849,38 @@ class _DashboardScreenState extends State<DashboardScreen> {
         if (overdue.isNotEmpty) ...[
           _buildSectionPill('OVERDUE', overdue.length, const Color(0xFFC2583F)),
           const SizedBox(height: 10),
-          ...overdue.map((t) => _buildRedesignTaskCard(t, now, isDark, cardBg, textColor)),
+          ...overdue.map(
+            (t) => _buildRedesignTaskCard(t, now, isDark, cardBg, textColor),
+          ),
           const SizedBox(height: 20),
         ],
 
         if (dueToday.isNotEmpty || soon.isNotEmpty) ...[
-          _buildSectionPill('DUE SOON', dueToday.length + soon.length, const Color(0xFFB98637)),
+          _buildSectionPill(
+            'DUE SOON',
+            dueToday.length + soon.length,
+            const Color(0xFFB98637),
+          ),
           const SizedBox(height: 10),
-          ...dueToday.map((t) => _buildRedesignTaskCard(t, now, isDark, cardBg, textColor)),
-          ...soon.map((t) => _buildRedesignTaskCard(t, now, isDark, cardBg, textColor)),
+          ...dueToday.map(
+            (t) => _buildRedesignTaskCard(t, now, isDark, cardBg, textColor),
+          ),
+          ...soon.map(
+            (t) => _buildRedesignTaskCard(t, now, isDark, cardBg, textColor),
+          ),
           const SizedBox(height: 20),
         ],
 
         if (upcoming.isNotEmpty) ...[
-          _buildSectionPill('UPCOMING', upcoming.length, const Color(0xFF3A7D5C)),
+          _buildSectionPill(
+            'UPCOMING',
+            upcoming.length,
+            const Color(0xFF3A7D5C),
+          ),
           const SizedBox(height: 10),
-          ...upcoming.map((t) => _buildRedesignTaskCard(t, now, isDark, cardBg, textColor)),
+          ...upcoming.map(
+            (t) => _buildRedesignTaskCard(t, now, isDark, cardBg, textColor),
+          ),
         ],
 
         if (_tasks.isEmpty && !DashboardScreen.testingMode)
@@ -645,7 +889,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: Center(
               child: Column(
                 children: [
-                  Icon(Icons.cleaning_services_outlined, size: 48, color: mutedText),
+                  Icon(
+                    Icons.cleaning_services_outlined,
+                    size: 48,
+                    color: mutedText,
+                  ),
                   const SizedBox(height: 12),
                   Text(
                     'No tasks created yet',
@@ -661,10 +909,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Text(
                     'Tap + to add your first cleaning task',
                     style: _safeGoogleFont(
-                      () => GoogleFonts.nunito(
-                        fontSize: 14,
-                        color: mutedText,
-                      ),
+                      () => GoogleFonts.nunito(fontSize: 14, color: mutedText),
                     ),
                   ),
                 ],
@@ -709,7 +954,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildRedesignTaskCard(Task task, DateTime now, bool isDark, Color cardBg, Color textColor) {
+  Widget _buildRedesignTaskCard(
+    Task task,
+    DateTime now,
+    bool isDark,
+    Color cardBg,
+    Color textColor,
+  ) {
     final d = _getDaysRemaining(task, now);
     final roomTheme = getRoomTheme(task.category);
 
@@ -767,7 +1018,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     color: roomTheme.tint(isDark),
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: Icon(roomTheme.icon, color: roomTheme.accent(isDark), size: 22),
+                  child: Icon(
+                    roomTheme.icon,
+                    color: roomTheme.accent(isDark),
+                    size: 22,
+                  ),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -794,11 +1049,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             style: GoogleFonts.nunito(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
-                              color: isDark ? const Color(0xFF9AA48F) : const Color(0xFF6B7563),
+                              color: isDark
+                                  ? const Color(0xFF9AA48F)
+                                  : const Color(0xFF6B7563),
                             ),
                           ),
                           const SizedBox(width: 6),
-                          Text('•', style: TextStyle(color: statusColor, fontSize: 10)),
+                          Text(
+                            '•',
+                            style: TextStyle(color: statusColor, fontSize: 10),
+                          ),
                           const SizedBox(width: 6),
                           Text(
                             statusLabel,
@@ -823,7 +1083,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       color: roomTheme.tint(isDark),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.check, color: roomTheme.accent(isDark), size: 20),
+                    child: Icon(
+                      Icons.check,
+                      color: roomTheme.accent(isDark),
+                      size: 20,
+                    ),
                   ),
                 ),
               ],
@@ -836,12 +1100,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildRoomsTab(BuildContext context, bool isDark, DateTime now) {
     final cardBg = isDark ? const Color(0xFF1E211A) : Colors.white;
-    final textColor = isDark ? const Color(0xFFEEF2E9) : const Color(0xFF26301F);
+    final textColor = isDark
+        ? const Color(0xFFEEF2E9)
+        : const Color(0xFF26301F);
 
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       children: [
-        ...ROOM_THEMES.map((rt) {
+        ...roomThemes.map((rt) {
           final roomTasks = _tasks.where((t) {
             final theme = getRoomTheme(t.category);
             return theme.categoryKey == rt.categoryKey;
@@ -855,7 +1121,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               color: cardBg,
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: isDark ? const Color(0x14FFFFFF) : const Color(0xFFEEF1EA),
+                color: isDark
+                    ? const Color(0x14FFFFFF)
+                    : const Color(0xFFEEF1EA),
               ),
             ),
             child: Column(
@@ -864,7 +1132,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
                   decoration: BoxDecoration(
                     color: rt.tint(isDark),
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(20),
+                    ),
                   ),
                   child: Row(
                     children: [
@@ -880,7 +1150,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                       const Spacer(),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: rt.accent(isDark).withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(10),
@@ -903,13 +1176,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   itemCount: roomTasks.length,
                   separatorBuilder: (context, i) => Divider(
                     height: 1,
-                    color: isDark ? const Color(0x14FFFFFF) : const Color(0xFFEEF1EA),
+                    color: isDark
+                        ? const Color(0x14FFFFFF)
+                        : const Color(0xFFEEF1EA),
                   ),
                   itemBuilder: (context, i) {
                     final task = roomTasks[i];
                     final d = _getDaysRemaining(task, now);
                     return ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 4,
+                      ),
                       title: Text(
                         task.title,
                         style: GoogleFonts.nunito(
@@ -922,16 +1200,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         d < 0
                             ? '${d.abs()}d overdue'
                             : d == 0
-                                ? 'Due today'
-                                : 'Due in ${d}d',
+                            ? 'Due today'
+                            : 'Due in ${d}d',
                         style: GoogleFonts.nunito(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                           color: d < 0
                               ? const Color(0xFFC2583F)
                               : d == 0
-                                  ? const Color(0xFFB98637)
-                                  : const Color(0xFF3A7D5C),
+                              ? const Color(0xFFB98637)
+                              : const Color(0xFF3A7D5C),
                         ),
                       ),
                       trailing: IconButton(
@@ -959,8 +1237,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildStatsTab(BuildContext context, bool isDark, DateTime now) {
     final cardBg = isDark ? const Color(0xFF1E211A) : Colors.white;
-    final textColor = isDark ? const Color(0xFFEEF2E9) : const Color(0xFF26301F);
-    final mutedText = isDark ? const Color(0xFF9AA48F) : const Color(0xFF6B7563);
+    final textColor = isDark
+        ? const Color(0xFFEEF2E9)
+        : const Color(0xFF26301F);
+    final mutedText = isDark
+        ? const Color(0xFF9AA48F)
+        : const Color(0xFF6B7563);
 
     final total = _tasks.length;
     final okCount = _tasks.where((t) => _getDaysRemaining(t, now) >= 0).length;
@@ -1001,12 +1283,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: CustomPaint(
                   painter: RingGaugePainter(
                     progress: healthPct / 100.0,
-                    trackColor: isDark ? const Color(0xFF333A2D) : const Color(0xFFD7DED0),
+                    trackColor: isDark
+                        ? const Color(0xFF333A2D)
+                        : const Color(0xFFD7DED0),
                     progressColor: healthPct >= 80
                         ? const Color(0xFF3A7D5C)
                         : healthPct >= 50
-                            ? const Color(0xFFB98637)
-                            : const Color(0xFFC2583F),
+                        ? const Color(0xFFB98637)
+                        : const Color(0xFFC2583F),
                     strokeWidth: 14,
                   ),
                   child: Center(
@@ -1057,7 +1341,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   color: cardBg,
                   borderRadius: BorderRadius.circular(18),
                   border: Border.all(
-                    color: isDark ? const Color(0x14FFFFFF) : const Color(0xFFEEF1EA),
+                    color: isDark
+                        ? const Color(0x14FFFFFF)
+                        : const Color(0xFFEEF1EA),
                   ),
                 ),
                 child: Column(
@@ -1091,7 +1377,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   color: cardBg,
                   borderRadius: BorderRadius.circular(18),
                   border: Border.all(
-                    color: isDark ? const Color(0x14FFFFFF) : const Color(0xFFEEF1EA),
+                    color: isDark
+                        ? const Color(0x14FFFFFF)
+                        : const Color(0xFFEEF1EA),
                   ),
                 ),
                 child: Column(
@@ -1130,14 +1418,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ),
         const SizedBox(height: 10),
-        ...ROOM_THEMES.map((rt) {
+        ...roomThemes.map((rt) {
           final roomTasks = _tasks.where((t) {
             final theme = getRoomTheme(t.category);
             return theme.categoryKey == rt.categoryKey;
           }).toList();
           if (roomTasks.isEmpty) return const SizedBox.shrink();
 
-          final ok = roomTasks.where((t) => _getDaysRemaining(t, now) >= 0).length;
+          final ok = roomTasks
+              .where((t) => _getDaysRemaining(t, now) >= 0)
+              .length;
           final pct = ((ok / roomTasks.length) * 100).round();
 
           return Container(
@@ -1147,7 +1437,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               color: cardBg,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: isDark ? const Color(0x14FFFFFF) : const Color(0xFFEEF1EA),
+                color: isDark
+                    ? const Color(0x14FFFFFF)
+                    : const Color(0xFFEEF1EA),
               ),
             ),
             child: Column(
@@ -1180,7 +1472,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     value: pct / 100.0,
                     minHeight: 8,
                     backgroundColor: rt.tint(isDark),
-                    valueColor: AlwaysStoppedAnimation<Color>(rt.accent(isDark)),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      rt.accent(isDark),
+                    ),
                   ),
                 ),
               ],
@@ -1194,8 +1488,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildMoreTab(BuildContext context, bool isDark, DateTime now) {
     final cardBg = isDark ? const Color(0xFF1E211A) : Colors.white;
-    final textColor = isDark ? const Color(0xFFEEF2E9) : const Color(0xFF26301F);
-    final mutedText = isDark ? const Color(0xFF9AA48F) : const Color(0xFF6B7563);
+    final textColor = isDark
+        ? const Color(0xFFEEF2E9)
+        : const Color(0xFF26301F);
+    final mutedText = isDark
+        ? const Color(0xFF9AA48F)
+        : const Color(0xFF6B7563);
 
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -1225,7 +1523,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                   Switch(
                     value: _remindersEnabled,
-                    activeColor: const Color(0xFF3A7D5C),
+                    activeThumbColor: const Color(0xFF3A7D5C),
                     onChanged: (v) {
                       setState(() {
                         _remindersEnabled = v;
@@ -1319,7 +1617,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
               const SizedBox(height: 8),
-              ...ROOM_THEMES.map((rt) {
+              ...roomThemes.map((rt) {
                 final on = _roomNotifs[rt.name] ?? true;
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1334,7 +1632,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                     Switch(
                       value: on,
-                      activeColor: rt.accent(isDark),
+                      activeThumbColor: rt.accent(isDark),
                       onChanged: (v) {
                         setState(() {
                           _roomNotifs[rt.name] = v;
@@ -1379,11 +1677,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
               Text(
-                _tasks.isEmpty ? 'Nothing due — enjoy the calm.' : 'Due soon • ${_tasks.first.category}',
-                style: GoogleFonts.nunito(
-                  fontSize: 13,
-                  color: mutedText,
-                ),
+                _tasks.isEmpty
+                    ? 'Nothing due — enjoy the calm.'
+                    : 'Due soon • ${_tasks.first.category}',
+                style: GoogleFonts.nunito(fontSize: 13, color: mutedText),
               ),
             ],
           ),
@@ -1397,7 +1694,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
               side: BorderSide(
-                color: isDark ? const Color(0x14FFFFFF) : const Color(0xFFEEF1EA),
+                color: isDark
+                    ? const Color(0x14FFFFFF)
+                    : const Color(0xFFEEF1EA),
               ),
             ),
             elevation: 0,
@@ -1408,7 +1707,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             children: [
               Text(
                 'Open Full Settings & Backup',
-                style: GoogleFonts.nunito(fontSize: 15, fontWeight: FontWeight.w800),
+                style: GoogleFonts.nunito(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
               const Icon(Icons.chevron_right),
             ],
@@ -1426,9 +1728,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildBottomNav(BuildContext context, bool isDark) {
     final navBg = isDark ? const Color(0xFF1A1D16) : Colors.white;
-    final navBorder = isDark ? const Color(0x14FFFFFF) : const Color(0xFFDDE3D8);
+    final navBorder = isDark
+        ? const Color(0x14FFFFFF)
+        : const Color(0xFFDDE3D8);
     final activeColor = const Color(0xFF3A7D5C);
-    final inactiveColor = isDark ? const Color(0xFF727B68) : const Color(0xFFB3BBA9);
+    final inactiveColor = isDark
+        ? const Color(0xFF727B68)
+        : const Color(0xFFB3BBA9);
 
     return Container(
       height: 72,
@@ -1439,8 +1745,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildNavItem(0, Icons.home_outlined, Icons.home, 'Due', activeColor, inactiveColor),
-          _buildNavItem(1, Icons.grid_view_outlined, Icons.grid_view, 'Rooms', activeColor, inactiveColor),
+          _buildNavItem(
+            0,
+            Icons.home_outlined,
+            Icons.home,
+            'Due',
+            activeColor,
+            inactiveColor,
+          ),
+          _buildNavItem(
+            1,
+            Icons.grid_view_outlined,
+            Icons.grid_view,
+            'Rooms',
+            activeColor,
+            inactiveColor,
+          ),
           GestureDetector(
             onTap: () {
               setState(() {
@@ -1465,14 +1785,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: const Icon(Icons.add, color: Colors.white, size: 28),
             ),
           ),
-          _buildNavItem(2, Icons.bar_chart_outlined, Icons.bar_chart, 'Stats', activeColor, inactiveColor),
-          _buildNavItem(3, Icons.notifications_none_outlined, Icons.notifications, 'More', activeColor, inactiveColor),
+          _buildNavItem(
+            2,
+            Icons.bar_chart_outlined,
+            Icons.bar_chart,
+            'Stats',
+            activeColor,
+            inactiveColor,
+          ),
+          _buildNavItem(
+            3,
+            Icons.notifications_none_outlined,
+            Icons.notifications,
+            'More',
+            activeColor,
+            inactiveColor,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildNavItem(int index, IconData iconOff, IconData iconOn, String label, Color activeColor, Color inactiveColor) {
+  Widget _buildNavItem(
+    int index,
+    IconData iconOff,
+    IconData iconOn,
+    String label,
+    Color activeColor,
+    Color inactiveColor,
+  ) {
     final active = _selectedIndex == index;
     return InkWell(
       onTap: () => setState(() => _selectedIndex = index),
@@ -1482,7 +1823,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(active ? iconOn : iconOff, color: active ? activeColor : inactiveColor, size: 22),
+            Icon(
+              active ? iconOn : iconOff,
+              color: active ? activeColor : inactiveColor,
+              size: 22,
+            ),
             const SizedBox(height: 2),
             Text(
               label,
@@ -1501,10 +1846,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildAddOverlay(BuildContext context, bool isDark) {
     final bgColor = isDark ? const Color(0xFF12140F) : const Color(0xFFE9EFE5);
     final cardBg = isDark ? const Color(0xFF1E211A) : Colors.white;
-    final textColor = isDark ? const Color(0xFFEEF2E9) : const Color(0xFF26301F);
-    final mutedText = isDark ? const Color(0xFF9AA48F) : const Color(0xFF6B7563);
+    final textColor = isDark
+        ? const Color(0xFFEEF2E9)
+        : const Color(0xFF26301F);
+    final mutedText = isDark
+        ? const Color(0xFF9AA48F)
+        : const Color(0xFF6B7563);
 
-    final filteredPresets = ALL_PRESETS.where((p) {
+    final filteredPresets = allPresets.where((p) {
       if (_selectedAddCategory == 'ALL') return true;
       return p['category'] == _selectedAddCategory;
     }).toList();
@@ -1522,7 +1871,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     icon: Container(
                       width: 36,
                       height: 36,
-                      decoration: BoxDecoration(color: cardBg, shape: BoxShape.circle),
+                      decoration: BoxDecoration(
+                        color: cardBg,
+                        shape: BoxShape.circle,
+                      ),
                       child: Icon(Icons.close, color: textColor, size: 20),
                     ),
                     onPressed: () => setState(() => _overlay = null),
@@ -1543,32 +1895,39 @@ class _DashboardScreenState extends State<DashboardScreen> {
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
-                children: [
-                  'ALL',
-                  'KITCHEN',
-                  'BATHROOM',
-                  'BEDROOM',
-                  'LIVING & GENERAL',
-                  'LAUNDRY & UTILITY'
-                ].map((cat) {
-                  final active = _selectedAddCategory == cat;
-                  final roomTheme = getRoomTheme(cat);
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: ChoiceChip(
-                      label: Text(roomTheme.name == 'Living room' && cat == 'ALL' ? 'All' : roomTheme.name),
-                      selected: active,
-                      selectedColor: isDark ? const Color(0xFF3A7D5C) : const Color(0xFF26301F),
-                      labelStyle: GoogleFonts.nunito(
-                        fontWeight: FontWeight.w800,
-                        color: active ? Colors.white : mutedText,
-                      ),
-                      onSelected: (sel) {
-                        if (sel) setState(() => _selectedAddCategory = cat);
-                      },
-                    ),
-                  );
-                }).toList(),
+                children:
+                    [
+                      'ALL',
+                      'KITCHEN',
+                      'BATHROOM',
+                      'BEDROOM',
+                      'LIVING & GENERAL',
+                      'LAUNDRY & UTILITY',
+                    ].map((cat) {
+                      final active = _selectedAddCategory == cat;
+                      final roomTheme = getRoomTheme(cat);
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: ChoiceChip(
+                          label: Text(
+                            roomTheme.name == 'Living room' && cat == 'ALL'
+                                ? 'All'
+                                : roomTheme.name,
+                          ),
+                          selected: active,
+                          selectedColor: isDark
+                              ? const Color(0xFF3A7D5C)
+                              : const Color(0xFF26301F),
+                          labelStyle: GoogleFonts.nunito(
+                            fontWeight: FontWeight.w800,
+                            color: active ? Colors.white : mutedText,
+                          ),
+                          onSelected: (sel) {
+                            if (sel) setState(() => _selectedAddCategory = cat);
+                          },
+                        ),
+                      );
+                    }).toList(),
               ),
             ),
             const SizedBox(height: 12),
@@ -1617,7 +1976,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       color: cardBg,
                       borderRadius: BorderRadius.circular(18),
                       border: Border.all(
-                        color: isDark ? const Color(0x14FFFFFF) : const Color(0xFFEEF1EA),
+                        color: isDark
+                            ? const Color(0x14FFFFFF)
+                            : const Color(0xFFEEF1EA),
                       ),
                     ),
                     child: Row(
@@ -1629,7 +1990,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             color: roomTheme.tint(isDark),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Icon(roomTheme.icon, color: roomTheme.accent(isDark), size: 20),
+                          child: Icon(
+                            roomTheme.icon,
+                            color: roomTheme.accent(isDark),
+                            size: 20,
+                          ),
                         ),
                         const SizedBox(width: 14),
                         Expanded(
@@ -1662,7 +2027,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               color: roomTheme.tint(isDark),
                               shape: BoxShape.circle,
                             ),
-                            child: Icon(Icons.add, color: roomTheme.accent(isDark), size: 20),
+                            child: Icon(
+                              Icons.add,
+                              color: roomTheme.accent(isDark),
+                              size: 20,
+                            ),
                           ),
                           onPressed: () => _addPreset(preset),
                         ),
@@ -1681,7 +2050,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildCustomOverlay(BuildContext context, bool isDark) {
     final bgColor = isDark ? const Color(0xFF12140F) : const Color(0xFFE9EFE5);
     final cardBg = isDark ? const Color(0xFF1E211A) : Colors.white;
-    final textColor = isDark ? const Color(0xFFEEF2E9) : const Color(0xFF26301F);
+    final textColor = isDark
+        ? const Color(0xFFEEF2E9)
+        : const Color(0xFF26301F);
 
     final rooms = ['Kitchen', 'Bathroom', 'Bedroom', 'Living room', 'Laundry'];
     final intervals = ['DAILY', 'WEEKLY', 'MONTHLY', '3 MONTHS', '1 YEAR'];
@@ -1699,7 +2070,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   icon: Container(
                     width: 36,
                     height: 36,
-                    decoration: BoxDecoration(color: cardBg, shape: BoxShape.circle),
+                    decoration: BoxDecoration(
+                      color: cardBg,
+                      shape: BoxShape.circle,
+                    ),
                     child: Icon(Icons.arrow_back, color: textColor, size: 20),
                   ),
                   onPressed: () => setState(() => _overlay = 'add'),
@@ -1841,8 +2215,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final task = _selectedTask!;
     final bgColor = isDark ? const Color(0xFF12140F) : const Color(0xFFE9EFE5);
     final cardBg = isDark ? const Color(0xFF1E211A) : Colors.white;
-    final textColor = isDark ? const Color(0xFFEEF2E9) : const Color(0xFF26301F);
-    final mutedText = isDark ? const Color(0xFF9AA48F) : const Color(0xFF6B7563);
+    final textColor = isDark
+        ? const Color(0xFFEEF2E9)
+        : const Color(0xFF26301F);
+    final mutedText = isDark
+        ? const Color(0xFF9AA48F)
+        : const Color(0xFF6B7563);
 
     final d = _getDaysRemaining(task, now);
     final roomTheme = getRoomTheme(task.category);
@@ -1874,7 +2252,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   icon: Container(
                     width: 36,
                     height: 36,
-                    decoration: BoxDecoration(color: cardBg, shape: BoxShape.circle),
+                    decoration: BoxDecoration(
+                      color: cardBg,
+                      shape: BoxShape.circle,
+                    ),
                     child: Icon(Icons.arrow_back, color: textColor, size: 20),
                   ),
                   onPressed: () => setState(() {
@@ -1886,8 +2267,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   icon: Container(
                     width: 36,
                     height: 36,
-                    decoration: BoxDecoration(color: cardBg, shape: BoxShape.circle),
-                    child: const Icon(Icons.delete_outline, color: Color(0xFFC2583F), size: 20),
+                    decoration: BoxDecoration(
+                      color: cardBg,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.delete_outline,
+                      color: Color(0xFFC2583F),
+                      size: 20,
+                    ),
                   ),
                   onPressed: () => _deleteTask(task),
                 ),
@@ -1904,12 +2292,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       child: CustomPaint(
                         painter: RingGaugePainter(
                           progress: health,
-                          trackColor: isDark ? const Color(0xFF333A2D) : const Color(0xFFD7DED0),
+                          trackColor: isDark
+                              ? const Color(0xFF333A2D)
+                              : const Color(0xFFD7DED0),
                           progressColor: statusColor,
                           strokeWidth: 12,
                         ),
                         child: Center(
-                          child: Icon(roomTheme.icon, color: roomTheme.accent(isDark), size: 40),
+                          child: Icon(
+                            roomTheme.icon,
+                            color: roomTheme.accent(isDark),
+                            size: 40,
+                          ),
                         ),
                       ),
                     ),
@@ -2004,7 +2398,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         padding: const EdgeInsets.all(16),
                         child: Text(
                           'No history yet',
-                          style: GoogleFonts.nunito(fontSize: 14, color: mutedText),
+                          style: GoogleFonts.nunito(
+                            fontSize: 14,
+                            color: mutedText,
+                          ),
                         ),
                       )
                     else
@@ -2013,11 +2410,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         final rel = diffDays == 0
                             ? 'Today'
                             : diffDays == 1
-                                ? 'Yesterday'
-                                : '$diffDays days ago';
+                            ? 'Yesterday'
+                            : '$diffDays days ago';
                         return Container(
                           margin: const EdgeInsets.only(bottom: 8),
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
                           decoration: BoxDecoration(
                             color: cardBg,
                             borderRadius: BorderRadius.circular(14),
@@ -2186,7 +2586,9 @@ class TaskCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final textColor = isOverdue ? theme.colorScheme.error : theme.colorScheme.onSurface;
+    final textColor = isOverdue
+        ? theme.colorScheme.error
+        : theme.colorScheme.onSurface;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -2229,7 +2631,9 @@ class TaskCard extends StatelessWidget {
                           () => GoogleFonts.nunito(
                             fontSize: 13,
                             color: textColor,
-                            fontWeight: isOverdue ? FontWeight.w900 : FontWeight.w700,
+                            fontWeight: isOverdue
+                                ? FontWeight.w900
+                                : FontWeight.w700,
                           ),
                         ),
                       ),
