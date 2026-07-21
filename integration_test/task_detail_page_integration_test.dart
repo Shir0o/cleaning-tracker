@@ -16,34 +16,30 @@ void main() {
     // Verify we are on Dashboard
     expect(find.text('Due'), findsWidgets);
 
-    // Tap add button (FAB)
-    await tester.tap(find.byIcon(Icons.add));
+    // Tap add button (center nav bar FAB)
+    await tester.tap(find.byIcon(Icons.add).first);
     await tester.pumpAndSettle();
 
-    // Tap + icon on first preset card
-    final addPresetButton = find.byIcon(Icons.add).at(1);
-    await tester.tap(addPresetButton);
+    // Tap 'WASH DISHES' preset card in Add Task overlay
+    await tester.tap(find.text('WASH DISHES'));
     await tester.pumpAndSettle();
 
     // Verify preset task (WASH DISHES) exists on Dashboard
     expect(find.text('WASH DISHES'), findsOneWidget);
 
     // Find and tap the TaskCard (WASH DISHES)
-    final taskCard = find.text('WASH DISHES');
-    expect(taskCard, findsOneWidget);
-
-    await tester.tap(taskCard);
+    await tester.tap(find.text('WASH DISHES'));
     await tester.pumpAndSettle();
 
     // Verify we are on the Task Detail view
     expect(find.text('MARK AS DONE'), findsOneWidget);
 
-    // Tap the back button
+    // Tap the back button to close Task Detail view
     final backButton = find.byIcon(Icons.arrow_back);
     await tester.tap(backButton);
     await tester.pumpAndSettle();
 
-    // Verify we are back on Dashboard
+    // Verify back on Dashboard
     expect(find.text('Due'), findsWidgets);
   });
 }

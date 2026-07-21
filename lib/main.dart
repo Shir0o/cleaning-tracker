@@ -1183,46 +1183,52 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   itemBuilder: (context, i) {
                     final task = roomTasks[i];
                     final d = _getDaysRemaining(task, now);
-                    return ListTile(
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 4,
-                      ),
-                      title: Text(
-                        task.title,
-                        style: GoogleFonts.nunito(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w800,
-                          color: textColor,
+                    return Material(
+                      color: Colors.transparent,
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 4,
                         ),
-                      ),
-                      subtitle: Text(
-                        d < 0
-                            ? '${d.abs()}d overdue'
-                            : d == 0
-                            ? 'Due today'
-                            : 'Due in ${d}d',
-                        style: GoogleFonts.nunito(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: d < 0
-                              ? const Color(0xFFC2583F)
+                        title: Text(
+                          task.title,
+                          style: GoogleFonts.nunito(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                            color: textColor,
+                          ),
+                        ),
+                        subtitle: Text(
+                          d < 0
+                              ? '${d.abs()}d overdue'
                               : d == 0
-                              ? const Color(0xFFB98637)
-                              : const Color(0xFF3A7D5C),
+                              ? 'Due today'
+                              : 'Due in ${d}d',
+                          style: GoogleFonts.nunito(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: d < 0
+                                ? const Color(0xFFC2583F)
+                                : d == 0
+                                ? const Color(0xFFB98637)
+                                : const Color(0xFF3A7D5C),
+                          ),
                         ),
+                        trailing: IconButton(
+                          icon: const Icon(
+                            Icons.check_circle_outline,
+                            size: 24,
+                          ),
+                          color: rt.accent(isDark),
+                          onPressed: () => _markDone(task),
+                        ),
+                        onTap: () {
+                          setState(() {
+                            _selectedTask = task;
+                            _overlay = 'detail';
+                          });
+                        },
                       ),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.check_circle_outline, size: 24),
-                        color: rt.accent(isDark),
-                        onPressed: () => _markDone(task),
-                      ),
-                      onTap: () {
-                        setState(() {
-                          _selectedTask = task;
-                          _overlay = 'detail';
-                        });
-                      },
                     );
                   },
                 ),
@@ -1971,7 +1977,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                   return Container(
                     margin: const EdgeInsets.only(bottom: 10),
-                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: cardBg,
                       borderRadius: BorderRadius.circular(18),
@@ -1981,61 +1986,72 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             : const Color(0xFFEEF1EA),
                       ),
                     ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: roomTheme.tint(isDark),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Icon(
-                            roomTheme.icon,
-                            color: roomTheme.accent(isDark),
-                            size: 20,
-                          ),
-                        ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Material(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(18),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(18),
+                        onTap: () => _addPreset(preset),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
                             children: [
-                              Text(
-                                preset['title']!,
-                                style: GoogleFonts.nunito(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w800,
-                                  color: textColor,
+                              Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: roomTheme.tint(isDark),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Icon(
+                                  roomTheme.icon,
+                                  color: roomTheme.accent(isDark),
+                                  size: 20,
                                 ),
                               ),
-                              Text(
-                                '${roomTheme.name} • ${preset['interval']}',
-                                style: GoogleFonts.nunito(
-                                  fontSize: 12,
-                                  color: mutedText,
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      preset['title']!,
+                                      style: GoogleFonts.nunito(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w800,
+                                        color: textColor,
+                                      ),
+                                    ),
+                                    Text(
+                                      '${roomTheme.name} • ${preset['interval']}',
+                                      style: GoogleFonts.nunito(
+                                        fontSize: 12,
+                                        color: mutedText,
+                                      ),
+                                    ),
+                                  ],
                                 ),
+                              ),
+                              IconButton(
+                                icon: Container(
+                                  width: 34,
+                                  height: 34,
+                                  decoration: BoxDecoration(
+                                    color: roomTheme.tint(isDark),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.add,
+                                    color: roomTheme.accent(isDark),
+                                    size: 20,
+                                  ),
+                                ),
+                                onPressed: () => _addPreset(preset),
                               ),
                             ],
                           ),
                         ),
-                        IconButton(
-                          icon: Container(
-                            width: 34,
-                            height: 34,
-                            decoration: BoxDecoration(
-                              color: roomTheme.tint(isDark),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.add,
-                              color: roomTheme.accent(isDark),
-                              size: 20,
-                            ),
-                          ),
-                          onPressed: () => _addPreset(preset),
-                        ),
-                      ],
+                      ),
                     ),
                   );
                 },
