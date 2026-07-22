@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:cleaning_tracker/main.dart' as app;
-import 'package:cleaning_tracker/task_detail_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -15,45 +14,32 @@ void main() {
     await tester.pumpAndSettle();
 
     // Verify we are on Dashboard
-    expect(find.text('STATUS'), findsOneWidget);
-    expect(find.text('NO SYSTEMS TRACKED'), findsOneWidget);
+    expect(find.text('Due'), findsWidgets);
 
-    // Tap add button
-    await tester.tap(find.byIcon(Icons.add));
+    // Tap add button (center nav bar FAB)
+    await tester.tap(find.byIcon(Icons.add).first);
     await tester.pumpAndSettle();
 
-    // Type name. AddTaskPage has multiple TextFields, so target the name
-    // field by its ValueKey.
-    await tester.enterText(
-      find.byKey(const ValueKey('add_task_name_field')),
-      'HVAC FILTER',
-    );
+    // Tap 'WASH DISHES' preset card in Add Task overlay
+    await tester.tap(find.text('WASH DISHES'));
     await tester.pumpAndSettle();
 
-    // Initialize tracker
-    await tester.tap(find.text('INITIALIZE TRACKER'));
+    // Verify preset task (WASH DISHES) exists on Dashboard
+    expect(find.text('WASH DISHES'), findsOneWidget);
+
+    // Find and tap the TaskCard (WASH DISHES)
+    await tester.tap(find.text('WASH DISHES'));
     await tester.pumpAndSettle();
 
-    // Verify back on Dashboard and task exists
-    expect(find.text('HVAC FILTER'), findsOneWidget);
+    // Verify we are on the Task Detail view
+    expect(find.text('MARK AS DONE'), findsOneWidget);
 
-    // Find and tap the TaskCard (HVAC FILTER)
-    final hvacFilterCard = find.text('HVAC FILTER');
-    expect(hvacFilterCard, findsOneWidget);
-
-    await tester.tap(hvacFilterCard);
-    await tester.pumpAndSettle();
-
-    // Verify we are on the TaskDetailPage
-    expect(find.byType(TaskDetailPage), findsOneWidget);
-    expect(find.text('CLEANLINESS'), findsOneWidget);
-
-    // Tap the back button
+    // Tap the back button to close Task Detail view
     final backButton = find.byIcon(Icons.arrow_back);
     await tester.tap(backButton);
     await tester.pumpAndSettle();
 
-    // Verify we are back on Dashboard
-    expect(find.text('STATUS'), findsOneWidget);
+    // Verify back on Dashboard
+    expect(find.text('Due'), findsWidgets);
   });
 }
