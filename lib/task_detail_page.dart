@@ -358,6 +358,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
         ),
       ),
       onTap: () async {
+        final oldTask = _currentTask;
         final snoozeDate = DateTime.now().add(duration);
         final updatedTask = _currentTask.copyWith(snoozedUntil: snoozeDate);
         await DatabaseService().updateTask(updatedTask);
@@ -366,11 +367,42 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
             _currentTask = updatedTask;
           });
           Navigator.pop(context);
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Snoozed for $label')));
+          _showUndoToast(
+            'Snoozed for $label',
+            onUndo: () async {
+              await DatabaseService().updateTask(oldTask);
+              if (mounted) {
+                setState(() {
+                  _currentTask = oldTask;
+                });
+                _showToast('Snooze undone');
+              }
+            },
+          );
         }
       },
+    );
+  }
+
+  void _showToast(String message) {
+    _showUndoToast(message);
+  }
+
+  void _showUndoToast(String message, {VoidCallback? onUndo}) {
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Duration(milliseconds: onUndo != null ? 4600 : 2000),
+        action: onUndo != null
+            ? SnackBarAction(
+                label: 'UNDO',
+                textColor: const Color(0xFF8FD3AC),
+                onPressed: onUndo,
+              )
+            : null,
+      ),
     );
   }
 
@@ -548,6 +580,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                             onPressed: () async {
                               final now = DateTime.now();
                               HapticFeedback.heavyImpact();
+                              final oldTask = _currentTask;
                               // Clear snooze when completing
                               final updatedTask = _currentTask.copyWith(
                                 lastCompleted: now,
@@ -559,10 +592,17 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                               setState(() {
                                 _currentTask = updatedTask;
                               });
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('System Reset Successful'),
-                                ),
+                              _showUndoToast(
+                                'System Reset Successful',
+                                onUndo: () async {
+                                  await DatabaseService().updateTask(oldTask);
+                                  if (mounted) {
+                                    setState(() {
+                                      _currentTask = oldTask;
+                                    });
+                                    _showToast('Undone — log entry removed');
+                                  }
+                                },
                               );
                             },
                             child: Row(
@@ -926,7 +966,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                             ),
                           ),
                           child: Text(
-                            'NO HISTORY YET',
+                            'No entries logged yet.',
                             style: _safeGoogleFont(
                               () => GoogleFonts.inter(
                                 fontSize: 14,
@@ -938,9 +978,17 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                       : Column(
                           children: _currentTask.completions.reversed
                               .take(5)
+                              .toList()
+                              .asMap()
+                              .entries
                               .map(
-                                (completion) =>
-                                    _buildHistoryRow(completion, context),
+                                (entry) => _buildHistoryRow(
+                                  entry.value,
+                                  _currentTask.completions.length -
+                                      1 -
+                                      entry.key,
+                                  context,
+                                ),
                               )
                               .toList(),
                         ),
@@ -953,7 +1001,11 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     );
   }
 
-  Widget _buildHistoryRow(DateTime completion, BuildContext context) {
+  Widget _buildHistoryRow(
+    DateTime completion,
+    int index,
+    BuildContext context,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
     final dateStr = DateFormat('MM.dd').format(completion);
     final yearStr = DateFormat('yyyy').format(completion);
@@ -1004,9 +1056,49 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
               ),
             ),
           ),
+          const SizedBox(width: 4),
+          Tooltip(
+            message: 'Remove this entry',
+            child: InkWell(
+              onTap: () => _removeHistoryEntry(index),
+              child: Padding(
+                padding: const EdgeInsets.all(4),
+                child: Icon(
+                  Icons.close,
+                  size: 16,
+                  color: const Color(0xFF8A8A8A),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  Future<void> _removeHistoryEntry(int index) async {
+    final oldTask = _currentTask;
+    final updatedCompletions = List<DateTime>.from(oldTask.completions)
+      ..removeAt(index);
+    final updatedTask = oldTask.copyWith(completions: updatedCompletions);
+    await DatabaseService().updateTask(updatedTask);
+    if (mounted) {
+      setState(() {
+        _currentTask = updatedTask;
+      });
+      _showUndoToast(
+        'Log entry removed',
+        onUndo: () async {
+          await DatabaseService().updateTask(oldTask);
+          if (mounted) {
+            setState(() {
+              _currentTask = oldTask;
+            });
+            _showToast('Entry restored');
+          }
+        },
+      );
+    }
   }
 
   void _showDeleteConfirmation(BuildContext context) {

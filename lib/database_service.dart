@@ -90,14 +90,28 @@ class DatabaseService {
     if (testingMode && _mockDb == null) return 0;
     final database = await db;
     return await database.transaction<int>((txn) async {
-      final id = await txn.insert('tasks', {
-        'title': task.title,
-        'interval': task.interval,
-        'lastCompleted': task.lastCompleted.toIso8601String(),
-        'category': task.category,
-        'notes': task.notes,
-        'snoozedUntil': task.snoozedUntil?.toIso8601String(),
-      });
+      int id;
+      if (task.id != null) {
+        id = task.id!;
+        await txn.insert('tasks', {
+          'id': id,
+          'title': task.title,
+          'interval': task.interval,
+          'lastCompleted': task.lastCompleted.toIso8601String(),
+          'category': task.category,
+          'notes': task.notes,
+          'snoozedUntil': task.snoozedUntil?.toIso8601String(),
+        });
+      } else {
+        id = await txn.insert('tasks', {
+          'title': task.title,
+          'interval': task.interval,
+          'lastCompleted': task.lastCompleted.toIso8601String(),
+          'category': task.category,
+          'notes': task.notes,
+          'snoozedUntil': task.snoozedUntil?.toIso8601String(),
+        });
+      }
 
       for (var completion in task.completions) {
         await txn.insert('completions', {
