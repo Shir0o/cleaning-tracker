@@ -55,7 +55,7 @@ void main() {
       await tester.pump();
 
       expect(find.text('HISTORY'), findsOneWidget);
-      expect(find.text('NO HISTORY YET'), findsOneWidget);
+      expect(find.text('No entries logged yet.'), findsOneWidget);
     });
 
     testWidgets(

@@ -552,6 +552,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Future<void> _markDone(Task task) async {
     HapticFeedback.heavyImpact();
     final now = DateTime.now();
+    final oldTask = task;
     final updatedTask = task.copyWith(
       lastCompleted: now,
       completions: [...task.completions, now],
@@ -565,13 +566,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
         }
       });
       await _refreshTasks();
-      _showToast('Marked as done 🌿');
+      _showUndoToast(
+        'Marked as done 🌿',
+        onUndo: () async {
+          await DatabaseService().updateTask(oldTask);
+          if (mounted) {
+            setState(() {
+              if (_selectedTask?.id == oldTask.id) {
+                _selectedTask = oldTask;
+              }
+            });
+            await _refreshTasks();
+            _showToast('Undone — log entry removed');
+          }
+        },
+      );
     }
   }
 
   Future<void> _snooze(Task task, int days) async {
     final now = DateTime.now();
     final snoozeUntil = now.add(Duration(days: days));
+    final oldTask = task;
     final updatedTask = task.copyWith(snoozedUntil: snoozeUntil);
     await DatabaseService().updateTask(updatedTask);
     if (mounted) {
@@ -581,7 +597,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
         }
       });
       await _refreshTasks();
-      _showToast('Snoozed for +$days day${days == 1 ? '' : 's'}');
+      _showUndoToast(
+        'Snoozed for +$days day${days == 1 ? '' : 's'}',
+        onUndo: () async {
+          await DatabaseService().updateTask(oldTask);
+          if (mounted) {
+            setState(() {
+              if (_selectedTask?.id == oldTask.id) {
+                _selectedTask = oldTask;
+              }
+            });
+            await _refreshTasks();
+            _showToast('Snooze undone');
+          }
+        },
+      );
     }
   }
 
@@ -594,8 +624,49 @@ class _DashboardScreenState extends State<DashboardScreen> {
           _selectedTask = null;
         });
         await _refreshTasks();
-        _showToast('Task deleted');
+        _showUndoToast(
+          'Task deleted',
+          onUndo: () async {
+            await DatabaseService().insertTask(task);
+            if (mounted) {
+              setState(() {});
+              await _refreshTasks();
+              _showToast('Task restored');
+            }
+          },
+        );
       }
+    }
+  }
+
+  Future<void> _removeHistoryEntry(Task task, int index) async {
+    final updatedCompletions = List<DateTime>.from(task.completions)
+      ..removeAt(index);
+    final updatedTask = task.copyWith(completions: updatedCompletions);
+    final oldTask = task;
+    await DatabaseService().updateTask(updatedTask);
+    if (mounted) {
+      setState(() {
+        if (_selectedTask?.id == task.id) {
+          _selectedTask = updatedTask;
+        }
+      });
+      await _refreshTasks();
+      _showUndoToast(
+        'Log entry removed',
+        onUndo: () async {
+          await DatabaseService().updateTask(oldTask);
+          if (mounted) {
+            setState(() {
+              if (_selectedTask?.id == oldTask.id) {
+                _selectedTask = oldTask;
+              }
+            });
+            await _refreshTasks();
+            _showToast('Entry restored');
+          }
+        },
+      );
     }
   }
 
@@ -641,7 +712,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _showToast(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
+    _showUndoToast(message);
+  }
+
+  void _showUndoToast(String message, {VoidCallback? onUndo}) {
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(
       SnackBar(
         content: Text(
           message,
@@ -653,7 +730,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
         backgroundColor: const Color(0xFF26301F),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        duration: const Duration(seconds: 2),
+        duration: Duration(milliseconds: onUndo != null ? 4600 : 2000),
+        action: onUndo != null
+            ? SnackBarAction(
+                label: 'UNDO',
+                textColor: const Color(0xFF8FD3AC),
+                onPressed: onUndo,
+              )
+            : null,
       ),
     );
   }
@@ -2413,7 +2497,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       Padding(
                         padding: const EdgeInsets.all(16),
                         child: Text(
-                          'No history yet',
+                          'No entries logged yet.',
                           style: GoogleFonts.nunito(
                             fontSize: 14,
                             color: mutedText,
@@ -2421,46 +2505,70 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                       )
                     else
-                      ...task.completions.reversed.take(6).map((c) {
-                        final diffDays = now.difference(c).inDays;
-                        final rel = diffDays == 0
-                            ? 'Today'
-                            : diffDays == 1
-                            ? 'Yesterday'
-                            : '$diffDays days ago';
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 8),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                          decoration: BoxDecoration(
-                            color: cardBg,
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                DateFormat('EEE, MMM d, yyyy').format(c),
-                                style: GoogleFonts.nunito(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w800,
-                                  color: textColor,
-                                ),
+                      ...task.completions.reversed
+                          .take(6)
+                          .toList()
+                          .asMap()
+                          .entries
+                          .map((entry) {
+                            final indexInTask =
+                                task.completions.length - 1 - entry.key;
+                            final c = entry.value;
+                            final diffDays = now.difference(c).inDays;
+                            final rel = diffDays == 0
+                                ? 'Today'
+                                : diffDays == 1
+                                ? 'Yesterday'
+                                : '$diffDays days ago';
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 8),
+                              padding: const EdgeInsets.only(
+                                left: 16,
+                                top: 4,
+                                bottom: 4,
+                                right: 4,
                               ),
-                              Text(
-                                rel,
-                                style: GoogleFonts.nunito(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
-                                  color: mutedText,
-                                ),
+                              decoration: BoxDecoration(
+                                color: cardBg,
+                                borderRadius: BorderRadius.circular(14),
                               ),
-                            ],
-                          ),
-                        );
-                      }),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      DateFormat('EEE, MMM d, yyyy').format(c),
+                                      style: GoogleFonts.nunito(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w800,
+                                        color: textColor,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    rel,
+                                    style: GoogleFonts.nunito(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                      color: mutedText,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.close,
+                                      size: 16,
+                                      color: mutedText,
+                                    ),
+                                    tooltip: 'Remove this entry',
+                                    visualDensity: VisualDensity.compact,
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                    onPressed: () =>
+                                        _removeHistoryEntry(task, indexInTask),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }),
                   ],
                 ),
               ),
