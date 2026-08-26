@@ -16,12 +16,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Dependencies:** Resolved open Dependabot security and maintenance dependency updates.
 - **Notification Reliability:** Fixed notification icon silhouettes, boot survival re-arm, cold-start initialization, and overdue task notification handling.
 
+### Added
+- **Test Coverage:** Added 54 new unit tests covering `Task` model edge cases (interval parsing, snoozed branches, JSON round-trip, suggested interval thresholds), `DatabaseService` (`getTasks`, `deleteTask`, `addCompletion`, `deleteAllTasks`, `migrateFromSharedPreferences`), `DriveService` (sync early-return, create-new branch, payload key filtering, backup timestamp, restore error paths), and `NotificationService` (notifyBefore parsing variants, cancel id fallback, uninitialized rescheduleAll, test notification, exact-alarm retry, PlatformException rethrow).
+
 ## [1.1.3] - 2026-05-07
 
 ### Fixed
 - **Notification Permissions:** Request notification permissions before scheduling reminders.
 - **Notification Scheduling:** Improved reminder scheduling reliability and diagnostics.
-- **Build Stability:** Resolved compilation errors and test regressions after recent feature work.
 
 ### Added
 - **Open Source Readiness:** Added license, security, contribution, and development documentation.
