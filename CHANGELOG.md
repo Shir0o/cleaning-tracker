@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Build System:** Migrated to modern Kotlin Gradle plugin and fixed missing `.env` asset error.
 - **Dependencies:** Resolved open Dependabot security and maintenance dependency updates.
 - **Notification Reliability:** Fixed notification icon silhouettes, boot survival re-arm, cold-start initialization, and overdue task notification handling.
+- **Notification Delivery:** Declared the `flutter_local_notifications` scheduled-notification and boot receivers in the Android manifest. The plugin ships no receivers of its own; without them Android silently drops the scheduled-reminder alarm broadcast, so reminders only ever appeared via the immediate-fire fallback when the app was opened.
 
 ### Added
 - **Test Coverage:** Added 54 new unit tests covering `Task` model edge cases (interval parsing, snoozed branches, JSON round-trip, suggested interval thresholds), `DatabaseService` (`getTasks`, `deleteTask`, `addCompletion`, `deleteAllTasks`, `migrateFromSharedPreferences`), `DriveService` (sync early-return, create-new branch, payload key filtering, backup timestamp, restore error paths), and `NotificationService` (notifyBefore parsing variants, cancel id fallback, uninitialized rescheduleAll, test notification, exact-alarm retry, PlatformException rethrow).
