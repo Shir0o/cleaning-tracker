@@ -1,11 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
+import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'models.dart';
 
 class DatabaseService {
+  static const String _dbName = 'cleaning_tracker.db';
   static DatabaseService _instance = DatabaseService._internal();
   factory DatabaseService() => _instance;
   DatabaseService._internal();
@@ -36,7 +37,7 @@ class DatabaseService {
       throw UnsupportedError('Database not available in testing mode');
     }
     final dbPath = await getDatabasesPath();
-    final path = join(dbPath, 'cleaning_tracker.db');
+    final path = p.normalize(p.join(dbPath, _dbName));
 
     return await openDatabase(
       path,
