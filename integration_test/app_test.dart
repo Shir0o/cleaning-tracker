@@ -1,3 +1,4 @@
+import 'package:cleaning_tracker/database_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ void main() {
   ) async {
     app.DashboardScreen.testingMode = true;
     LogHistoryPage.testingMode = true;
+    await DatabaseService().deleteAllTasks();
     app.main();
     await tester.pumpAndSettle();
 
