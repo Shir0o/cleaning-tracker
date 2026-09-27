@@ -54,6 +54,11 @@ lib/secrets.dart
 .env
 dart_defines.json
 dart_defines.local.json
+key.properties
+*.jks
+*.keystore
+android/key.properties
+android/key.properties.example
 
 # Test failure artifacts
 test/failures/
