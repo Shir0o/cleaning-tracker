@@ -275,6 +275,77 @@ void main() {
     });
   });
 
+  group('Task.fromJson deserialization', () {
+    test('deserializes a complete json map with all fields populated', () {
+      final json = {
+        'id': 42,
+        'title': 'CLEAN OVEN',
+        'interval': '30 DAYS',
+        'lastCompleted': '2026-03-15T10:00:00.000Z',
+        'category': 'KITCHEN',
+        'notes': 'Use heavy duty cleaner',
+        'completions': ['2026-02-15T10:00:00.000Z', '2026-03-15T10:00:00.000Z'],
+        'snoozedUntil': '2026-03-20T00:00:00.000Z',
+      };
+
+      final task = Task.fromJson(json);
+
+      expect(task.id, 42);
+      expect(task.title, 'CLEAN OVEN');
+      expect(task.interval, '30 DAYS');
+      expect(task.lastCompleted, DateTime.parse('2026-03-15T10:00:00.000Z'));
+      expect(task.category, 'KITCHEN');
+      expect(task.notes, 'Use heavy duty cleaner');
+      expect(task.completions, [
+        DateTime.parse('2026-02-15T10:00:00.000Z'),
+        DateTime.parse('2026-03-15T10:00:00.000Z'),
+      ]);
+      expect(task.snoozedUntil, DateTime.parse('2026-03-20T00:00:00.000Z'));
+    });
+
+    test(
+      'deserializes minimal json map using default values for missing optional fields',
+      () {
+        final json = {'title': 'SWEEP FLOOR', 'interval': '1 DAYS'};
+
+        final task = Task.fromJson(json);
+
+        expect(task.id, isNull);
+        expect(task.title, 'SWEEP FLOOR');
+        expect(task.interval, '1 DAYS');
+        expect(task.lastCompleted, isA<DateTime>());
+        expect(task.category, 'GENERAL');
+        expect(task.notes, '');
+        expect(task.completions, isEmpty);
+        expect(task.snoozedUntil, isNull);
+      },
+    );
+
+    test('handles explicit null optional fields correctly', () {
+      final json = {
+        'id': null,
+        'title': 'WASH WINDOWS',
+        'interval': '14 DAYS',
+        'lastCompleted': null,
+        'category': null,
+        'notes': null,
+        'completions': null,
+        'snoozedUntil': null,
+      };
+
+      final task = Task.fromJson(json);
+
+      expect(task.id, isNull);
+      expect(task.title, 'WASH WINDOWS');
+      expect(task.interval, '14 DAYS');
+      expect(task.lastCompleted, isA<DateTime>());
+      expect(task.category, 'GENERAL');
+      expect(task.notes, '');
+      expect(task.completions, isEmpty);
+      expect(task.snoozedUntil, isNull);
+    });
+  });
+
   group('Task JSON round-trip', () {
     test('toJson includes every field and respects id omission', () {
       final t = Task(
