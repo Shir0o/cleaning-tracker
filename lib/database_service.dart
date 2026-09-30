@@ -78,10 +78,12 @@ class DatabaseService {
     if (isMigrated) return;
 
     final taskStrings = prefs.getStringList('tasks') ?? [];
-    for (var s in taskStrings) {
-      final json = jsonDecode(s) as Map<String, dynamic>;
-      final task = Task.fromJson(json);
-      await insertTask(task);
+    if (taskStrings.isNotEmpty) {
+      final tasks = taskStrings.map((s) {
+        final json = jsonDecode(s) as Map<String, dynamic>;
+        return Task.fromJson(json);
+      }).toList();
+      await batchInsertTasks(tasks);
     }
 
     await prefs.setBool('migration_complete', true);

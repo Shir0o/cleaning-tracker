@@ -297,7 +297,7 @@ void main() {
       verifyNever(() => mockDb.transaction(any()));
     });
 
-    test('imports existing tasks from SharedPreferences', () async {
+    test('imports existing tasks from SharedPreferences using batch', () async {
       final date = DateTime.utc(2026, 1, 1);
       final taskJson = jsonEncode({
         'title': 'Legacy',
@@ -311,19 +311,22 @@ void main() {
         'tasks': [taskJson],
       });
 
-      when(() => mockDb.transaction<int>(any())).thenAnswer((invocation) {
+      final mockBatch = MockBatch();
+      when(() => mockDb.transaction<void>(any())).thenAnswer((invocation) {
         final action =
             invocation.positionalArguments[0]
-                as Future<int> Function(Transaction);
+                as Future<void> Function(Transaction);
         return action(mockTxn);
       });
-      when(() => mockTxn.insert(any(), any())).thenAnswer((_) async => 1);
+      when(() => mockTxn.batch()).thenReturn(mockBatch);
+      when(() => mockBatch.commit()).thenAnswer((_) async => [1]);
+      when(() => mockBatch.commit(noResult: true)).thenAnswer((_) async => []);
 
       await databaseService.migrateFromSharedPreferences();
 
-      // One insert for the task, none for completions.
-      verify(() => mockTxn.insert('tasks', any())).called(1);
-      verifyNever(() => mockTxn.insert('completions', any()));
+      verify(() => mockDb.transaction<void>(any())).called(1);
+      verify(() => mockBatch.insert('tasks', any())).called(1);
+      verifyNever(() => mockBatch.insert('completions', any()));
 
       final prefs = await SharedPreferences.getInstance();
       expect(prefs.getBool('migration_complete'), isTrue);
