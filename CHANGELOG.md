@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1](https://github.com/Shir0o/cleaning-tracker/compare/v1.2.0...v1.2.1) (2026-10-02)
+
+
+### Bug Fixes
+
+* **ci:** format Play Store release notes without leading spaces or excess blank lines ([#60](https://github.com/Shir0o/cleaning-tracker/issues/60)) ([c990464](https://github.com/Shir0o/cleaning-tracker/commit/c99046489640709b9124b0a70def3d931c8e79fb))
+
 ## [1.2.0](https://github.com/Shir0o/cleaning-tracker/compare/v1.1.3...v1.2.0) (2026-09-27)
 
 
