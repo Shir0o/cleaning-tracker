@@ -240,7 +240,13 @@ class _SettingsPageState extends State<SettingsPage>
   }
 
   Future<void> _checkNotificationPermission() async {
-    await Permission.notification.status;
+    final status = await Permission.notification.status;
+    if (mounted) {
+      if (!status.isGranted && _appNotificationsEnabled) {
+        setState(() => _appNotificationsEnabled = false);
+        await _saveBoolSetting('notifications_enabled', false);
+      }
+    }
   }
 
   Future<void> _handleSignIn() async {
