@@ -32,14 +32,30 @@ Future<void> main() async {
   if (!DashboardScreen.testingMode) {
     try {
       await dotenv.load(fileName: '.env', isOptional: true);
+    } catch (e) {
+      debugPrint('dotenv initialization failed: $e');
+    }
+    try {
       await GoogleSignIn.instance.initialize(
         serverClientId: googleServerClientId,
       );
+    } catch (e) {
+      debugPrint('GoogleSignIn initialization failed: $e');
+    }
+    try {
       await DriveService().init();
+    } catch (e) {
+      debugPrint('DriveService initialization failed: $e');
+    }
+    try {
       await DatabaseService().migrateFromSharedPreferences();
+    } catch (e) {
+      debugPrint('DatabaseService migration failed: $e');
+    }
+    try {
       await NotificationService().init();
     } catch (e) {
-      debugPrint('Global initialization failed: $e');
+      debugPrint('NotificationService initialization failed: $e');
     }
   }
 
@@ -499,6 +515,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
     super.initState();
     _loadTasks();
     _listenToAuthEvents();
+    if (!DashboardScreen.testingMode) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _requestNotificationPermissionOnStartup();
+      });
+    }
+  }
+
+  Future<void> _requestNotificationPermissionOnStartup() async {
+    final prefs = await SharedPreferences.getInstance();
+    final prompted = prefs.getBool('notification_permission_prompted') ?? false;
+    if (!prompted) {
+      await prefs.setBool('notification_permission_prompted', true);
+      await NotificationService().requestPermission();
+    }
   }
 
   @override
@@ -2108,9 +2138,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       style: GoogleFonts.nunito(
                                         fontSize: 15,
                                         fontWeight: FontWeight.w800,
-                                        color: isAdded
-                                            ? mutedText
-                                            : textColor,
+                                        color: isAdded ? mutedText : textColor,
                                       ),
                                     ),
                                     Text(
@@ -2128,10 +2156,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   width: 34,
                                   height: 34,
                                   decoration: BoxDecoration(
-                                    color: (isDark
-                                            ? const Color(0xFF3A7D5C)
-                                            : const Color(0xFF4C9A73))
-                                        .withValues(alpha: 0.2),
+                                    color:
+                                        (isDark
+                                                ? const Color(0xFF3A7D5C)
+                                                : const Color(0xFF4C9A73))
+                                            .withValues(alpha: 0.2),
                                     shape: BoxShape.circle,
                                   ),
                                   child: Icon(

@@ -83,14 +83,18 @@ class NotificationService {
       },
     );
 
+    _prefs = await SharedPreferences.getInstance();
+    _initialized = true;
+
+    await createNotificationChannelIfNeeded();
+  }
+
+  Future<void> createNotificationChannelIfNeeded() async {
     if (!kIsWeb && Platform.isAndroid) {
       final androidPlugin = _notificationsPlugin
           .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin
           >();
-      final granted = await androidPlugin?.requestNotificationsPermission();
-      debugPrint('Android POST_NOTIFICATIONS granted: $granted');
-
       await androidPlugin?.createNotificationChannel(
         const AndroidNotificationChannel(
           _channelId,
@@ -100,9 +104,19 @@ class NotificationService {
         ),
       );
     }
+  }
 
-    _prefs = await SharedPreferences.getInstance();
-    _initialized = true;
+  Future<bool> requestPermission() async {
+    if (!kIsWeb && Platform.isAndroid) {
+      final androidPlugin = _notificationsPlugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
+      final granted = await androidPlugin?.requestNotificationsPermission();
+      debugPrint('Android POST_NOTIFICATIONS request result: $granted');
+      return granted ?? false;
+    }
+    return true;
   }
 
   Future<SharedPreferences> _getPrefs() async {
@@ -282,6 +296,7 @@ class NotificationService {
   }
 
   Future<void> showTestNotification() async {
+    await createNotificationChannelIfNeeded();
     await _notificationsPlugin.show(
       id: 999999,
       title: 'TEST NOTIFICATION',

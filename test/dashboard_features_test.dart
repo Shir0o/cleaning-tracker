@@ -33,43 +33,44 @@ void main() {
     expect(find.text('NO SYSTEMS TRACKED'), findsOneWidget);
   });
 
-  testWidgets('Add preset stays open for batch adding and shows checkmark when added', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(const CleaningTrackerApp());
-    await tester.pumpAndSettle();
+  testWidgets(
+    'Add preset stays open for batch adding and shows checkmark when added',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(const CleaningTrackerApp());
+      await tester.pumpAndSettle();
 
-    // Tap the floating '+' add task button
-    final addButton = find.byIcon(Icons.add);
-    expect(addButton, findsWidgets);
-    await tester.tap(addButton.first);
-    await tester.pumpAndSettle();
+      // Tap the floating '+' add task button
+      final addButton = find.byIcon(Icons.add);
+      expect(addButton, findsWidgets);
+      await tester.tap(addButton.first);
+      await tester.pumpAndSettle();
 
-    // Verify Add overlay is open
-    expect(find.text('Add a task'), findsOneWidget);
+      // Verify Add overlay is open
+      expect(find.text('Add a task'), findsOneWidget);
 
-    // Initial state: presets show '+' icon
-    expect(find.text('WASH DISHES'), findsOneWidget);
+      // Initial state: presets show '+' icon
+      expect(find.text('WASH DISHES'), findsOneWidget);
 
-    // Tap to add WASH DISHES
-    await tester.tap(find.text('WASH DISHES'));
-    await tester.pumpAndSettle();
+      // Tap to add WASH DISHES
+      await tester.tap(find.text('WASH DISHES'));
+      await tester.pumpAndSettle();
 
-    // Verify overlay stays open (does not return to home)
-    expect(find.text('Add a task'), findsOneWidget);
+      // Verify overlay stays open (does not return to home)
+      expect(find.text('Add a task'), findsOneWidget);
 
-    // Verify checkmark appears for added task
-    expect(find.byIcon(Icons.check), findsAtLeastNWidgets(1));
+      // Verify checkmark appears for added task
+      expect(find.byIcon(Icons.check), findsAtLeastNWidgets(1));
 
-    // Can add another task without leaving (WIPE COUNTERS & SINK)
-    expect(find.text('WIPE COUNTERS & SINK'), findsOneWidget);
-    await tester.tap(find.text('WIPE COUNTERS & SINK'));
-    await tester.pumpAndSettle();
+      // Can add another task without leaving (WIPE COUNTERS & SINK)
+      expect(find.text('WIPE COUNTERS & SINK'), findsOneWidget);
+      await tester.tap(find.text('WIPE COUNTERS & SINK'));
+      await tester.pumpAndSettle();
 
-    // Still on Add a task overlay with both tasks showing checkmark
-    expect(find.text('Add a task'), findsOneWidget);
-    expect(find.byIcon(Icons.check), findsAtLeastNWidgets(2));
-  });
+      // Still on Add a task overlay with both tasks showing checkmark
+      expect(find.text('Add a task'), findsOneWidget);
+      expect(find.byIcon(Icons.check), findsAtLeastNWidgets(2));
+    },
+  );
 
   testWidgets('Switching tab from bottom nav dismisses the add overlay', (
     WidgetTester tester,
@@ -93,4 +94,3 @@ void main() {
     expect(find.text('Rooms'), findsNWidgets(2));
   });
 }
-
