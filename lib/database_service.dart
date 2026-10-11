@@ -18,6 +18,7 @@ class DatabaseService {
 
   static bool testingMode = false;
   static Database? _mockDb;
+  static List<Task>? mockTasks;
 
   static void setMockDb(Database? mockDb) {
     _mockDb = mockDb;
@@ -90,7 +91,15 @@ class DatabaseService {
   }
 
   Future<int> insertTask(Task task) async {
-    if (testingMode && _mockDb == null) return 0;
+    if (testingMode && _mockDb == null) {
+      if (mockTasks != null) {
+        final id = (mockTasks!.length + 1);
+        final inserted = task.copyWith(id: id);
+        mockTasks!.add(inserted);
+        return id;
+      }
+      return 0;
+    }
     final database = await db;
     return await database.transaction<int>((txn) async {
       int id;
@@ -160,7 +169,9 @@ class DatabaseService {
   }
 
   Future<List<Task>> getTasks() async {
-    if (testingMode && _mockDb == null) return [];
+    if (testingMode && _mockDb == null) {
+      return mockTasks != null ? List<Task>.from(mockTasks!) : [];
+    }
     final database = await db;
     final List<Map<String, dynamic>> taskMaps = await database.query('tasks');
 
