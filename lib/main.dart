@@ -733,9 +733,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     await DatabaseService().insertTask(newTask);
     if (mounted) {
-      setState(() {
-        _overlay = null;
-      });
       await _refreshTasks();
       _showToast('Task added 🌿');
     }
@@ -1936,7 +1933,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   ) {
     final active = _selectedIndex == index;
     return InkWell(
-      onTap: () => setState(() => _selectedIndex = index),
+      onTap: () => setState(() {
+        _selectedIndex = index;
+        _overlay = null;
+      }),
       borderRadius: BorderRadius.circular(16),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -2088,6 +2088,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                   final preset = filteredPresets[index];
                   final roomTheme = getRoomTheme(preset['category']!);
+                  final isAdded = _tasks.any(
+                    (t) =>
+                        t.title.trim().toLowerCase() ==
+                        preset['title']!.trim().toLowerCase(),
+                  );
 
                   return Container(
                     margin: const EdgeInsets.only(bottom: 10),
@@ -2105,7 +2110,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       borderRadius: BorderRadius.circular(18),
                       child: InkWell(
                         borderRadius: BorderRadius.circular(18),
-                        onTap: () => _addPreset(preset),
+                        onTap: isAdded ? null : () => _addPreset(preset),
                         child: Padding(
                           padding: const EdgeInsets.all(16),
                           child: Row(
@@ -2133,7 +2138,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       style: GoogleFonts.nunito(
                                         fontSize: 15,
                                         fontWeight: FontWeight.w800,
-                                        color: textColor,
+                                        color: isAdded
+                                            ? mutedText
+                                            : textColor,
                                       ),
                                     ),
                                     Text(
@@ -2146,22 +2153,42 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   ],
                                 ),
                               ),
-                              IconButton(
-                                icon: Container(
+                              if (isAdded)
+                                Container(
                                   width: 34,
                                   height: 34,
                                   decoration: BoxDecoration(
-                                    color: roomTheme.tint(isDark),
+                                    color: (isDark
+                                            ? const Color(0xFF3A7D5C)
+                                            : const Color(0xFF4C9A73))
+                                        .withValues(alpha: 0.2),
                                     shape: BoxShape.circle,
                                   ),
                                   child: Icon(
-                                    Icons.add,
-                                    color: roomTheme.accent(isDark),
+                                    Icons.check,
+                                    color: isDark
+                                        ? const Color(0xFF67B28B)
+                                        : const Color(0xFF2E6B4E),
                                     size: 20,
                                   ),
+                                )
+                              else
+                                IconButton(
+                                  icon: Container(
+                                    width: 34,
+                                    height: 34,
+                                    decoration: BoxDecoration(
+                                      color: roomTheme.tint(isDark),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.add,
+                                      color: roomTheme.accent(isDark),
+                                      size: 20,
+                                    ),
+                                  ),
+                                  onPressed: () => _addPreset(preset),
                                 ),
-                                onPressed: () => _addPreset(preset),
-                              ),
                             ],
                           ),
                         ),
