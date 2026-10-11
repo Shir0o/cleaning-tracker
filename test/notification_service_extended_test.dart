@@ -339,9 +339,12 @@ void main() {
       await notificationService.createNotificationChannelIfNeeded();
     });
 
-    test('requestPermission returns true when on non-Android platform or allowed', () async {
-      final res = await notificationService.requestPermission();
-      expect(res, isTrue);
-    });
+    test(
+      'requestPermission returns true when on non-Android platform or allowed',
+      () async {
+        final res = await notificationService.requestPermission();
+        expect(res, isTrue);
+      },
+    );
   });
 }
