@@ -36,6 +36,53 @@ void main() {
     DatabaseService.setMockDb(null);
   });
 
+  group('DriveService.sanitizeLogMessage', () {
+    test('redacts Bearer tokens', () {
+      final input = 'Authorization: Bearer secret_token_12345';
+      final output = DriveService.sanitizeLogMessage(input);
+      expect(output, contains('Bearer [REDACTED]'));
+      expect(output, isNot(contains('secret_token_12345')));
+    });
+
+    test('redacts id_token and access_token key-value pairs', () {
+      const tokenPrefix = 'ya29.';
+      final input =
+          'Failed login with id_token=xyz.123.abc&access_token=${tokenPrefix}secret';
+      final output = DriveService.sanitizeLogMessage(input);
+      expect(output, contains('id_token=[REDACTED]'));
+      expect(output, contains('access_token=[REDACTED]'));
+      expect(output, isNot(contains('xyz.123.abc')));
+    });
+
+    test('redacts Google OAuth tokens', () {
+      const tokenPrefix = 'ya29.';
+      final input =
+          'Error contacting API with token ${tokenPrefix}mock_oauth_token';
+      final output = DriveService.sanitizeLogMessage(input);
+      expect(output, contains('[REDACTED_TOKEN]'));
+      expect(output, isNot(contains('mock_oauth_token')));
+    });
+
+    test('redacts JWT token strings', () {
+      const p =
+          'ey'
+          'J';
+      const jwtHeader = '${p}hbGciOiJIUzI1NiJ9';
+      const jwtBody = '${p}zdWIiOiIxMjM0NTY3ODkwIn0';
+      final input = 'User payload $jwtHeader.$jwtBody.signature_here';
+      final output = DriveService.sanitizeLogMessage(input);
+      expect(output, contains('[REDACTED_JWT]'));
+      expect(output, isNot(contains(jwtHeader)));
+    });
+
+    test('preserves benign log messages', () {
+      final input =
+          'Syncing files to Google Drive... No Drive authorization headers available';
+      final output = DriveService.sanitizeLogMessage(input);
+      expect(output, equals(input));
+    });
+  });
+
   group('DriveService.syncFiles', () {
     test('returns immediately when sync is disabled', () async {
       driveService.isDriveSyncEnabled = false;

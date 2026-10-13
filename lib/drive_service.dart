@@ -44,6 +44,47 @@ class DriveService extends ChangeNotifier {
   @visibleForTesting
   set isDriveSyncEnabled(bool enabled) => _isDriveSyncEnabled = enabled;
 
+  /// Sanitizes log messages to ensure sensitive tokens, auth headers, and credentials are redacted.
+  static String sanitizeLogMessage(String message) {
+    return message
+        .replaceAll(
+          RegExp(r'Bearer\s+[A-Za-z0-9\-\._~\+\/]+=*', caseSensitive: false),
+          'Bearer [REDACTED]',
+        )
+        .replaceAllMapped(
+          RegExp(
+            r'(id_token|access_token|token|auth_token)=([A-Za-z0-9\-\._~\+\/]+=*)',
+            caseSensitive: false,
+          ),
+          (match) => '${match.group(1)}=[REDACTED]',
+        )
+        .replaceAllMapped(
+          RegExp(
+            r'("?(?:id_token|access_token|token|authorization)"?\s*:\s*)"[^"]+"',
+            caseSensitive: false,
+          ),
+          (match) => '${match.group(1)}"[REDACTED]"',
+        )
+        .replaceAll(
+          RegExp(r'ya29\.[A-Za-z0-9\-_]+', caseSensitive: false),
+          '[REDACTED_TOKEN]',
+        )
+        .replaceAll(
+          RegExp(
+            r'ey'
+            r'J[A-Za-z0-9\-_]+\.'
+            r'ey'
+            r'J[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+',
+            caseSensitive: false,
+          ),
+          '[REDACTED_JWT]',
+        );
+  }
+
+  void _logSafe(String message) {
+    debugPrint(sanitizeLogMessage(message));
+  }
+
   void _listenToAuth() {
     _googleSignIn.authenticationEvents.listen((event) {
       if (event is GoogleSignInAuthenticationEventSignIn) {
@@ -65,7 +106,7 @@ class DriveService extends ChangeNotifier {
     await signInSilently();
 
     if (_isDriveSyncEnabled && _currentUser != null) {
-      syncFiles().catchError((e) => debugPrint('Initial sync failed: $e'));
+      syncFiles().catchError((e) => _logSafe('Initial sync failed: $e'));
     }
   }
 
@@ -94,7 +135,7 @@ class DriveService extends ChangeNotifier {
       }
       notifyListeners();
     } catch (e) {
-      debugPrint('Silent sign in failed: $e');
+      _logSafe('Silent sign in failed: $e');
     }
   }
 
@@ -106,7 +147,7 @@ class DriveService extends ChangeNotifier {
       notifyListeners();
       return account;
     } catch (e) {
-      debugPrint('Authentication failed: $e');
+      _logSafe('Authentication failed: $e');
       return null;
     }
   }
@@ -126,7 +167,7 @@ class DriveService extends ChangeNotifier {
       drive.DriveApi.driveFileScope,
     ], promptIfNecessary: promptIfNecessary);
     if (headers == null) {
-      debugPrint('No Drive authorization headers available');
+      _logSafe('No Drive authorization headers available');
       return;
     }
 
@@ -149,12 +190,12 @@ class DriveService extends ChangeNotifier {
     }
 
     if (_driveApi == null) {
-      debugPrint('Cannot sync: Drive API not initialized');
+      _logSafe('Cannot sync: Drive API not initialized');
       return;
     }
 
     try {
-      debugPrint('Syncing files to Google Drive...');
+      _logSafe('Syncing files to Google Drive...');
       final prefs = await SharedPreferences.getInstance();
 
       // Collect settings from SharedPreferences
@@ -190,10 +231,10 @@ class DriveService extends ChangeNotifier {
           existingFileId,
           uploadMedia: media,
         );
-        debugPrint('Updated existing backup on Google Drive');
+        _logSafe('Updated existing backup on Google Drive');
       } else {
         await _driveApi!.files.create(driveFile, uploadMedia: media);
-        debugPrint('Created new backup on Google Drive');
+        _logSafe('Created new backup on Google Drive');
       }
 
       // Save last backup time
@@ -203,7 +244,7 @@ class DriveService extends ChangeNotifier {
       );
       notifyListeners();
     } catch (e) {
-      debugPrint('Sync failed: $e');
+      _logSafe('Sync failed: $e');
       rethrow;
     }
   }
@@ -225,7 +266,7 @@ class DriveService extends ChangeNotifier {
     }
 
     try {
-      debugPrint('Searching for backup on Google Drive...');
+      _logSafe('Searching for backup on Google Drive...');
       final fileList = await _driveApi!.files.list(
         q: "name = 'cleaning_tracker_backup.json' and trashed = false",
         spaces: 'drive',
@@ -236,7 +277,7 @@ class DriveService extends ChangeNotifier {
       }
 
       final fileId = fileList.files!.first.id!;
-      debugPrint('Downloading backup file (ID: $fileId)...');
+      _logSafe('Downloading backup file (ID: $fileId)...');
 
       final media =
           await _driveApi!.files.get(
@@ -290,10 +331,10 @@ class DriveService extends ChangeNotifier {
         await databaseService.batchInsertTasks(tasks);
       }
 
-      debugPrint('Restore complete');
+      _logSafe('Restore complete');
       notifyListeners();
     } catch (e) {
-      debugPrint('Restore failed: $e');
+      _logSafe('Restore failed: $e');
       rethrow;
     }
   }

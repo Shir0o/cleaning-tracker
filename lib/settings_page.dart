@@ -254,8 +254,12 @@ class _SettingsPageState extends State<SettingsPage>
       debugPrint('Attempting Google Sign In...');
       await DriveService().setSyncEnabled(true);
     } catch (error, stackTrace) {
-      debugPrint('Sign in error: $error');
-      debugPrint('Stack trace: $stackTrace');
+      debugPrint(
+        'Sign in error: ${DriveService.sanitizeLogMessage(error.toString())}',
+      );
+      debugPrint(
+        'Stack trace: ${DriveService.sanitizeLogMessage(stackTrace.toString())}',
+      );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
