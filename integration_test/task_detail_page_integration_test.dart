@@ -26,6 +26,10 @@ void main() {
     await tester.tap(find.text('WASH DISHES'));
     await tester.pumpAndSettle();
 
+    // Close the Add Task overlay
+    await tester.tap(find.byIcon(Icons.close));
+    await tester.pumpAndSettle();
+
     // Verify preset task (WASH DISHES) exists on Dashboard
     expect(find.text('WASH DISHES'), findsOneWidget);
 
