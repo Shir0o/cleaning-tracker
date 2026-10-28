@@ -9,16 +9,22 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show PlatformException;
 import 'models.dart';
 import 'database_service.dart';
+import 'main.dart' show getRoomTheme;
+
+/// SharedPreferences key holding the room category keys whose reminders are off.
+const String mutedRoomsPrefKey = 'muted_room_categories';
 
 class NotificationSettings {
   final bool enabled;
   final String notifyBefore;
   final String reminderTime;
+  final Set<String> mutedRooms;
 
   NotificationSettings({
     required this.enabled,
     required this.notifyBefore,
     required this.reminderTime,
+    this.mutedRooms = const {},
   });
 }
 
@@ -144,27 +150,26 @@ class NotificationService {
       enabled: notificationsEnabled,
       notifyBefore: notifyBeforeStr,
       reminderTime: reminderTimeStr,
+      mutedRooms: (prefs.getStringList(mutedRoomsPrefKey) ?? []).toSet(),
     );
   }
 
   Future<void> scheduleTaskNotification(Task task) async {
     final settings = await _getSettings();
 
-    await _scheduleTaskNotification(
-      task,
-      settings.enabled,
-      settings.notifyBefore,
-      settings.reminderTime,
-    );
+    await _scheduleTaskNotification(task, settings);
   }
 
   Future<void> _scheduleTaskNotification(
     Task task,
-    bool notificationsEnabled,
-    String notifyBeforeStr,
-    String reminderTimeStr,
+    NotificationSettings settings,
   ) async {
-    if (!notificationsEnabled) return;
+    if (!settings.enabled) return;
+    if (settings.mutedRooms.contains(getRoomTheme(task.category).categoryKey)) {
+      return;
+    }
+    final notifyBeforeStr = settings.notifyBefore;
+    final reminderTimeStr = settings.reminderTime;
 
     // Calculate due date
     final dueDate = task.lastCompleted.add(task.intervalDuration);
@@ -344,12 +349,7 @@ class NotificationService {
       'Cancelled all notifications. Rescheduling ${tasksToSchedule.length} tasks...',
     );
     for (final task in tasksToSchedule) {
-      await _scheduleTaskNotification(
-        task,
-        settings.enabled,
-        settings.notifyBefore,
-        settings.reminderTime,
-      );
+      await _scheduleTaskNotification(task, settings);
     }
 
     if (kDebugMode) {
