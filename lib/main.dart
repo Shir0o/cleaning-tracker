@@ -9,7 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
-import 'settings_page.dart';
+import 'settings_tab.dart';
 import 'drive_service.dart';
 import 'notification_service.dart';
 import 'database_service.dart';
@@ -478,7 +478,7 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  int _selectedIndex = 0; // 0: Due, 1: Rooms, 2: Stats, 3: More
+  int _selectedIndex = 0; // 0: Due, 1: Rooms, 2: Stats, 3: Settings
   bool _isLoading = true;
   List<Task> _tasks = [];
   StreamSubscription? _authSubscription;
@@ -492,18 +492,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final TextEditingController _customNameController = TextEditingController();
   String _customRoom = 'Kitchen';
   String _customInterval = 'WEEKLY';
-
-  // Reminders state
-  bool _remindersEnabled = true;
-  String _remindTime = 'Morning';
-  int _leadDays = 1;
-  final Map<String, bool> _roomNotifs = {
-    'Kitchen': true,
-    'Bathroom': true,
-    'Bedroom': true,
-    'Living room': true,
-    'Laundry': true,
-  };
 
   TextStyle _safeGoogleFont(TextStyle Function() fontFn) {
     if (DashboardScreen.testingMode) return const TextStyle();
@@ -801,7 +789,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             _buildDueTab(context, isDark, now),
                             _buildRoomsTab(context, isDark, now),
                             _buildStatsTab(context, isDark, now),
-                            _buildMoreTab(context, isDark, now),
+                            const SettingsTab(),
                           ],
                         ),
                 ),
@@ -825,7 +813,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     DateTime now,
   ) {
     final dateStr = DateFormat('EEEE, MMMM d').format(now);
-    final titles = ['Due', 'Rooms', 'Stats', 'Reminders & Settings'];
+    final titles = ['Due', 'Rooms', 'Stats', 'Settings'];
     final title = titles[_selectedIndex];
 
     return Container(
@@ -860,37 +848,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     color: textColor,
                   ),
                 ),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              IconButton(
-                icon: Icon(
-                  isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
-                  color: textColor,
-                  size: 22,
-                ),
-                onPressed: () {
-                  final nextTheme = isDark ? ThemeMode.light : ThemeMode.dark;
-                  themeNotifier.value = nextTheme;
-                  SharedPreferences.getInstance().then((prefs) {
-                    prefs.setString(
-                      'interfaceTheme',
-                      isDark ? 'LIGHT' : 'DARK',
-                    );
-                  });
-                },
-              ),
-              IconButton(
-                icon: Icon(Icons.settings, color: textColor, size: 22),
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const SettingsPage(),
-                    ),
-                  );
-                },
               ),
             ],
           ),
@@ -1603,246 +1560,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildMoreTab(BuildContext context, bool isDark, DateTime now) {
-    final cardBg = isDark ? const Color(0xFF1E211A) : Colors.white;
-    final textColor = isDark
-        ? const Color(0xFFEEF2E9)
-        : const Color(0xFF26301F);
-    final mutedText = isDark
-        ? const Color(0xFF9AA48F)
-        : const Color(0xFF6B7563);
-
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      children: [
-        Container(
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: cardBg,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: isDark ? const Color(0x14FFFFFF) : const Color(0xFFEEF1EA),
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Daily Reminders',
-                    style: GoogleFonts.nunito(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      color: textColor,
-                    ),
-                  ),
-                  Switch(
-                    value: _remindersEnabled,
-                    activeThumbColor: const Color(0xFF3A7D5C),
-                    onChanged: (v) {
-                      setState(() {
-                        _remindersEnabled = v;
-                      });
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Reminder time',
-                style: GoogleFonts.nunito(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: mutedText,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: ['Morning', 'Noon', 'Evening'].map((t) {
-                  final active = _remindTime == t;
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: ChoiceChip(
-                      label: Text(t),
-                      selected: active,
-                      selectedColor: const Color(0xFF3A7D5C),
-                      labelStyle: GoogleFonts.nunito(
-                        fontWeight: FontWeight.w800,
-                        color: active ? Colors.white : textColor,
-                      ),
-                      onSelected: (sel) {
-                        if (sel) setState(() => _remindTime = t);
-                      },
-                    ),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Lead time',
-                style: GoogleFonts.nunito(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: mutedText,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [1, 2, 3].map((d) {
-                  final active = _leadDays == d;
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: ChoiceChip(
-                      label: Text('$d day${d == 1 ? '' : 's'}'),
-                      selected: active,
-                      selectedColor: const Color(0xFF3A7D5C),
-                      labelStyle: GoogleFonts.nunito(
-                        fontWeight: FontWeight.w800,
-                        color: active ? Colors.white : textColor,
-                      ),
-                      onSelected: (sel) {
-                        if (sel) setState(() => _leadDays = d);
-                      },
-                    ),
-                  );
-                }).toList(),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        Container(
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: cardBg,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: isDark ? const Color(0x14FFFFFF) : const Color(0xFFEEF1EA),
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Room Notifications',
-                style: GoogleFonts.nunito(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w800,
-                  color: textColor,
-                ),
-              ),
-              const SizedBox(height: 8),
-              ...roomThemes.map((rt) {
-                final on = _roomNotifs[rt.name] ?? true;
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      rt.name,
-                      style: GoogleFonts.nunito(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: textColor,
-                      ),
-                    ),
-                    Switch(
-                      value: on,
-                      activeThumbColor: rt.accent(isDark),
-                      onChanged: (v) {
-                        setState(() {
-                          _roomNotifs[rt.name] = v;
-                        });
-                      },
-                    ),
-                  ],
-                );
-              }),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        Container(
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF26302A) : const Color(0xFFEEF4EE),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: isDark ? const Color(0xFF3A7D5C) : const Color(0xFF7FB298),
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'NOTIFICATION PREVIEW',
-                style: GoogleFonts.nunito(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1.0,
-                  color: const Color(0xFF3A7D5C),
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                _tasks.isEmpty ? 'All clear today' : _tasks.first.title,
-                style: GoogleFonts.nunito(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w800,
-                  color: textColor,
-                ),
-              ),
-              Text(
-                _tasks.isEmpty
-                    ? 'Nothing due — enjoy the calm.'
-                    : 'Due soon • ${_tasks.first.category}',
-                style: GoogleFonts.nunito(fontSize: 13, color: mutedText),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        ElevatedButton.icon(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: cardBg,
-            foregroundColor: textColor,
-            padding: const EdgeInsets.all(16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-              side: BorderSide(
-                color: isDark
-                    ? const Color(0x14FFFFFF)
-                    : const Color(0xFFEEF1EA),
-              ),
-            ),
-            elevation: 0,
-          ),
-          icon: const Icon(Icons.settings, color: Color(0xFF3A7D5C)),
-          label: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Open Full Settings & Backup',
-                style: GoogleFonts.nunito(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const Icon(Icons.chevron_right),
-            ],
-          ),
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const SettingsPage()),
-            );
-          },
-        ),
-        const SizedBox(height: 80),
-      ],
-    );
-  }
-
   Widget _buildBottomNav(BuildContext context, bool isDark) {
     final navBg = isDark ? const Color(0xFF1A1D16) : Colors.white;
     final navBorder = isDark
@@ -1912,9 +1629,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
           _buildNavItem(
             3,
-            Icons.notifications_none_outlined,
-            Icons.notifications,
-            'More',
+            Icons.settings_outlined,
+            Icons.settings,
+            'Settings',
             activeColor,
             inactiveColor,
           ),

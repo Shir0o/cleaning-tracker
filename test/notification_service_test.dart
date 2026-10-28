@@ -205,6 +205,98 @@ void main() {
     },
   );
 
+  group('muted rooms', () {
+    Future<void> scheduleFuture(String category) async {
+      await notificationService.scheduleTaskNotification(
+        Task(
+          id: 1,
+          title: 'Room Task',
+          interval: '7 DAYS',
+          category: category,
+          lastCompleted: DateTime.now(),
+        ),
+      );
+    }
+
+    test('skips tasks in a muted room', () async {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList(mutedRoomsPrefKey, ['KITCHEN']);
+
+      await scheduleFuture('KITCHEN');
+
+      verifyNever(
+        () => mockPlugin.zonedSchedule(
+          id: any(named: 'id'),
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          notificationDetails: any(named: 'notificationDetails'),
+          androidScheduleMode: any(named: 'androidScheduleMode'),
+        ),
+      );
+    });
+
+    test('still schedules tasks in other rooms', () async {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList(mutedRoomsPrefKey, ['KITCHEN']);
+
+      await scheduleFuture('BATHROOM');
+
+      verify(
+        () => mockPlugin.zonedSchedule(
+          id: any(named: 'id'),
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          notificationDetails: any(named: 'notificationDetails'),
+          androidScheduleMode: any(named: 'androidScheduleMode'),
+        ),
+      ).called(1);
+    });
+
+    test('uncategorized tasks follow the Living room switch', () async {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList(mutedRoomsPrefKey, ['LIVING & GENERAL']);
+
+      await scheduleFuture('GENERAL');
+
+      verifyNever(
+        () => mockPlugin.zonedSchedule(
+          id: any(named: 'id'),
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          notificationDetails: any(named: 'notificationDetails'),
+          androidScheduleMode: any(named: 'androidScheduleMode'),
+        ),
+      );
+    });
+
+    test('overdue tasks in a muted room do not fire immediately', () async {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList(mutedRoomsPrefKey, ['BEDROOM']);
+
+      await notificationService.rescheduleAll([
+        Task(
+          id: 3,
+          title: 'Overdue',
+          interval: '7 DAYS',
+          category: 'BEDROOM',
+          lastCompleted: DateTime.now().subtract(const Duration(days: 30)),
+        ),
+      ]);
+
+      verifyNever(
+        () => mockPlugin.show(
+          id: any(named: 'id'),
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          notificationDetails: any(named: 'notificationDetails'),
+        ),
+      );
+    });
+  });
+
   test('cancelTaskNotification cancels the correct notification', () async {
     final task = Task(
       id: 42,
