@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0](https://github.com/Shir0o/cleaning-tracker/compare/v1.3.0...v1.4.0) (2026-10-28)
+
+
+### Features
+
+* batch add default presets without leaving overlay and indicate added state ([#65](https://github.com/Shir0o/cleaning-tracker/issues/65)) ([360923f](https://github.com/Shir0o/cleaning-tracker/commit/360923f46dfb25375975703f5b39938393d88a25))
+* **design:** initialize impeccable context and harden mobile UX ([#73](https://github.com/Shir0o/cleaning-tracker/issues/73)) ([099ab9e](https://github.com/Shir0o/cleaning-tracker/commit/099ab9ea234d70a41567456492cf82d5963664cc))
+* **settings:** replace More tab and settings page with one Settings tab ([#72](https://github.com/Shir0o/cleaning-tracker/issues/72)) ([329875c](https://github.com/Shir0o/cleaning-tracker/commit/329875c115ee394e2d4970dbc18b8027b7732041))
+
+
+### Bug Fixes
+
+* **drive:** sanitize sensitive tokens and auth headers in log output ([#68](https://github.com/Shir0o/cleaning-tracker/issues/68)) ([20406da](https://github.com/Shir0o/cleaning-tracker/commit/20406dae01dee00516b1728e1d63fe1a9eaa5454))
+* **notifications:** prompt permission on first launch and ensure channel registration ([#67](https://github.com/Shir0o/cleaning-tracker/issues/67)) ([1bff5c7](https://github.com/Shir0o/cleaning-tracker/commit/1bff5c73322cf607a240660490306137ea42964a))
+
 ## [1.3.0](https://github.com/Shir0o/cleaning-tracker/compare/v1.2.0...v1.3.0) (2026-10-10)
 
 
