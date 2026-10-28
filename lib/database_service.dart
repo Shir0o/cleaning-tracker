@@ -63,6 +63,9 @@ class DatabaseService {
             FOREIGN KEY (task_id) REFERENCES tasks (id) ON DELETE CASCADE
           )
         ''');
+        await db.execute(
+          'CREATE INDEX IF NOT EXISTS idx_completions_task_id ON completions (task_id);',
+        );
       },
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
@@ -174,20 +177,26 @@ class DatabaseService {
     }
     final database = await db;
     final List<Map<String, dynamic>> taskMaps = await database.query('tasks');
+    if (taskMaps.isEmpty) return [];
+
+    final List<Map<String, dynamic>> completionMaps = await database.query(
+      'completions',
+      orderBy: 'date ASC',
+    );
+
+    final Map<int, List<DateTime>> completionsByTaskId = {};
+    for (var m in completionMaps) {
+      final taskId = m['task_id'] as int?;
+      if (taskId != null) {
+        final date = DateTime.parse(m['date'] as String);
+        (completionsByTaskId[taskId] ??= []).add(date);
+      }
+    }
 
     final List<Task> tasks = [];
     for (var map in taskMaps) {
       final taskId = map['id'] as int;
-      final List<Map<String, dynamic>> completionMaps = await database.query(
-        'completions',
-        where: 'task_id = ?',
-        whereArgs: [taskId],
-        orderBy: 'date ASC',
-      );
-
-      final completions = completionMaps
-          .map((m) => DateTime.parse(m['date'] as String))
-          .toList();
+      final completions = completionsByTaskId[taskId] ?? [];
 
       tasks.add(
         Task(

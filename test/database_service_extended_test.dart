@@ -65,16 +65,11 @@ void main() {
         ],
       );
       when(
-        () => mockDb.query(
-          'completions',
-          where: any(named: 'where'),
-          whereArgs: any(named: 'whereArgs'),
-          orderBy: any(named: 'orderBy'),
-        ),
+        () => mockDb.query('completions', orderBy: any(named: 'orderBy')),
       ).thenAnswer(
         (_) async => [
-          {'date': now.toIso8601String()},
-          {'date': due.toIso8601String()},
+          {'task_id': 1, 'date': now.toIso8601String()},
+          {'task_id': 1, 'date': due.toIso8601String()},
         ],
       );
 
@@ -107,12 +102,7 @@ void main() {
         ],
       );
       when(
-        () => mockDb.query(
-          'completions',
-          where: any(named: 'where'),
-          whereArgs: any(named: 'whereArgs'),
-          orderBy: any(named: 'orderBy'),
-        ),
+        () => mockDb.query('completions', orderBy: any(named: 'orderBy')),
       ).thenAnswer((_) async => []);
 
       final result = await databaseService.getTasks();
