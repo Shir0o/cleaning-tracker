@@ -263,4 +263,62 @@ void main() {
       verify(() => mockBatch.commit(noResult: true)).called(1);
     });
   });
+
+  group('DatabaseService.getTasks', () {
+    test('fetches all tasks and batch queries completions', () async {
+      final now = DateTime.utc(2026, 1, 1, 12);
+      final completion1 = DateTime.utc(2026, 1, 2);
+      final completion2 = DateTime.utc(2026, 1, 3);
+
+      when(() => mockDb.query('tasks')).thenAnswer(
+        (_) async => [
+          {
+            'id': 1,
+            'title': 'Task 1',
+            'interval': '7 DAYS',
+            'lastCompleted': now.toIso8601String(),
+            'category': 'KITCHEN',
+            'notes': 'note 1',
+            'snoozedUntil': null,
+          },
+          {
+            'id': 2,
+            'title': 'Task 2',
+            'interval': '1 DAYS',
+            'lastCompleted': now.toIso8601String(),
+            'category': 'BATHROOM',
+            'notes': '',
+            'snoozedUntil': null,
+          },
+        ],
+      );
+
+      when(() => mockDb.query('completions', orderBy: 'date ASC')).thenAnswer(
+        (_) async => [
+          {'task_id': 1, 'date': completion1.toIso8601String()},
+          {'task_id': 2, 'date': completion2.toIso8601String()},
+        ],
+      );
+
+      final result = await databaseService.getTasks();
+
+      expect(result, hasLength(2));
+      expect(result[0].id, 1);
+      expect(result[0].completions, [completion1]);
+      expect(result[1].id, 2);
+      expect(result[1].completions, [completion2]);
+
+      verify(() => mockDb.query('tasks')).called(1);
+      verify(() => mockDb.query('completions', orderBy: 'date ASC')).called(1);
+      // Ensure N+1 per-task queries were eliminated
+      verifyNever(
+        () => mockDb.query(
+          'completions',
+          where: any(named: 'where'),
+          whereArgs: any(named: 'whereArgs'),
+          orderBy: any(named: 'orderBy'),
+        ),
+      );
+    });
+  });
 }

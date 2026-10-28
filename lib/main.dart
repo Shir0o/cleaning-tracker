@@ -26,6 +26,32 @@ String get googleServerClientId {
   return 'dummy_client_id';
 }
 
+Future<void> _initBackgroundServices() async {
+  if (DashboardScreen.testingMode) return;
+  try {
+    await GoogleSignIn.instance.initialize(
+      serverClientId: googleServerClientId,
+    );
+  } catch (e) {
+    debugPrint('GoogleSignIn initialization failed: $e');
+  }
+  try {
+    await DriveService().init();
+  } catch (e) {
+    debugPrint('DriveService initialization failed: $e');
+  }
+  try {
+    await DatabaseService().migrateFromSharedPreferences();
+  } catch (e) {
+    debugPrint('DatabaseService migration failed: $e');
+  }
+  try {
+    await NotificationService().init();
+  } catch (e) {
+    debugPrint('NotificationService initialization failed: $e');
+  }
+}
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -34,28 +60,6 @@ Future<void> main() async {
       await dotenv.load(fileName: '.env', isOptional: true);
     } catch (e) {
       debugPrint('dotenv initialization failed: $e');
-    }
-    try {
-      await GoogleSignIn.instance.initialize(
-        serverClientId: googleServerClientId,
-      );
-    } catch (e) {
-      debugPrint('GoogleSignIn initialization failed: $e');
-    }
-    try {
-      await DriveService().init();
-    } catch (e) {
-      debugPrint('DriveService initialization failed: $e');
-    }
-    try {
-      await DatabaseService().migrateFromSharedPreferences();
-    } catch (e) {
-      debugPrint('DatabaseService migration failed: $e');
-    }
-    try {
-      await NotificationService().init();
-    } catch (e) {
-      debugPrint('NotificationService initialization failed: $e');
     }
   }
 
@@ -70,6 +74,9 @@ Future<void> main() async {
   }
 
   runApp(const CleaningTrackerApp());
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    _initBackgroundServices();
+  });
 }
 
 class CleaningTrackerApp extends StatefulWidget {
@@ -768,41 +775,57 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ? const Color(0xFFEEF2E9)
         : const Color(0xFF26301F);
 
-    return Scaffold(
-      backgroundColor: bgColor,
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Column(
-              children: [
-                _buildHeader(context, isDark, textColor, now),
-                Expanded(
-                  child: _isLoading
-                      ? ListView.builder(
-                          itemCount: 3,
-                          padding: const EdgeInsets.all(16),
-                          itemBuilder: (context, index) => const ShimmerCard(),
-                        )
-                      : IndexedStack(
-                          index: _selectedIndex,
-                          children: [
-                            _buildDueTab(context, isDark, now),
-                            _buildRoomsTab(context, isDark, now),
-                            _buildStatsTab(context, isDark, now),
-                            const SettingsTab(),
-                          ],
-                        ),
-                ),
-              ],
-            ),
-            if (_overlay == 'add') _buildAddOverlay(context, isDark),
-            if (_overlay == 'custom') _buildCustomOverlay(context, isDark),
-            if (_overlay == 'detail' && _selectedTask != null)
-              _buildDetailOverlay(context, isDark, now),
-          ],
+    return PopScope(
+      canPop: _overlay == null,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop && _overlay != null) {
+          setState(() {
+            if (_overlay == 'custom') {
+              _overlay = 'add';
+            } else {
+              _overlay = null;
+              _selectedTask = null;
+            }
+          });
+        }
+      },
+      child: Scaffold(
+        backgroundColor: bgColor,
+        body: SafeArea(
+          child: Stack(
+            children: [
+              Column(
+                children: [
+                  _buildHeader(context, isDark, textColor, now),
+                  Expanded(
+                    child: _isLoading
+                        ? ListView.builder(
+                            itemCount: 3,
+                            padding: const EdgeInsets.all(16),
+                            itemBuilder: (context, index) =>
+                                const ShimmerCard(),
+                          )
+                        : IndexedStack(
+                            index: _selectedIndex,
+                            children: [
+                              _buildDueTab(context, isDark, now),
+                              _buildRoomsTab(context, isDark, now),
+                              _buildStatsTab(context, isDark, now),
+                              const SettingsTab(),
+                            ],
+                          ),
+                  ),
+                ],
+              ),
+              if (_overlay == 'add') _buildAddOverlay(context, isDark),
+              if (_overlay == 'custom') _buildCustomOverlay(context, isDark),
+              if (_overlay == 'detail' && _selectedTask != null)
+                _buildDetailOverlay(context, isDark, now),
+            ],
+          ),
         ),
+        bottomNavigationBar: _buildBottomNav(context, isDark),
       ),
-      bottomNavigationBar: _buildBottomNav(context, isDark),
     );
   }
 
@@ -1567,75 +1590,78 @@ class _DashboardScreenState extends State<DashboardScreen> {
         : const Color(0xFFDDE3D8);
     final activeColor = const Color(0xFF3A7D5C);
     final inactiveColor = isDark
-        ? const Color(0xFF727B68)
-        : const Color(0xFFB3BBA9);
+        ? const Color(0xFF9AA48F)
+        : const Color(0xFF5C6652);
 
-    return Container(
-      height: 72,
-      decoration: BoxDecoration(
-        color: navBg,
-        border: Border(top: BorderSide(color: navBorder)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildNavItem(
-            0,
-            Icons.home_outlined,
-            Icons.home,
-            'Due',
-            activeColor,
-            inactiveColor,
-          ),
-          _buildNavItem(
-            1,
-            Icons.grid_view_outlined,
-            Icons.grid_view,
-            'Rooms',
-            activeColor,
-            inactiveColor,
-          ),
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                _overlay = 'add';
-                _selectedAddCategory = 'ALL';
-              });
-            },
-            child: Container(
-              width: 52,
-              height: 52,
-              decoration: const BoxDecoration(
-                color: Color(0xFF3A7D5C),
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0x403A7D5C),
-                    blurRadius: 10,
-                    offset: Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: const Icon(Icons.add, color: Colors.white, size: 28),
+    return SafeArea(
+      top: false,
+      child: Container(
+        height: 72,
+        decoration: BoxDecoration(
+          color: navBg,
+          border: Border(top: BorderSide(color: navBorder)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildNavItem(
+              0,
+              Icons.home_outlined,
+              Icons.home,
+              'Due',
+              activeColor,
+              inactiveColor,
             ),
-          ),
-          _buildNavItem(
-            2,
-            Icons.bar_chart_outlined,
-            Icons.bar_chart,
-            'Stats',
-            activeColor,
-            inactiveColor,
-          ),
-          _buildNavItem(
-            3,
-            Icons.settings_outlined,
-            Icons.settings,
-            'Settings',
-            activeColor,
-            inactiveColor,
-          ),
-        ],
+            _buildNavItem(
+              1,
+              Icons.grid_view_outlined,
+              Icons.grid_view,
+              'Rooms',
+              activeColor,
+              inactiveColor,
+            ),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  _overlay = 'add';
+                  _selectedAddCategory = 'ALL';
+                });
+              },
+              child: Container(
+                width: 52,
+                height: 52,
+                decoration: const BoxDecoration(
+                  color: Color(0xFF3A7D5C),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0x403A7D5C),
+                      blurRadius: 10,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const Icon(Icons.add, color: Colors.white, size: 28),
+              ),
+            ),
+            _buildNavItem(
+              2,
+              Icons.bar_chart_outlined,
+              Icons.bar_chart,
+              'Stats',
+              activeColor,
+              inactiveColor,
+            ),
+            _buildNavItem(
+              3,
+              Icons.settings_outlined,
+              Icons.settings,
+              'Settings',
+              activeColor,
+              inactiveColor,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -2333,8 +2359,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     ),
                                     tooltip: 'Remove this entry',
                                     visualDensity: VisualDensity.compact,
-                                    padding: EdgeInsets.zero,
-                                    constraints: const BoxConstraints(),
+                                    constraints: const BoxConstraints(
+                                      minWidth: 44,
+                                      minHeight: 44,
+                                    ),
                                     onPressed: () =>
                                         _removeHistoryEntry(task, indexInTask),
                                   ),
