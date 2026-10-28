@@ -1,0 +1,603 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-28T00:22:00Z",
+  "title": "Design System: Cleaning Tracker",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Forest Pine",
+        "canonical": "#3A7D5C",
+        "tonalRamp": [
+          "#143022",
+          "#1F4834",
+          "#2B6145",
+          "#3A7D5C",
+          "#539B76",
+          "#78B895",
+          "#A8D7BE",
+          "#DDF0E5"
+        ]
+      },
+      "warning": {
+        "role": "secondary",
+        "displayName": "Warm Amber",
+        "canonical": "#B98637",
+        "tonalRamp": [
+          "#3D2A0C",
+          "#5E4215",
+          "#8A6122",
+          "#B98637",
+          "#D19F4F",
+          "#E3BB76",
+          "#F2D8A7",
+          "#FDF5E6"
+        ]
+      },
+      "critical": {
+        "role": "tertiary",
+        "displayName": "Terracotta Brick",
+        "canonical": "#C2583F",
+        "tonalRamp": [
+          "#421A11",
+          "#682A1B",
+          "#943D28",
+          "#C2583F",
+          "#D47761",
+          "#E49B89",
+          "#F2C3B8",
+          "#FCEEEB"
+        ]
+      },
+      "surface-light": {
+        "role": "neutral",
+        "displayName": "Surface Light",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "#4D4D4D",
+          "#737373",
+          "#999999",
+          "#CCCCCC",
+          "#E6E6E6",
+          "#F2F2F2",
+          "#FAFAFA",
+          "#FFFFFF"
+        ]
+      },
+      "surface-dark": {
+        "role": "neutral",
+        "displayName": "Surface Dark",
+        "canonical": "#1E211A",
+        "tonalRamp": [
+          "#0D0E0B",
+          "#1E211A",
+          "#30352A",
+          "#464D3D",
+          "#5F6953",
+          "#7B876C",
+          "#9AA78A",
+          "#BCC8AE"
+        ]
+      },
+      "bg-light": {
+        "role": "neutral",
+        "displayName": "Background Light",
+        "canonical": "#E9EFE5",
+        "tonalRamp": [
+          "#22271E",
+          "#424A3B",
+          "#68735E",
+          "#919E87",
+          "#BAC6B1",
+          "#D3DDD0",
+          "#E9EFE5",
+          "#F6F9F4"
+        ]
+      },
+      "bg-dark": {
+        "role": "neutral",
+        "displayName": "Background Dark",
+        "canonical": "#12140F",
+        "tonalRamp": [
+          "#090A08",
+          "#12140F",
+          "#1D211A",
+          "#2B3126",
+          "#3E4637",
+          "#5B6651",
+          "#808D73",
+          "#ADBBA0"
+        ]
+      },
+      "text-light": {
+        "role": "neutral",
+        "displayName": "Text Light",
+        "canonical": "#26301F",
+        "tonalRamp": [
+          "#0F140C",
+          "#26301F",
+          "#3B4B30",
+          "#536944",
+          "#6F8A5C",
+          "#8EAC79",
+          "#AFC99C",
+          "#D4E4C7"
+        ]
+      },
+      "text-dark": {
+        "role": "neutral",
+        "displayName": "Text Dark",
+        "canonical": "#EEF2E9",
+        "tonalRamp": [
+          "#1E231B",
+          "#394234",
+          "#5B6953",
+          "#819277",
+          "#A9BAA0",
+          "#CCD6C5",
+          "#EEF2E9",
+          "#F8FAF6"
+        ]
+      },
+      "text-muted-light": {
+        "role": "neutral",
+        "displayName": "Muted Text Light",
+        "canonical": "#6B7563",
+        "tonalRamp": [
+          "#22261F",
+          "#3E4439",
+          "#6B7563",
+          "#85917C",
+          "#A1AC99",
+          "#BFC7B9",
+          "#DDE2D9",
+          "#EFF2EC"
+        ]
+      },
+      "text-muted-dark": {
+        "role": "neutral",
+        "displayName": "Muted Text Dark",
+        "canonical": "#9AA48F",
+        "tonalRamp": [
+          "#242820",
+          "#414639",
+          "#656D5B",
+          "#8C9680",
+          "#9AA48F",
+          "#B6BEAE",
+          "#D3D8CE",
+          "#EBEFE8"
+        ]
+      },
+      "border-light": {
+        "role": "neutral",
+        "displayName": "Border Light",
+        "canonical": "#EEF1EA",
+        "tonalRamp": [
+          "#33382F",
+          "#5B6353",
+          "#88927E",
+          "#B5BEAD",
+          "#D3DACD",
+          "#EEF1EA",
+          "#F5F7F3",
+          "#FCFDFC"
+        ]
+      },
+      "border-dark": {
+        "role": "neutral",
+        "displayName": "Border Dark",
+        "canonical": "#26301F",
+        "tonalRamp": [
+          "#0F140C",
+          "#26301F",
+          "#3B4B30",
+          "#536944",
+          "#6F8A5C",
+          "#8EAC79",
+          "#AFC99C",
+          "#D4E4C7"
+        ]
+      },
+      "nav-border-light": {
+        "role": "neutral",
+        "displayName": "Nav Border Light",
+        "canonical": "#DDE3D8",
+        "tonalRamp": [
+          "#2F332C",
+          "#51584C",
+          "#788272",
+          "#A4AEA0",
+          "#C2CCC0",
+          "#DDE3D8",
+          "#EDF1EA",
+          "#F7F9F5"
+        ]
+      },
+      "gauge-track-light": {
+        "role": "neutral",
+        "displayName": "Gauge Track Light",
+        "canonical": "#D7DED0",
+        "tonalRamp": [
+          "#2D3328",
+          "#4E5746",
+          "#74806A",
+          "#9FA996",
+          "#BDC5B7",
+          "#D7DED0",
+          "#E8EDE3",
+          "#F5F7F3"
+        ]
+      },
+      "gauge-track-dark": {
+        "role": "neutral",
+        "displayName": "Gauge Track Dark",
+        "canonical": "#333A2D",
+        "tonalRamp": [
+          "#151813",
+          "#252A20",
+          "#333A2D",
+          "#4C5643",
+          "#68755D",
+          "#87947B",
+          "#AAB4A1",
+          "#CFD6C8"
+        ]
+      },
+      "room-kitchen-accent": {
+        "role": "accent",
+        "displayName": "Kitchen Accent",
+        "canonical": "#3A7D5C",
+        "tonalRamp": [
+          "#143022",
+          "#1F4834",
+          "#2B6145",
+          "#3A7D5C",
+          "#539B76",
+          "#78B895",
+          "#A8D7BE",
+          "#DDF0E5"
+        ]
+      },
+      "room-kitchen-tint": {
+        "role": "accent",
+        "displayName": "Kitchen Tint",
+        "canonical": "#EAF3EC",
+        "tonalRamp": [
+          "#28382B",
+          "#455E4A",
+          "#6A8C70",
+          "#96B79C",
+          "#C2D9C6",
+          "#EAF3EC",
+          "#F3F8F4",
+          "#FCFDFC"
+        ]
+      },
+      "room-bathroom-accent": {
+        "role": "accent",
+        "displayName": "Bathroom Accent",
+        "canonical": "#3F7F9C",
+        "tonalRamp": [
+          "#142B36",
+          "#204557",
+          "#2E6079",
+          "#3F7F9C",
+          "#5CA0BF",
+          "#82BCD5",
+          "#B0D8EA",
+          "#E0EFF6"
+        ]
+      },
+      "room-bathroom-tint": {
+        "role": "accent",
+        "displayName": "Bathroom Tint",
+        "canonical": "#E7F0F4",
+        "tonalRamp": [
+          "#22333B",
+          "#3B5763",
+          "#5D8292",
+          "#89AEC0",
+          "#B9D4E2",
+          "#E7F0F4",
+          "#F2F7F9",
+          "#FCFDFE"
+        ]
+      },
+      "room-bedroom-accent": {
+        "role": "accent",
+        "displayName": "Bedroom Accent",
+        "canonical": "#7A5DB0",
+        "tonalRamp": [
+          "#291E3D",
+          "#413060",
+          "#5C4486",
+          "#7A5DB0",
+          "#9A7FD0",
+          "#BAA3E6",
+          "#D8CBF4",
+          "#F0ECFA"
+        ]
+      },
+      "room-bedroom-tint": {
+        "role": "accent",
+        "displayName": "Bedroom Tint",
+        "canonical": "#F1ECF5",
+        "tonalRamp": [
+          "#342D3D",
+          "#574B64",
+          "#7F6F92",
+          "#ABA0BD",
+          "#D3CBE0",
+          "#F1ECF5",
+          "#F8F5FB",
+          "#FDFCFF"
+        ]
+      },
+      "room-living-accent": {
+        "role": "accent",
+        "displayName": "Living Room Accent",
+        "canonical": "#B0803F",
+        "tonalRamp": [
+          "#3B2A12",
+          "#5B411C",
+          "#835D29",
+          "#B0803F",
+          "#C89B5F",
+          "#DFB884",
+          "#F0D6AF",
+          "#FBF2E3"
+        ]
+      },
+      "room-living-tint": {
+        "role": "accent",
+        "displayName": "Living Room Tint",
+        "canonical": "#F4EFE6",
+        "tonalRamp": [
+          "#3A3428",
+          "#5F5542",
+          "#8A7C63",
+          "#B6A98F",
+          "#DACFBD",
+          "#F4EFE6",
+          "#FAF6F0",
+          "#FDFBF9"
+        ]
+      },
+      "room-laundry-accent": {
+        "role": "accent",
+        "displayName": "Laundry Accent",
+        "canonical": "#5C7A52",
+        "tonalRamp": [
+          "#1E291B",
+          "#31422C",
+          "#465D3E",
+          "#5C7A52",
+          "#76986A",
+          "#96B58B",
+          "#BACFB3",
+          "#E2ECE0"
+        ]
+      },
+      "room-laundry-tint": {
+        "role": "accent",
+        "displayName": "Laundry Tint",
+        "canonical": "#EEF1EA",
+        "tonalRamp": [
+          "#32372F",
+          "#525A4D",
+          "#788371",
+          "#A4B09D",
+          "#C8D2C3",
+          "#EEF1EA",
+          "#F5F7F3",
+          "#FCFDFC"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Primary screen titles ('DUE TODAY', 'ROOMS') and aggregate health percentages."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Modal dialog titles, category sheet banners, and completion confirmations."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Task titles, room header names, and button labels."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Task descriptions, settings explanations, and helper text."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Uppercase section tags ('OVERDUE (2)', 'DUE SOON'), button actions, and room count tags."
+      },
+      "mono": {
+        "displayName": "Mono",
+        "purpose": "Technical maintenance intervals ('EVERY 90 DAYS'), calendar dates, and completion timestamps."
+      }
+    },
+    "shadows": [
+      {
+        "name": "neobrutalist-hard",
+        "value": "4px 4px 0px #26301F",
+        "purpose": "Tactile un-blurred hard offset on primary action buttons, dialog confirmations, and settings triggers."
+      },
+      {
+        "name": "ambient-card",
+        "value": "0 4px 10px rgba(0, 0, 0, 0.04)",
+        "purpose": "Subtle resting elevation under task cards and room section containers."
+      },
+      {
+        "name": "fab-glow",
+        "value": "0 4px 10px rgba(58, 125, 92, 0.25)",
+        "purpose": "Luminous floating emphasis under the primary circular add button."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-standard",
+        "value": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Default easing for tab transitions, bottom sheet slides, and modal reveals."
+      },
+      {
+        "name": "ease-tactile",
+        "value": "cubic-bezier(0.2, 0, 0, 1)",
+        "purpose": "Snappy response for button active presses and neobrutalist offset shifts."
+      },
+      {
+        "name": "duration-fast",
+        "value": "150ms",
+        "purpose": "Micro-interactions, button hover states, and checkmark triggers."
+      },
+      {
+        "name": "duration-medium",
+        "value": "300ms",
+        "purpose": "Sheet expansion, route navigation, and health gauge circular arc sweep."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "mobile-compact",
+        "value": "360px"
+      },
+      {
+        "name": "mobile-standard",
+        "value": "390px"
+      },
+      {
+        "name": "mobile-expanded",
+        "value": "428px"
+      },
+      {
+        "name": "tablet",
+        "value": "768px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Neobrutalist Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Zero-radius high-contrast action button with solid 2px border and 4px hard offset drop shadow.",
+      "html": "<button class=\"ds-btn-primary\">COMPLETE ALL SYSTEMS</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; width: 100%; height: 56px; background-color: #26301F; color: #FFFFFF; border: 2px solid #26301F; border-radius: 0px; font-family: Nunito, -apple-system, sans-serif; font-size: 13px; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; box-shadow: 4px 4px 0px #26301F; transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.15s ease; } .ds-btn-primary:hover { background-color: #3A7D5C; border-color: #3A7D5C; transform: translate(-1px, -1px); box-shadow: 5px 5px 0px #26301F; } .ds-btn-primary:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0px #26301F; }"
+    },
+    {
+      "name": "Forest Pine Action Button",
+      "kind": "button",
+      "refersTo": "button-action",
+      "description": "Primary action button with solid Forest Pine fill, 2px border, and tactile hard shadow.",
+      "html": "<button class=\"ds-btn-action\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" style=\"margin-right:8px\"><polyline points=\"20 6 9 17 4 12\"></polyline></svg>MARK AS DONE</button>",
+      "css": ".ds-btn-action { display: inline-flex; align-items: center; justify-content: center; padding: 14px 28px; background-color: #3A7D5C; color: #FFFFFF; border: 2px solid #26301F; border-radius: 0px; font-family: Nunito, -apple-system, sans-serif; font-size: 13px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; box-shadow: 3px 3px 0px #26301F; transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.15s ease; } .ds-btn-action:hover { background-color: #2F694C; transform: translate(-1px, -1px); box-shadow: 4px 4px 0px #26301F; } .ds-btn-action:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px #26301F; }"
+    },
+    {
+      "name": "Quick Snooze Button",
+      "kind": "button",
+      "refersTo": "button-snooze",
+      "description": "Lightweight 12px rounded outline button for postponing tasks by 1-3 days.",
+      "html": "<button class=\"ds-btn-snooze\">+3 days</button>",
+      "css": ".ds-btn-snooze { display: inline-flex; align-items: center; justify-content: center; padding: 8px 16px; background-color: transparent; color: #3A7D5C; border: 1.5px solid #3A7D5C; border-radius: 12px; font-family: Nunito, -apple-system, sans-serif; font-size: 13px; font-weight: 800; cursor: pointer; transition: background-color 0.15s ease, color 0.15s ease; } .ds-btn-snooze:hover { background-color: rgba(58, 125, 92, 0.1); } .ds-btn-snooze:active { background-color: rgba(58, 125, 92, 0.2); }"
+    },
+    {
+      "name": "Add Task FAB",
+      "kind": "button",
+      "refersTo": "fab",
+      "description": "52px circular floating action button with ambient forest pine glow.",
+      "html": "<button class=\"ds-fab-add\" aria-label=\"Add Task\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><line x1=\"12\" y1=\"5\" x2=\"12\" y2=\"19\"></line><line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\"></line></svg></button>",
+      "css": ".ds-fab-add { display: inline-flex; align-items: center; justify-content: center; width: 52px; height: 52px; background-color: #3A7D5C; color: #FFFFFF; border: none; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 10px rgba(58, 125, 92, 0.25); transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease; } .ds-fab-add:hover { background-color: #2F694C; transform: translateY(-2px); box-shadow: 0 6px 14px rgba(58, 125, 92, 0.35); } .ds-fab-add:active { transform: translateY(1px); box-shadow: 0 2px 6px rgba(58, 125, 92, 0.25); }"
+    },
+    {
+      "name": "Task Item Card",
+      "kind": "card",
+      "refersTo": "card-task",
+      "description": "18px rounded task container with category icon badge, status dot, and checkmark target.",
+      "html": "<div class=\"ds-card-task\"><div class=\"ds-task-icon-wrap\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#3A7D5C\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\"></rect><path d=\"M3 9h18\"></path></svg></div><div class=\"ds-task-info\"><div class=\"ds-task-title\">Replace HVAC Filter</div><div class=\"ds-task-meta\">Kitchen <span class=\"ds-task-dot\">•</span> <span class=\"ds-task-due\">Due in 2d</span></div></div><button class=\"ds-task-check\" aria-label=\"Complete\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#3A7D5C\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"20 6 9 17 4 12\"></polyline></svg></button></div>",
+      "css": ".ds-card-task { display: flex; align-items: center; padding: 16px; background-color: #FFFFFF; border-radius: 18px; border: 1px solid #EEF1EA; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04); font-family: Nunito, -apple-system, sans-serif; } .ds-task-icon-wrap { width: 42px; height: 42px; border-radius: 14px; background-color: #EAF3EC; display: flex; align-items: center; justify-content: center; margin-right: 14px; flex-shrink: 0; } .ds-task-info { flex: 1; min-width: 0; } .ds-task-title { font-size: 16px; font-weight: 800; color: #26301F; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .ds-task-meta { font-size: 12px; font-weight: 700; color: #6B7563; margin-top: 2px; display: flex; align-items: center; gap: 6px; } .ds-task-dot { font-size: 10px; color: #3A7D5C; } .ds-task-due { color: #3A7D5C; font-weight: 800; } .ds-task-check { width: 38px; height: 38px; border-radius: 50%; background-color: #EAF3EC; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: transform 0.15s ease, background-color 0.15s ease; } .ds-task-check:hover { background-color: #D6E8D9; transform: scale(1.05); }"
+    },
+    {
+      "name": "Room Category Section",
+      "kind": "card",
+      "refersTo": "card-room",
+      "description": "20px rounded card with dedicated room tint header, count badge, and task list.",
+      "html": "<div class=\"ds-card-room\"><div class=\"ds-room-header\"><div class=\"ds-room-header-left\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#3A7D5C\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"></path></svg><span class=\"ds-room-title\">Kitchen</span></div><span class=\"ds-room-count\">3 tasks</span></div><div class=\"ds-room-body\"><div class=\"ds-room-item\">Clean range hood filter</div><div class=\"ds-room-item\">Descale kettle & coffee maker</div></div></div>",
+      "css": ".ds-card-room { background-color: #FFFFFF; border-radius: 20px; border: 1px solid #EEF1EA; overflow: hidden; font-family: Nunito, -apple-system, sans-serif; } .ds-room-header { padding: 14px 16px 12px 16px; background-color: #EAF3EC; display: flex; align-items: center; justify-content: space-between; } .ds-room-header-left { display: flex; align-items: center; gap: 10px; } .ds-room-title { font-size: 16px; font-weight: 900; color: #3A7D5C; } .ds-room-count { font-size: 11px; font-weight: 800; color: #3A7D5C; background-color: rgba(58, 125, 92, 0.15); padding: 2px 8px; border-radius: 10px; } .ds-room-body { padding: 8px 16px; } .ds-room-item { padding: 10px 0; font-size: 14px; font-weight: 700; color: #26301F; border-bottom: 1px solid #EEF1EA; } .ds-room-item:last-child { border-bottom: none; }"
+    },
+    {
+      "name": "Status Urgency Pill",
+      "kind": "chip",
+      "refersTo": "chip-pill",
+      "description": "Capsule badge with 7px circular dot and semantic tri-state background tint.",
+      "html": "<div class=\"ds-chip-status ds-status-overdue\"><span class=\"ds-status-dot\"></span>OVERDUE (2)</div>",
+      "css": ".ds-chip-status { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 12px; font-family: Nunito, -apple-system, sans-serif; font-size: 11px; font-weight: 900; letter-spacing: 0.5px; } .ds-chip-status .ds-status-dot { width: 7px; height: 7px; border-radius: 50%; } .ds-status-overdue { background-color: rgba(194, 88, 63, 0.15); color: #C2583F; } .ds-status-overdue .ds-status-dot { background-color: #C2583F; } .ds-status-warning { background-color: rgba(185, 134, 55, 0.15); color: #B98637; } .ds-status-warning .ds-status-dot { background-color: #B98637; } .ds-status-healthy { background-color: rgba(58, 125, 92, 0.15); color: #3A7D5C; } .ds-status-healthy .ds-status-dot { background-color: #3A7D5C; }"
+    },
+    {
+      "name": "Neobrutalist Input Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "56px rectangular text field with 2px solid border and primary focus transition.",
+      "html": "<input type=\"text\" class=\"ds-input-field\" placeholder=\"SYSTEM NAME (E.G. HVAC FILTER)...\" />",
+      "css": ".ds-input-field { width: 100%; height: 56px; padding: 0 16px; background-color: #FFFFFF; color: #26301F; border: 2px solid #26301F; border-radius: 0px; font-family: Nunito, -apple-system, sans-serif; font-size: 15px; font-weight: 700; box-sizing: border-box; outline: none; transition: border-color 0.15s ease; } .ds-input-field::placeholder { color: #8A8A8A; font-weight: 600; } .ds-input-field:focus { border-color: #3A7D5C; }"
+    },
+    {
+      "name": "Home Health Ring Gauge",
+      "kind": "custom",
+      "refersTo": "gauge-health",
+      "description": "Signature 140px circular dual-arc gauge with tri-state status fill and center score readout.",
+      "html": "<div class=\"ds-gauge-health\"><svg viewBox=\"0 0 140 140\" width=\"140\" height=\"140\" class=\"ds-gauge-svg\"><circle cx=\"70\" cy=\"70\" r=\"56\" fill=\"none\" stroke=\"#D7DED0\" stroke-width=\"14\"></circle><circle cx=\"70\" cy=\"70\" r=\"56\" fill=\"none\" stroke=\"#3A7D5C\" stroke-width=\"14\" stroke-dasharray=\"351.86\" stroke-dashoffset=\"52.78\" stroke-linecap=\"round\" transform=\"rotate(-90 70 70)\"></circle></svg><div class=\"ds-gauge-center\"><span class=\"ds-gauge-pct\">85%</span><span class=\"ds-gauge-label\">OPTIMAL</span></div></div>",
+      "css": ".ds-gauge-health { position: relative; width: 140px; height: 140px; display: flex; align-items: center; justify-content: center; font-family: Nunito, -apple-system, sans-serif; } .ds-gauge-svg { width: 100%; height: 100%; } .ds-gauge-center { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; } .ds-gauge-pct { font-size: 28px; font-weight: 900; color: #26301F; line-height: 1; } .ds-gauge-label { font-size: 11px; font-weight: 800; letter-spacing: 0.08em; color: #3A7D5C; margin-top: 4px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Domestic Workshop",
+    "overview": "Cleaning Tracker is a pragmatic, tactile instrument for home stewardship. Rather than feeling like a chore checklist or gamified mobile app, Cleaning Tracker behaves like a precision physical tool found in a well-kept domestic workshop—rugged, high-contrast, deeply tactile, and calm under pressure. Combining rounded ergonomic cards and comforting sage tones with unapologetic neobrutalist utility controls (2px solid black strokes, zero-radius action buttons, 4px hard offsets), the interface provides instantaneous clarity when inspecting appliances in low light or operating with wet hands.\n\nThe visual language rejects frivolous gradients, low-contrast pastel gray-on-gray palettes, and patronizing gamification. In their place, it uses clear tri-state health telemetry, structured room category identities, and bold geometric typography. Every domestic zone is immediately distinct, and every interaction offers tangible tactile weight.",
+    "keyCharacteristics": [
+      "High-Contrast Tactile Neobrutalism: Crisp 2px solid borders, 4px un-blurred hard drop shadows on interactive controls, and zero-radius utility buttons balance ergonomic rounded cards (18px–24px).",
+      "Tri-State Urgency Telemetry: Clear maintenance health tracking anchored by Forest Pine (#3A7D5C), Warm Amber (#B98637), and Terracotta Brick (#C2583F).",
+      "Atmospheric Room Identities: Five dedicated domestic categories (Kitchen, Bathroom, Bedroom, Living Room, Laundry & Utility) paired with distinct pastel tints and rich accent colors.",
+      "Frictionless Mobile Ergonomics: Engineered for physical, high-friction environments with oversized touch targets (48px–64px), persistent bottom navigation, and high legibility."
+    ],
+    "rules": [
+      {
+        "name": "The Health Spectrum Rule",
+        "body": "Home Health and urgency status are communicated strictly across three canonical thresholds: Forest Pine (>=80% Operational), Warm Amber (50%–79% Degrading), and Terracotta Brick (<50% Critical/Overdue). No arbitrary intermediary gradients or celebratory pastel confetti.",
+        "section": "colors"
+      },
+      {
+        "name": "The Room Identity Rule",
+        "body": "Domestic zones must strictly use their assigned room theme tint and accent pairing. A Kitchen task must never be badged with Bathroom slate or Laundry sage.",
+        "section": "colors"
+      },
+      {
+        "name": "The Heavyweight Hierarchy Rule",
+        "body": "Nunito's rounded letterforms require heavy weights (w700 to w900) for structural headings, card titles, and badges to preserve tactical authority and avoid playful softness.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tactical Anchor Rule",
+        "body": "Utility buttons and bottom action sheets use zero-radius rectangular geometry with solid 2px borders and 4px un-blurred drop shadows. Floating blur is reserved strictly for the circular add FAB and ambient card elevation.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do anchor primary interface actions and healthy states to Forest Pine (#3A7D5C).",
+      "Do use 2px solid borders and zero-radius geometry on neobrutalist action triggers and primary input fields.",
+      "Do maintain a strict 3-tier health state (Pine for >=80%, Amber for 50%–79%, Terracotta for <50%).",
+      "Do format maintenance intervals and completion logs in monospace (Chivo Mono) with uppercase styling.",
+      "Do pair every room category with its official tint and accent colors.",
+      "Do keep interactive button heights at or above 48px (56px–64px preferred for main action sheets) for wet-hands mobile operation."
+    ],
+    "donts": [
+      "Don't use multi-color gradients, saturated rainbow borders, or celebratory floating confetti animations.",
+      "Don't apply blurry, multi-layer ambient drop shadows to utility buttons; maintain flat borders or hard 4px un-blurred drop shadows.",
+      "Don't use light font weights (<w600) with GoogleFonts.nunito on interface elements.",
+      "Don't mix room theme accent colors across categories (e.g. using Kitchen green for a Bathroom task).",
+      "Don't shrink touch targets below 44px on any interactive control."
+    ]
+  }
+}
