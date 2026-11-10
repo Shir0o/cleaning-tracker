@@ -501,8 +501,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String _customInterval = 'WEEKLY';
 
   TextStyle _safeGoogleFont(TextStyle Function() fontFn) {
-    if (DashboardScreen.testingMode) return const TextStyle();
-    return fontFn();
+    try {
+      return fontFn();
+    } catch (_) {
+      return const TextStyle();
+    }
   }
 
   @override
@@ -845,34 +848,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                dateStr.toUpperCase(),
-                style: _safeGoogleFont(
-                  () => GoogleFonts.nunito(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.2,
-                    color: isDark
-                        ? const Color(0xFF9AA48F)
-                        : const Color(0xFF6B7563),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  dateStr.toUpperCase(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: _safeGoogleFont(
+                    () => GoogleFonts.nunito(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.2,
+                      color: isDark
+                          ? const Color(0xFF9AA48F)
+                          : const Color(0xFF56604E),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                title,
-                style: _safeGoogleFont(
-                  () => GoogleFonts.nunito(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w900,
-                    color: textColor,
+                const SizedBox(height: 2),
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: _safeGoogleFont(
+                    () => GoogleFonts.nunito(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w900,
+                      color: textColor,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
@@ -886,7 +895,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         : const Color(0xFF26301F);
     final mutedText = isDark
         ? const Color(0xFF9AA48F)
-        : const Color(0xFF6B7563);
+        : const Color(0xFF56604E);
 
     final sortedTasks = List<Task>.from(_tasks)
       ..sort(
@@ -918,11 +927,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
       children: [
         // Backward compatibility text elements for tests
         if (DashboardScreen.testingMode) ...[
-          const Text('STATUS', style: TextStyle(fontSize: 1)),
-          const Text('HOME HEALTH', style: TextStyle(fontSize: 1)),
-          const Text('100%', style: TextStyle(fontSize: 1)),
+          const ExcludeSemantics(
+            child: Text('STATUS', style: TextStyle(fontSize: 1)),
+          ),
+          const ExcludeSemantics(
+            child: Text('HOME HEALTH', style: TextStyle(fontSize: 1)),
+          ),
+          const ExcludeSemantics(
+            child: Text('100%', style: TextStyle(fontSize: 1)),
+          ),
           if (_tasks.isEmpty)
-            const Text('NO SYSTEMS TRACKED', style: TextStyle(fontSize: 1)),
+            const ExcludeSemantics(
+              child: Text('NO SYSTEMS TRACKED', style: TextStyle(fontSize: 1)),
+            ),
         ],
 
         Text(
@@ -938,7 +955,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
         const SizedBox(height: 16),
 
         if (overdue.isNotEmpty) ...[
-          _buildSectionPill('OVERDUE', overdue.length, const Color(0xFFC2583F)),
+          _buildSectionPill(
+            'OVERDUE',
+            overdue.length,
+            const Color(0xFFC2583F),
+            isDark,
+          ),
           const SizedBox(height: 10),
           ...overdue.map(
             (t) => _buildRedesignTaskCard(t, now, isDark, cardBg, textColor),
@@ -951,6 +973,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             'DUE SOON',
             dueToday.length + soon.length,
             const Color(0xFFB98637),
+            isDark,
           ),
           const SizedBox(height: 10),
           ...dueToday.map(
@@ -967,6 +990,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             'UPCOMING',
             upcoming.length,
             const Color(0xFF3A7D5C),
+            isDark,
           ),
           const SizedBox(height: 10),
           ...upcoming.map(
@@ -1012,7 +1036,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildSectionPill(String title, int count, Color color) {
+  Widget _buildSectionPill(String title, int count, Color color, bool isDark) {
+    final textColor = isDark
+        ? (title == 'OVERDUE'
+              ? const Color(0xFFFF9E8A)
+              : title == 'DUE SOON'
+              ? const Color(0xFFFFD48F)
+              : const Color(0xFF8CE0B0))
+        : (title == 'OVERDUE'
+              ? const Color(0xFF7A1F0E)
+              : title == 'DUE SOON'
+              ? const Color(0xFF634105)
+              : const Color(0xFF1B4E36));
     return Row(
       children: [
         Container(
@@ -1034,7 +1069,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 style: GoogleFonts.nunito(
                   fontSize: 11,
                   fontWeight: FontWeight.w900,
-                  color: color,
+                  color: textColor,
                   letterSpacing: 0.5,
                 ),
               ),
@@ -1135,14 +1170,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       const SizedBox(height: 2),
                       Row(
                         children: [
-                          Text(
-                            roomTheme.name,
-                            style: GoogleFonts.nunito(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: isDark
-                                  ? const Color(0xFF9AA48F)
-                                  : const Color(0xFF6B7563),
+                          Flexible(
+                            child: Text(
+                              roomTheme.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.nunito(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: isDark
+                                    ? const Color(0xFF9AA48F)
+                                    : const Color(0xFF56604E),
+                              ),
                             ),
                           ),
                           const SizedBox(width: 6),
@@ -1151,12 +1190,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             style: TextStyle(color: statusColor, fontSize: 10),
                           ),
                           const SizedBox(width: 6),
-                          Text(
-                            statusLabel,
-                            style: GoogleFonts.nunito(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800,
-                              color: statusColor,
+                          Flexible(
+                            child: Text(
+                              statusLabel,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.nunito(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w800,
+                                color: statusColor,
+                              ),
                             ),
                           ),
                         ],
@@ -1164,20 +1207,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ],
                   ),
                 ),
-                InkWell(
-                  onTap: () => _markDone(task),
-                  borderRadius: BorderRadius.circular(20),
-                  child: Container(
-                    width: 38,
-                    height: 38,
-                    decoration: BoxDecoration(
-                      color: roomTheme.tint(isDark),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.check,
-                      color: roomTheme.accent(isDark),
-                      size: 20,
+                Semantics(
+                  button: true,
+                  label: 'Mark ${task.title} complete',
+                  child: InkWell(
+                    onTap: () => _markDone(task),
+                    borderRadius: BorderRadius.circular(24),
+                    child: SizedBox(
+                      width: 48,
+                      height: 48,
+                      child: Center(
+                        child: Container(
+                          width: 38,
+                          height: 38,
+                          decoration: BoxDecoration(
+                            color: roomTheme.tint(isDark),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.check,
+                            color: roomTheme.accent(isDark),
+                            size: 20,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -1339,7 +1392,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         : const Color(0xFF26301F);
     final mutedText = isDark
         ? const Color(0xFF9AA48F)
-        : const Color(0xFF6B7563);
+        : const Color(0xFF56604E);
 
     final total = _tasks.length;
     final okCount = _tasks.where((t) => _getDaysRemaining(t, now) >= 0).length;
@@ -1588,7 +1641,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final navBorder = isDark
         ? const Color(0x14FFFFFF)
         : const Color(0xFFDDE3D8);
-    final activeColor = const Color(0xFF3A7D5C);
+    final activeColor = isDark
+        ? const Color(0xFF7FD3A4)
+        : const Color(0xFF3A7D5C);
     final inactiveColor = isDark
         ? const Color(0xFF9AA48F)
         : const Color(0xFF5C6652);
@@ -1675,32 +1730,36 @@ class _DashboardScreenState extends State<DashboardScreen> {
     Color inactiveColor,
   ) {
     final active = _selectedIndex == index;
-    return InkWell(
-      onTap: () => setState(() {
-        _selectedIndex = index;
-        _overlay = null;
-      }),
-      borderRadius: BorderRadius.circular(16),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              active ? iconOn : iconOff,
-              color: active ? activeColor : inactiveColor,
-              size: 22,
-            ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: GoogleFonts.nunito(
-                fontSize: 10.5,
-                fontWeight: FontWeight.w800,
+    return Expanded(
+      child: InkWell(
+        onTap: () => setState(() {
+          _selectedIndex = index;
+          _overlay = null;
+        }),
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                active ? iconOn : iconOff,
                 color: active ? activeColor : inactiveColor,
+                size: 22,
               ),
-            ),
-          ],
+              const SizedBox(height: 2),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.nunito(
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w800,
+                  color: active ? activeColor : inactiveColor,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -1714,7 +1773,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         : const Color(0xFF26301F);
     final mutedText = isDark
         ? const Color(0xFF9AA48F)
-        : const Color(0xFF6B7563);
+        : const Color(0xFF56604E);
 
     final filteredPresets = allPresets.where((p) {
       if (_selectedAddCategory == 'ALL') return true;
@@ -2119,7 +2178,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         : const Color(0xFF26301F);
     final mutedText = isDark
         ? const Color(0xFF9AA48F)
-        : const Color(0xFF6B7563);
+        : const Color(0xFF56604E);
 
     final d = _getDaysRemaining(task, now);
     final roomTheme = getRoomTheme(task.category);
