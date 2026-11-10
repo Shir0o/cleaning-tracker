@@ -4,7 +4,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'drive_service.dart';
 import 'log_history_page.dart';
-import 'main.dart' show themeNotifier, roomThemes;
+import 'main.dart' show themeNotifier, roomThemes, DashboardScreen;
 import 'notification_service.dart';
 import 'privacy_policy_page.dart';
 
@@ -104,12 +104,15 @@ class _SettingsTabState extends State<SettingsTab> with WidgetsBindingObserver {
   }
 
   Future<void> _checkNotificationPermission() async {
-    final status = await Permission.notification.status;
-    if (mounted && !status.isGranted && _notificationsEnabled) {
-      setState(() => _notificationsEnabled = false);
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('notifications_enabled', false);
-    }
+    if (DashboardScreen.testingMode) return;
+    try {
+      final status = await Permission.notification.status;
+      if (mounted && !status.isGranted && _notificationsEnabled) {
+        setState(() => _notificationsEnabled = false);
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('notifications_enabled', false);
+      }
+    } catch (_) {}
   }
 
   void _showSnack(String message) {

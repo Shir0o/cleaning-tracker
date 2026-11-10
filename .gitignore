@@ -62,3 +62,4 @@ android/key.properties.example
 
 # Test failure artifacts
 test/failures/
+/test/goldens/
