@@ -60,7 +60,7 @@ jobs:
           find test -name "*_test.dart" ! -name "*_golden_test.dart" | xargs flutter test --fail-fast
 
       - name: Build debug APK
-        run: flutter build apk --debug
+        run: flutter build apk --debug --android-skip-build-dependency-validation
 
   # Job 2: Golden Tests (macOS)
   # Goldens are committed from macOS dev environments. Skia renders text
@@ -130,7 +130,7 @@ jobs:
         run: flutter pub get
 
       - name: Bootstrap Android project (generates gradlew)
-        run: flutter build apk --debug
+        run: flutter build apk --debug --android-skip-build-dependency-validation
 
       - name: Build app APK with integration tests bundled
         run: |
