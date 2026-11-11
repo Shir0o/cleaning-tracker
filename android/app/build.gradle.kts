@@ -73,6 +73,8 @@ configurations.all {
         force("androidx.test:monitor:1.6.1")
         force("androidx.test.ext:junit:1.1.5")
         force("androidx.test.espresso:espresso-core:3.5.1")
+        force("androidx.core:core:1.15.0")
+        force("androidx.core:core-ktx:1.15.0")
     }
 }
 
