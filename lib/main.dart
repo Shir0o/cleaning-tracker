@@ -232,6 +232,16 @@ RoomTheme getRoomTheme(String categoryOrRoom) {
   return roomThemes[3]; // Default Living room / General
 }
 
+// WCAG AA (>= 4.5:1) task status colors for light and dark surfaces.
+Color overdueStatusColor(bool isDark) =>
+    isDark ? const Color(0xFFF08272) : const Color(0xFFB83A20);
+
+Color dueSoonStatusColor(bool isDark) =>
+    isDark ? const Color(0xFFF5B041) : const Color(0xFF8A5714);
+
+Color onTrackStatusColor(bool isDark) =>
+    isDark ? const Color(0xFF66C492) : const Color(0xFF2D6B4D);
+
 const List<Map<String, String>> allPresets = [
   {
     'title': 'WASH DISHES',
@@ -736,6 +746,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
+  void _openOverlay(String overlay) {
+    setState(() {
+      _overlay = overlay;
+      if (overlay == 'add') {
+        _selectedAddCategory = 'ALL';
+      }
+    });
+  }
+
   void _showToast(String message) {
     _showUndoToast(message);
   }
@@ -958,7 +977,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           _buildSectionPill(
             'OVERDUE',
             overdue.length,
-            const Color(0xFFC2583F),
+            overdueStatusColor(isDark),
             isDark,
           ),
           const SizedBox(height: 10),
@@ -972,7 +991,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           _buildSectionPill(
             'DUE SOON',
             dueToday.length + soon.length,
-            const Color(0xFFB98637),
+            dueSoonStatusColor(isDark),
             isDark,
           ),
           const SizedBox(height: 10),
@@ -989,7 +1008,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           _buildSectionPill(
             'UPCOMING',
             upcoming.length,
-            const Color(0xFF3A7D5C),
+            onTrackStatusColor(isDark),
             isDark,
           ),
           const SizedBox(height: 10),
@@ -1037,23 +1056,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildSectionPill(String title, int count, Color color, bool isDark) {
-    final textColor = isDark
-        ? (title == 'OVERDUE'
-              ? const Color(0xFFFF9E8A)
-              : title == 'DUE SOON'
-              ? const Color(0xFFFFD48F)
-              : const Color(0xFF8CE0B0))
-        : (title == 'OVERDUE'
-              ? const Color(0xFF7A1F0E)
-              : title == 'DUE SOON'
-              ? const Color(0xFF634105)
-              : const Color(0xFF1B4E36));
     return Row(
       children: [
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.15),
+            // A solid light surface keeps the status text above 4.5:1 in light
+            // mode; in dark mode the subtle tint still leaves it well above AA.
+            color: isDark ? color.withValues(alpha: 0.15) : Colors.white,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
@@ -1069,7 +1079,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 style: GoogleFonts.nunito(
                   fontSize: 11,
                   fontWeight: FontWeight.w900,
-                  color: textColor,
+                  color: color,
                   letterSpacing: 0.5,
                 ),
               ),
@@ -1093,16 +1103,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
     Color statusColor;
     String statusLabel;
     if (d < 0) {
-      statusColor = const Color(0xFFC2583F);
+      statusColor = overdueStatusColor(isDark);
       statusLabel = '${d.abs()}d overdue';
     } else if (d == 0) {
-      statusColor = const Color(0xFFB98637);
+      statusColor = dueSoonStatusColor(isDark);
       statusLabel = 'Due today';
     } else if (d <= 2) {
-      statusColor = const Color(0xFFB98637);
+      statusColor = dueSoonStatusColor(isDark);
       statusLabel = 'Due in ${d}d';
     } else {
-      statusColor = const Color(0xFF3A7D5C);
+      statusColor = onTrackStatusColor(isDark);
       statusLabel = 'Due in ${d}d';
     }
 
@@ -1352,10 +1362,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
                             color: d < 0
-                                ? const Color(0xFFC2583F)
+                                ? overdueStatusColor(isDark)
                                 : d == 0
-                                ? const Color(0xFFB98637)
-                                : const Color(0xFF3A7D5C),
+                                ? dueSoonStatusColor(isDark)
+                                : onTrackStatusColor(isDark),
                           ),
                         ),
                         trailing: IconButton(
@@ -1675,28 +1685,39 @@ class _DashboardScreenState extends State<DashboardScreen> {
               activeColor,
               inactiveColor,
             ),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  _overlay = 'add';
-                  _selectedAddCategory = 'ALL';
-                });
-              },
-              child: Container(
-                width: 52,
-                height: 52,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF3A7D5C),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Color(0x403A7D5C),
-                      blurRadius: 10,
-                      offset: Offset(0, 4),
+            Semantics(
+              button: true,
+              label: 'Add task',
+              child: Tooltip(
+                message: 'Add task',
+                child: Container(
+                  width: 52,
+                  height: 52,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF3A7D5C),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(0x403A7D5C),
+                        blurRadius: 10,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    shape: const CircleBorder(),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(26),
+                      onTap: () => _openOverlay('add'),
+                      child: const Icon(
+                        Icons.add,
+                        color: Colors.white,
+                        size: 28,
+                      ),
                     ),
-                  ],
+                  ),
                 ),
-                child: const Icon(Icons.add, color: Colors.white, size: 28),
               ),
             ),
             _buildNavItem(
@@ -2187,13 +2208,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
     Color statusColor;
     String statusTitle;
     if (d < 0) {
-      statusColor = const Color(0xFFC2583F);
+      statusColor = overdueStatusColor(isDark);
       statusTitle = 'Overdue by ${d.abs()} day${d.abs() == 1 ? '' : 's'}';
     } else if (d == 0) {
-      statusColor = const Color(0xFFB98637);
+      statusColor = dueSoonStatusColor(isDark);
       statusTitle = 'Due today';
     } else {
-      statusColor = const Color(0xFF3A7D5C);
+      statusColor = onTrackStatusColor(isDark);
       statusTitle = 'Due in $d day${d == 1 ? '' : 's'}';
     }
 
