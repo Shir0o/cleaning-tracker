@@ -41,6 +41,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+          flutter-version: "3.47.9"
           cache: true
 
       - name: Bootstrap .env from template
@@ -60,7 +61,7 @@ jobs:
           find test -name "*_test.dart" ! -name "*_golden_test.dart" | xargs flutter test --fail-fast
 
       - name: Build debug APK
-        run: flutter build apk --debug --android-skip-build-dependency-validation
+        run: flutter build apk --debug
 
   # Job 2: Golden Tests (macOS)
   # Goldens are committed from macOS dev environments. Skia renders text
@@ -76,6 +77,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+          flutter-version: "3.47.9"
           cache: true
 
       - name: Bootstrap .env from template
@@ -121,6 +123,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+          flutter-version: "3.47.9"
           cache: true
 
       - name: Bootstrap .env from template
@@ -130,7 +133,7 @@ jobs:
         run: flutter pub get
 
       - name: Bootstrap Android project (generates gradlew)
-        run: flutter build apk --debug --android-skip-build-dependency-validation
+        run: flutter build apk --debug
 
       - name: Build app APK with integration tests bundled
         run: |

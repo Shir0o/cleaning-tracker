@@ -61,6 +61,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
+          flutter-version: "3.47.9"
           cache: true
 
       - name: Setup Ruby + Bundler for fastlane
@@ -124,15 +125,15 @@ jobs:
           echo "Derived versionCode=$code from tag $tag (major=$major minor=$minor patch=$patch)"
 
       - name: Bootstrap Android project (Generates gradlew)
-        run: flutter build apk --debug --android-skip-build-dependency-validation
+        run: flutter build apk --debug
         env:
           CI: 'true'
 
       - name: Build signed release AAB
-        run: flutter build appbundle --release --no-tree-shake-icons --build-number=${{ steps.vc.outputs.code }} --android-skip-build-dependency-validation
+        run: flutter build appbundle --release --no-tree-shake-icons --build-number=${{ steps.vc.outputs.code }}
 
       - name: Build signed release APK
-        run: flutter build apk --release --no-tree-shake-icons --build-number=${{ steps.vc.outputs.code }} --android-skip-build-dependency-validation
+        run: flutter build apk --release --no-tree-shake-icons --build-number=${{ steps.vc.outputs.code }}
 
       - name: Locate built artifacts
         id: locate
