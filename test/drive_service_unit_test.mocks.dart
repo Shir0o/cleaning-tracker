@@ -10,7 +10,6 @@ import 'package:google_sign_in/google_sign_in.dart' as _i4;
 import 'package:google_sign_in/src/event_types.dart' as _i8;
 import 'package:google_sign_in/src/token_types.dart' as _i5;
 import 'package:googleapis/drive/v3.dart' as _i2;
-import 'package:googleapis/shared.dart' as _i3;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i9;
 
@@ -146,8 +145,8 @@ class _FakeModifyLabelsResponse_20 extends _i1.SmartFake
     : super(parent, parentInvocation);
 }
 
-class _Fake$Channel01_21 extends _i1.SmartFake implements _i3.$Channel01 {
-  _Fake$Channel01_21(Object parent, Invocation parentInvocation)
+class _FakeChannel_21 extends _i1.SmartFake implements _i2.Channel {
+  _FakeChannel_21(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
@@ -337,6 +336,7 @@ class MockFilesResource extends _i1.Mock implements _i2.FilesResource {
   _i6.Future<_i2.File> copy(
     _i2.File? request,
     String? fileId, {
+    bool? copyComments,
     bool? enforceSingleParent,
     bool? ignoreDefaultVisibility,
     String? includeLabels,
@@ -352,6 +352,7 @@ class MockFilesResource extends _i1.Mock implements _i2.FilesResource {
               #copy,
               [request, fileId],
               {
+                #copyComments: copyComments,
                 #enforceSingleParent: enforceSingleParent,
                 #ignoreDefaultVisibility: ignoreDefaultVisibility,
                 #includeLabels: includeLabels,
@@ -798,8 +799,8 @@ class MockFilesResource extends _i1.Mock implements _i2.FilesResource {
           as _i6.Future<_i2.File>);
 
   @override
-  _i6.Future<_i3.$Channel01> watch(
-    _i3.$Channel01? request,
+  _i6.Future<_i2.Channel> watch(
+    _i2.Channel? request,
     String? fileId, {
     bool? acknowledgeAbuse,
     String? includeLabels,
@@ -821,8 +822,8 @@ class MockFilesResource extends _i1.Mock implements _i2.FilesResource {
                 #$fields: $fields,
               },
             ),
-            returnValue: _i6.Future<_i3.$Channel01>.value(
-              _Fake$Channel01_21(
+            returnValue: _i6.Future<_i2.Channel>.value(
+              _FakeChannel_21(
                 this,
                 Invocation.method(
                   #watch,
@@ -839,7 +840,7 @@ class MockFilesResource extends _i1.Mock implements _i2.FilesResource {
               ),
             ),
           )
-          as _i6.Future<_i3.$Channel01>);
+          as _i6.Future<_i2.Channel>);
 }
 
 /// A class which mocks [GoogleSignIn].
@@ -953,7 +954,6 @@ class MockGoogleSignIn extends _i1.Mock implements _i4.GoogleSignIn {
 /// A class which mocks [GoogleSignInAccount].
 ///
 /// See the documentation for Mockito's code generation for more information.
-// ignore: must_be_immutable
 class MockGoogleSignInAccount extends _i1.Mock
     implements _i4.GoogleSignInAccount {
   MockGoogleSignInAccount() {
