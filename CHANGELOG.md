@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.3](https://github.com/Shir0o/cleaning-tracker/compare/v1.4.2...v1.4.3) (2026-11-19)
+
+
+### Bug Fixes
+
+* **ui:** fix crushed settings row layout and interactive a11y audit ([#82](https://github.com/Shir0o/cleaning-tracker/issues/82)) ([9a6d0b5](https://github.com/Shir0o/cleaning-tracker/commit/9a6d0b58d5858454fa8566c5d1bf733997c77005))
+
 ## [1.4.2](https://github.com/Shir0o/cleaning-tracker/compare/v1.4.1...v1.4.2) (2026-11-11)
 
 
