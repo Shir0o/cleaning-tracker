@@ -433,7 +433,7 @@ class _SettingsTabState extends State<SettingsTab> with WidgetsBindingObserver {
                     Expanded(
                       child: OutlinedButton(
                         style: OutlinedButton.styleFrom(
-                          minimumSize: const Size.fromHeight(44),
+                          minimumSize: const Size.fromHeight(48),
                           foregroundColor: palette.text,
                           side: BorderSide(color: palette.border),
                           shape: RoundedRectangleBorder(
@@ -568,24 +568,38 @@ class _SettingsTabState extends State<SettingsTab> with WidgetsBindingObserver {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(title, style: palette.title),
+                      if (value == null)
+                        Text(title, style: palette.title)
+                      else
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: Text(title, style: palette.title)),
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: Text(
+                                value,
+                                textAlign: TextAlign.end,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w800,
+                                  color: palette.accentText,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       if (subtitle != null)
                         Text(subtitle, style: palette.subtitle),
                     ],
                   ),
                 ),
-                if (value != null)
-                  Text(
-                    value,
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w800,
-                      color: palette.accentText,
-                    ),
-                  ),
                 ?trailing,
-                if (onTap != null)
+                if (onTap != null) ...[
+                  if (value != null) const SizedBox(width: 8),
                   Icon(Icons.chevron_right, color: palette.muted, size: 20),
+                ],
               ],
             ),
           ),
@@ -608,7 +622,7 @@ class _SettingsTabState extends State<SettingsTab> with WidgetsBindingObserver {
         borderRadius: BorderRadius.circular(11),
         onTap: onTap,
         child: SizedBox(
-          height: 44,
+          height: 48,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -636,7 +650,7 @@ class _SettingsTabState extends State<SettingsTab> with WidgetsBindingObserver {
   Widget _primaryButton(String label, VoidCallback onPressed) {
     return FilledButton(
       style: FilledButton.styleFrom(
-        minimumSize: const Size.fromHeight(44),
+        minimumSize: const Size.fromHeight(48),
         backgroundColor: _primary,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),

@@ -136,6 +136,7 @@ class _CleaningTrackerAppState extends State<CleaningTrackerApp>
             scaffoldBackgroundColor: const Color(0xFF12140F),
             colorScheme: const ColorScheme.dark(
               primary: Color(0xFF3A7D5C),
+              onPrimary: Colors.white,
               surface: Color(0xFF1E211A),
               onSurface: Color(0xFFEEF2E9),
               error: Color(0xFFC2583F),
@@ -1369,6 +1370,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ),
                         ),
                         trailing: IconButton(
+                          tooltip: 'Mark ${task.title} complete',
                           icon: const Icon(
                             Icons.check_circle_outline,
                             size: 24,
@@ -1605,16 +1607,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: Column(
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      rt.name,
-                      style: GoogleFonts.nunito(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
-                        color: textColor,
+                    Expanded(
+                      child: Text(
+                        rt.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.nunito(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                          color: textColor,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     Text(
                       '$ok/${roomTasks.length} on track ($pct%)',
                       style: GoogleFonts.nunito(
@@ -1811,6 +1817,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: Row(
                 children: [
                   IconButton(
+                    tooltip: 'Close',
                     icon: Container(
                       width: 36,
                       height: 36,
@@ -1996,6 +2003,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 )
                               else
                                 IconButton(
+                                  tooltip: 'Add ${preset['title']}',
                                   icon: Container(
                                     width: 34,
                                     height: 34,
@@ -2046,6 +2054,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Row(
               children: [
                 IconButton(
+                  tooltip: 'Back',
                   icon: Container(
                     width: 36,
                     height: 36,
@@ -2228,6 +2237,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 IconButton(
+                  tooltip: 'Back',
                   icon: Container(
                     width: 36,
                     height: 36,
@@ -2243,6 +2253,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   }),
                 ),
                 IconButton(
+                  tooltip: 'Delete task',
                   icon: Container(
                     width: 36,
                     height: 36,
@@ -2349,13 +2360,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                     const SizedBox(height: 8),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        _buildSnoozeButton('+1 day', 1, task),
+                        Expanded(child: _buildSnoozeButton('+1 day', 1, task)),
                         const SizedBox(width: 8),
-                        _buildSnoozeButton('+3 days', 3, task),
+                        Expanded(child: _buildSnoozeButton('+3 days', 3, task)),
                         const SizedBox(width: 8),
-                        _buildSnoozeButton('+1 week', 7, task),
+                        Expanded(child: _buildSnoozeButton('+1 week', 7, task)),
                       ],
                     ),
                     const SizedBox(height: 24),
@@ -2463,13 +2473,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildSnoozeButton(String label, int days, Task task) {
     return OutlinedButton(
       style: OutlinedButton.styleFrom(
-        foregroundColor: const Color(0xFF3A7D5C),
-        side: const BorderSide(color: Color(0xFF3A7D5C)),
+        foregroundColor: const Color(0xFF2E6B4E),
+        side: const BorderSide(color: Color(0xFF2E6B4E)),
+        minimumSize: const Size(0, 48),
+        padding: const EdgeInsets.symmetric(horizontal: 8),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       onPressed: () => _snooze(task, days),
       child: Text(
         label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        textAlign: TextAlign.center,
         style: GoogleFonts.nunito(fontWeight: FontWeight.w800, fontSize: 13),
       ),
     );

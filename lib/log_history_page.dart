@@ -67,21 +67,24 @@ class _LogHistoryPageState extends State<LogHistoryPage> {
         scrolledUnderElevation: 0,
         leadingWidth: 72,
         leading: Padding(
-          padding: const EdgeInsets.only(left: 16.0, top: 8.0, bottom: 8.0),
+          padding: const EdgeInsets.only(left: 16.0),
           child: Container(
             decoration: BoxDecoration(
               border: Border.all(color: colorScheme.onSurface, width: 2),
             ),
             child: Material(
               color: Colors.transparent,
-              child: InkWell(
-                onTap: () {
-                  Navigator.of(context).pop();
-                },
-                child: Icon(
-                  Icons.arrow_back,
-                  color: colorScheme.onSurface,
-                  size: 24,
+              child: Tooltip(
+                message: 'Back',
+                child: InkWell(
+                  onTap: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Icon(
+                    Icons.arrow_back,
+                    color: colorScheme.onSurface,
+                    size: 24,
+                  ),
                 ),
               ),
             ),

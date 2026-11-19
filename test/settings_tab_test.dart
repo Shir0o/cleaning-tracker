@@ -46,6 +46,29 @@ void main() {
     expect(find.text('Start of Week'), findsNothing);
   });
 
+  testWidgets('Heads-up row stays readable at 320x568 @ 1.6x', (tester) async {
+    tester.view.physicalSize = const Size(320, 568);
+    tester.view.devicePixelRatio = 1;
+    tester.platformDispatcher.textScaleFactorTestValue = 1.6;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+      tester.platformDispatcher.clearTextScaleFactorTestValue();
+    });
+
+    await tester.pumpWidget(_app());
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+
+    // The subtitle must keep the full width of the row instead of being
+    // squeezed into a narrow strip beside the value.
+    final subtitleWidth = tester
+        .getSize(find.text('How early to warn before a task is due'))
+        .width;
+    expect(subtitleWidth, greaterThan(140));
+  });
+
   testWidgets('dashboard Settings tab shows SettingsTab', (tester) async {
     await tester.pumpWidget(const CleaningTrackerApp());
     await tester.pumpAndSettle();
