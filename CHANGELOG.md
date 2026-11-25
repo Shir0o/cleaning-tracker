@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.4](https://github.com/Shir0o/cleaning-tracker/compare/v1.4.3...v1.4.4) (2026-11-25)
+
+
+### Bug Fixes
+
+* **ui:** keep stats ring labels inside inner circle ([#84](https://github.com/Shir0o/cleaning-tracker/issues/84)) ([2ea2ca0](https://github.com/Shir0o/cleaning-tracker/commit/2ea2ca01ac2ffab62f00d8cb0a60f80e0a1d74b0))
+
 ## [1.4.3](https://github.com/Shir0o/cleaning-tracker/compare/v1.4.2...v1.4.3) (2026-11-19)
 
 
