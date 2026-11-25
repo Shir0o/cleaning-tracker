@@ -1440,8 +1440,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: Column(
             children: [
               SizedBox(
-                width: 140,
-                height: 140,
+                width: 160,
+                height: 160,
                 child: CustomPaint(
                   painter: RingGaugePainter(
                     progress: healthPct / 100.0,
@@ -1456,26 +1456,38 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     strokeWidth: 14,
                   ),
                   child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          '$healthPct%',
-                          style: GoogleFonts.nunito(
-                            fontSize: 32,
-                            fontWeight: FontWeight.w900,
-                            color: textColor,
-                          ),
+                    // 96x68 keeps every corner inside the stroke's inner edge:
+                    // sqrt(48^2 + 34^2) = 58.8px < 66px inner radius.
+                    child: SizedBox(
+                      width: 96,
+                      height: 68,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.center,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              '$healthPct%',
+                              style: GoogleFonts.nunito(
+                                fontSize: 32,
+                                fontWeight: FontWeight.w900,
+                                height: 1.05,
+                                color: textColor,
+                              ),
+                            ),
+                            Text(
+                              'Cleanliness',
+                              style: GoogleFonts.nunito(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: mutedText,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          'Cleanliness',
-                          style: GoogleFonts.nunito(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: mutedText,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
@@ -2535,7 +2547,8 @@ class RingGaugePainter extends CustomPainter {
   bool shouldRepaint(covariant RingGaugePainter oldDelegate) {
     return oldDelegate.progress != progress ||
         oldDelegate.progressColor != progressColor ||
-        oldDelegate.trackColor != trackColor;
+        oldDelegate.trackColor != trackColor ||
+        oldDelegate.strokeWidth != strokeWidth;
   }
 }
 

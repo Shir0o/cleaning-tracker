@@ -110,6 +110,60 @@ void main() {
     await expectLater(tester, meetsGuideline(textContrastGuideline));
   }
 
+  /// Asserts that the ring gauge's inner labels stay inside the painted ring
+  /// with at least 4px of radial clearance from the stroke's inner edge.
+  void expectRingLabelsInsideInnerCircle(WidgetTester tester) {
+    final ringFinder = find.byWidgetPredicate(
+      (widget) => widget is CustomPaint && widget.painter is RingGaugePainter,
+    );
+    expect(ringFinder, findsOneWidget);
+
+    final painter =
+        tester.widget<CustomPaint>(ringFinder).painter! as RingGaugePainter;
+    final ringRect = tester.getRect(ringFinder);
+    final center = ringRect.center;
+
+    // The painter centers the stroke on (width - strokeWidth) / 2, so the
+    // stroke's inner edge sits strokeWidth / 2 inside that radius.
+    final strokeRadius = (ringRect.width - painter.strokeWidth) / 2;
+    final innerRadius = strokeRadius - painter.strokeWidth / 2;
+    const minClearance = 4.0;
+
+    final labelFinders = <Finder>[
+      find.descendant(of: ringFinder, matching: find.byType(FittedBox)),
+      find.descendant(of: ringFinder, matching: find.textContaining('%')),
+      find.descendant(of: ringFinder, matching: find.text('Cleanliness')),
+    ];
+
+    for (final finder in labelFinders) {
+      expect(finder, findsWidgets);
+      for (final element in finder.evaluate()) {
+        final box = element.renderObject! as RenderBox;
+        final rect = MatrixUtils.transformRect(
+          box.getTransformTo(null),
+          Offset.zero & box.size,
+        );
+        for (final corner in [
+          rect.topLeft,
+          rect.topRight,
+          rect.bottomLeft,
+          rect.bottomRight,
+        ]) {
+          final distance = (corner - center).distance;
+          expect(
+            distance,
+            lessThanOrEqualTo(innerRadius - minClearance),
+            reason:
+                'Ring label corner $corner is ${distance.toStringAsFixed(1)}px '
+                'from the ring centre; it must stay at least '
+                '${minClearance}px inside the '
+                '${innerRadius.toStringAsFixed(1)}px inner radius.',
+          );
+        }
+      }
+    }
+  }
+
   Future<void> renderVariant(
     WidgetTester tester, {
     required String variantName,
@@ -158,6 +212,20 @@ void main() {
         textScale: 1.6,
         themeMode: ThemeMode.light,
       );
+    });
+  });
+
+  testWidgets('stats_small_large_font (320x568 @ 1.6x)', (
+    WidgetTester tester,
+  ) async {
+    await withSemantics(tester, () async {
+      configureView(tester, size: const Size(320, 568), textScale: 1.6);
+      themeNotifier.value = ThemeMode.light;
+
+      await tester.pumpWidget(const CleaningTrackerApp());
+      await tester.tap(find.byIcon(Icons.bar_chart_outlined));
+      await captureAndAudit(tester, name: 'stats_small_large_font');
+      expectRingLabelsInsideInnerCircle(tester);
     });
   });
 
@@ -220,6 +288,7 @@ void main() {
       // ---------------------------------------------------------------
       await tester.tap(find.byIcon(Icons.bar_chart_outlined));
       await captureAndAudit(tester, name: 'e2e_stats_tab');
+      expectRingLabelsInsideInnerCircle(tester);
 
       // ---------------------------------------------------------------
       // Settings tab
